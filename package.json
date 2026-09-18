@@ -1,0 +1,19 @@
+{
+  "name": "log-analyzer",
+  "version": "0.1.0",
+  "description": "Detects brute force, likely break-ins, off-hours logins and backdoor accounts in Linux SSH auth.log files",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "ssh-log-analyzer": "bin/analyze.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "analyze": "node bin/analyze.js",
+    "test": "node --test",
+    "generate-sample": "node scripts/generate-sample-log.js"
+  }
+}

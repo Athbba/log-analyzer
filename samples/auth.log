@@ -1,0 +1,1316 @@
+Sep  7 00:17:01 web01 CRON[1190]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 00:17:02 web01 CRON[1190]: pam_unix(cron:session): session closed for user root
+Sep  7 00:18:57 web01 sshd[1224]: Connection closed by 198.51.100.63 port 59052 [preauth]
+Sep  7 00:36:17 web01 sshd[1240]: error: kex_exchange_identification: Connection closed by remote host
+Sep  7 00:36:17 web01 sshd[1240]: Connection closed by 198.51.100.102 port 60823
+Sep  7 00:54:48 web01 sshd[1274]: Unable to negotiate with 192.0.2.75 port 55612: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  7 01:17:01 web01 CRON[1281]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 01:17:02 web01 CRON[1281]: pam_unix(cron:session): session closed for user root
+Sep  7 01:42:47 web01 sshd[1320]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.44  user=root
+Sep  7 01:42:49 web01 sshd[1320]: Failed password for root from 203.0.113.44 port 59939 ssh2
+Sep  7 01:42:49 web01 sshd[1320]: Received disconnect from 203.0.113.44 port 59939:11: Bye Bye [preauth]
+Sep  7 01:42:49 web01 sshd[1320]: Disconnected from authenticating user root 203.0.113.44 port 59939 [preauth]
+Sep  7 02:17:01 web01 CRON[1326]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 02:17:02 web01 CRON[1326]: pam_unix(cron:session): session closed for user root
+Sep  7 02:34:11 web01 sshd[1361]: error: kex_exchange_identification: Connection closed by remote host
+Sep  7 02:34:11 web01 sshd[1361]: Connection closed by 198.51.100.140 port 33442
+Sep  7 03:17:01 web01 CRON[1367]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 03:17:01 web01 CRON[1367]: pam_unix(cron:session): session closed for user root
+Sep  7 03:18:52 web01 sshd[1396]: Invalid user user from 198.51.100.28 port 49318
+Sep  7 03:18:52 web01 sshd[1396]: pam_unix(sshd:auth): check pass; user unknown
+Sep  7 03:18:52 web01 sshd[1396]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.28
+Sep  7 03:18:54 web01 sshd[1396]: Failed password for invalid user user from 198.51.100.28 port 49318 ssh2
+Sep  7 03:18:54 web01 sshd[1396]: Received disconnect from 198.51.100.28 port 49318:11: Bye Bye [preauth]
+Sep  7 03:18:54 web01 sshd[1396]: Disconnected from invalid user user 198.51.100.28 port 49318 [preauth]
+Sep  7 04:17:01 web01 CRON[1402]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 04:17:01 web01 CRON[1402]: pam_unix(cron:session): session closed for user root
+Sep  7 04:21:55 web01 sshd[1422]: Invalid user hadoop from 198.51.100.102 port 55917
+Sep  7 04:21:56 web01 sshd[1422]: Connection closed by invalid user hadoop 198.51.100.102 port 55917 [preauth]
+Sep  7 04:53:49 web01 sshd[1462]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.30  user=root
+Sep  7 04:53:51 web01 sshd[1462]: Failed password for root from 198.51.100.30 port 46380 ssh2
+Sep  7 04:53:53 web01 sshd[1462]: Received disconnect from 198.51.100.30 port 46380:11: Bye Bye [preauth]
+Sep  7 04:53:53 web01 sshd[1462]: Disconnected from authenticating user root 198.51.100.30 port 46380 [preauth]
+Sep  7 05:14:48 web01 sshd[1467]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.245  user=root
+Sep  7 05:14:50 web01 sshd[1467]: Failed password for root from 198.51.100.245 port 33744 ssh2
+Sep  7 05:14:51 web01 sshd[1467]: Received disconnect from 198.51.100.245 port 33744:11: Bye Bye [preauth]
+Sep  7 05:14:51 web01 sshd[1467]: Disconnected from authenticating user root 198.51.100.245 port 33744 [preauth]
+Sep  7 05:17:01 web01 CRON[1475]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 05:17:02 web01 CRON[1475]: pam_unix(cron:session): session closed for user root
+Sep  7 05:30:08 web01 sshd[1503]: Accepted publickey for deploy from 10.0.5.10 port 33443 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  7 05:30:08 web01 sshd[1503]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  7 05:30:08 web01 systemd-logind[612]: New session 212 of user deploy.
+Sep  7 05:31:30 web01 sudo:   deploy : TTY=pts/2 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/local/bin/db-backup.sh
+Sep  7 05:31:30 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  7 05:31:49 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  7 05:32:08 web01 sshd[1503]: Received disconnect from 10.0.5.10 port 33443:11: disconnected by user
+Sep  7 05:32:08 web01 sshd[1503]: Disconnected from user deploy 10.0.5.10 port 33443
+Sep  7 05:32:08 web01 sshd[1503]: pam_unix(sshd:session): session closed for user deploy
+Sep  7 05:32:08 web01 systemd-logind[612]: Session 212 logged out. Waiting for processes to exit.
+Sep  7 05:32:08 web01 systemd-logind[612]: Removed session 212.
+Sep  7 06:17:01 web01 CRON[1522]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 06:17:01 web01 CRON[1522]: pam_unix(cron:session): session closed for user root
+Sep  7 06:22:35 web01 sshd[1542]: Unable to negotiate with 198.51.100.140 port 47258: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  7 06:25:01 web01 CRON[1560]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 06:25:02 web01 CRON[1560]: pam_unix(cron:session): session closed for user root
+Sep  7 07:17:01 web01 CRON[1593]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 07:17:01 web01 CRON[1593]: pam_unix(cron:session): session closed for user root
+Sep  7 07:21:49 web01 sshd[1627]: Unable to negotiate with 203.0.113.49 port 51396: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  7 08:17:01 web01 CRON[1645]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 08:17:02 web01 CRON[1645]: pam_unix(cron:session): session closed for user root
+Sep  7 08:29:39 web01 sshd[1681]: Accepted publickey for alice from 10.0.1.23 port 39635 ssh2: ED25519 SHA256:ZxoHLgbtngZEEnlg3ouJTqxeIDc7B4ATB1ejdXOATe2
+Sep  7 08:29:39 web01 sshd[1681]: pam_unix(sshd:session): session opened for user alice(uid=1001) by (uid=0)
+Sep  7 08:29:39 web01 systemd-logind[612]: New session 213 of user alice.
+Sep  7 09:01:43 web01 sshd[1688]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.0.1.57  user=bob
+Sep  7 09:01:44 web01 sshd[1688]: Failed password for bob from 10.0.1.57 port 48067 ssh2
+Sep  7 09:01:50 web01 sshd[1688]: Accepted password for bob from 10.0.1.57 port 48067 ssh2
+Sep  7 09:01:50 web01 sshd[1688]: pam_unix(sshd:session): session opened for user bob(uid=1002) by (uid=0)
+Sep  7 09:01:50 web01 systemd-logind[612]: New session 214 of user bob.
+Sep  7 09:17:01 web01 CRON[1710]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 09:17:02 web01 CRON[1710]: pam_unix(cron:session): session closed for user root
+Sep  7 09:35:02 web01 sshd[1748]: Accepted publickey for dave from 10.0.1.81 port 51097 ssh2: ED25519 SHA256:z1lM9vKv0caUXc2KSQMu7/vcm0FG/uGvdMBgI7N02tN
+Sep  7 09:35:02 web01 sshd[1748]: pam_unix(sshd:session): session opened for user dave(uid=1004) by (uid=0)
+Sep  7 09:35:02 web01 systemd-logind[612]: New session 215 of user dave.
+Sep  7 09:41:12 web01 sshd[1770]: Invalid user user from 203.0.113.152 port 59966
+Sep  7 09:41:13 web01 sshd[1770]: Connection closed by invalid user user 203.0.113.152 port 59966 [preauth]
+Sep  7 09:50:17 web01 sudo:    alice : TTY=pts/2 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/tail -n 200 /var/log/nginx/error.log
+Sep  7 09:50:17 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by alice(uid=1001)
+Sep  7 09:50:21 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  7 10:17:01 web01 CRON[1785]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 10:17:02 web01 CRON[1785]: pam_unix(cron:session): session closed for user root
+Sep  7 10:25:43 web01 sshd[1688]: Received disconnect from 10.0.1.57 port 48067:11: disconnected by user
+Sep  7 10:25:43 web01 sshd[1688]: Disconnected from user bob 10.0.1.57 port 48067
+Sep  7 10:25:43 web01 sshd[1688]: pam_unix(sshd:session): session closed for user bob
+Sep  7 10:25:43 web01 systemd-logind[612]: Session 214 logged out. Waiting for processes to exit.
+Sep  7 10:25:43 web01 systemd-logind[612]: Removed session 214.
+Sep  7 10:37:25 web01 sshd[1808]: Accepted publickey for carol from 10.8.0.14 port 58280 ssh2: RSA SHA256:jSYqOSB8+WrzrIUtzefLoPus+Khu3iROj4TEzpbDQ/h
+Sep  7 10:37:25 web01 sshd[1808]: pam_unix(sshd:session): session opened for user carol(uid=1003) by (uid=0)
+Sep  7 10:37:25 web01 systemd-logind[612]: New session 216 of user carol.
+Sep  7 10:45:08 web01 sshd[1846]: Accepted publickey for deploy from 10.0.5.10 port 51997 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  7 10:45:08 web01 sshd[1846]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  7 10:45:08 web01 systemd-logind[612]: New session 217 of user deploy.
+Sep  7 10:46:42 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  7 10:46:42 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  7 10:46:56 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  7 10:49:08 web01 sshd[1846]: Received disconnect from 10.0.5.10 port 51997:11: disconnected by user
+Sep  7 10:49:08 web01 sshd[1846]: Disconnected from user deploy 10.0.5.10 port 51997
+Sep  7 10:49:08 web01 sshd[1846]: pam_unix(sshd:session): session closed for user deploy
+Sep  7 10:49:08 web01 systemd-logind[612]: Session 217 logged out. Waiting for processes to exit.
+Sep  7 10:49:08 web01 systemd-logind[612]: Removed session 217.
+Sep  7 11:02:34 web01 sshd[1874]: Invalid user steam from 198.51.100.244 port 34403
+Sep  7 11:02:35 web01 sshd[1874]: Connection closed by invalid user steam 198.51.100.244 port 34403 [preauth]
+Sep  7 11:13:00 web01 sshd[1878]: Unable to negotiate with 203.0.113.93 port 46594: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  7 11:17:01 web01 CRON[1882]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 11:17:02 web01 CRON[1882]: pam_unix(cron:session): session closed for user root
+Sep  7 11:26:06 web01 sshd[1892]: Accepted publickey for deploy from 10.0.5.10 port 51140 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  7 11:26:06 web01 sshd[1892]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  7 11:26:06 web01 systemd-logind[612]: New session 218 of user deploy.
+Sep  7 11:26:51 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  7 11:26:51 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  7 11:27:00 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  7 11:28:06 web01 sshd[1892]: Received disconnect from 10.0.5.10 port 51140:11: disconnected by user
+Sep  7 11:28:06 web01 sshd[1892]: Disconnected from user deploy 10.0.5.10 port 51140
+Sep  7 11:28:06 web01 sshd[1892]: pam_unix(sshd:session): session closed for user deploy
+Sep  7 11:28:06 web01 systemd-logind[612]: Session 218 logged out. Waiting for processes to exit.
+Sep  7 11:28:06 web01 systemd-logind[612]: Removed session 218.
+Sep  7 11:34:39 web01 sshd[1681]: Received disconnect from 10.0.1.23 port 39635:11: disconnected by user
+Sep  7 11:34:39 web01 sshd[1681]: Disconnected from user alice 10.0.1.23 port 39635
+Sep  7 11:34:39 web01 sshd[1681]: pam_unix(sshd:session): session closed for user alice
+Sep  7 11:34:39 web01 systemd-logind[612]: Session 213 logged out. Waiting for processes to exit.
+Sep  7 11:34:39 web01 systemd-logind[612]: Removed session 213.
+Sep  7 11:55:40 web01 sudo:     dave : TTY=pts/1 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/du -sh /var/lib/postgresql
+Sep  7 11:55:40 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep  7 11:55:48 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  7 11:55:57 web01 sshd[1900]: Accepted publickey for deploy from 10.0.5.10 port 36793 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  7 11:55:57 web01 sshd[1900]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  7 11:55:57 web01 systemd-logind[612]: New session 219 of user deploy.
+Sep  7 11:56:36 web01 sudo:   deploy : TTY=pts/3 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  7 11:56:36 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  7 11:56:39 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  7 11:57:57 web01 sshd[1900]: Received disconnect from 10.0.5.10 port 36793:11: disconnected by user
+Sep  7 11:57:57 web01 sshd[1900]: Disconnected from user deploy 10.0.5.10 port 36793
+Sep  7 11:57:57 web01 sshd[1900]: pam_unix(sshd:session): session closed for user deploy
+Sep  7 11:57:57 web01 systemd-logind[612]: Session 219 logged out. Waiting for processes to exit.
+Sep  7 11:57:57 web01 systemd-logind[612]: Removed session 219.
+Sep  7 12:17:01 web01 CRON[1913]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 12:17:01 web01 CRON[1913]: pam_unix(cron:session): session closed for user root
+Sep  7 12:17:25 web01 sshd[1808]: Received disconnect from 10.8.0.14 port 58280:11: disconnected by user
+Sep  7 12:17:25 web01 sshd[1808]: Disconnected from user carol 10.8.0.14 port 58280
+Sep  7 12:17:25 web01 sshd[1808]: pam_unix(sshd:session): session closed for user carol
+Sep  7 12:17:25 web01 systemd-logind[612]: Session 216 logged out. Waiting for processes to exit.
+Sep  7 12:17:25 web01 systemd-logind[612]: Removed session 216.
+Sep  7 12:34:03 web01 sshd[1954]: Accepted publickey for deploy from 10.0.5.10 port 39821 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  7 12:34:03 web01 sshd[1954]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  7 12:34:03 web01 systemd-logind[612]: New session 220 of user deploy.
+Sep  7 12:35:10 web01 sudo:   deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  7 12:35:10 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  7 12:35:25 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  7 12:36:03 web01 sshd[1954]: Received disconnect from 10.0.5.10 port 39821:11: disconnected by user
+Sep  7 12:36:03 web01 sshd[1954]: Disconnected from user deploy 10.0.5.10 port 39821
+Sep  7 12:36:03 web01 sshd[1954]: pam_unix(sshd:session): session closed for user deploy
+Sep  7 12:36:03 web01 systemd-logind[612]: Session 220 logged out. Waiting for processes to exit.
+Sep  7 12:36:03 web01 systemd-logind[612]: Removed session 220.
+Sep  7 12:58:22 web01 sshd[1995]: Accepted publickey for deploy from 10.0.5.10 port 59767 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  7 12:58:22 web01 sshd[1995]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  7 12:58:22 web01 systemd-logind[612]: New session 221 of user deploy.
+Sep  7 12:58:58 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  7 12:58:58 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  7 12:58:59 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  7 13:01:22 web01 sshd[1995]: Received disconnect from 10.0.5.10 port 59767:11: disconnected by user
+Sep  7 13:01:22 web01 sshd[1995]: Disconnected from user deploy 10.0.5.10 port 59767
+Sep  7 13:01:22 web01 sshd[1995]: pam_unix(sshd:session): session closed for user deploy
+Sep  7 13:01:22 web01 systemd-logind[612]: Session 221 logged out. Waiting for processes to exit.
+Sep  7 13:01:22 web01 systemd-logind[612]: Removed session 221.
+Sep  7 13:17:01 web01 CRON[2032]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 13:17:01 web01 CRON[2032]: pam_unix(cron:session): session closed for user root
+Sep  7 13:19:27 web01 sshd[2046]: Unable to negotiate with 192.0.2.190 port 53980: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  7 13:26:25 web01 sshd[2085]: Accepted publickey for alice from 10.0.1.23 port 45459 ssh2: ED25519 SHA256:ZxoHLgbtngZEEnlg3ouJTqxeIDc7B4ATB1ejdXOATe2
+Sep  7 13:26:25 web01 sshd[2085]: pam_unix(sshd:session): session opened for user alice(uid=1001) by (uid=0)
+Sep  7 13:26:25 web01 systemd-logind[612]: New session 222 of user alice.
+Sep  7 13:39:02 web01 sshd[1748]: Received disconnect from 10.0.1.81 port 51097:11: disconnected by user
+Sep  7 13:39:02 web01 sshd[1748]: Disconnected from user dave 10.0.1.81 port 51097
+Sep  7 13:39:02 web01 sshd[1748]: pam_unix(sshd:session): session closed for user dave
+Sep  7 13:39:02 web01 systemd-logind[612]: Session 215 logged out. Waiting for processes to exit.
+Sep  7 13:39:02 web01 systemd-logind[612]: Removed session 215.
+Sep  7 13:41:53 web01 sshd[2105]: error: kex_exchange_identification: Connection closed by remote host
+Sep  7 13:41:53 web01 sshd[2105]: Connection closed by 203.0.113.92 port 39434
+Sep  7 14:17:01 web01 CRON[2134]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 14:17:02 web01 CRON[2134]: pam_unix(cron:session): session closed for user root
+Sep  7 14:18:57 web01 sshd[2168]: Invalid user ubuntu from 198.51.100.79 port 55941
+Sep  7 14:18:57 web01 sshd[2168]: pam_unix(sshd:auth): check pass; user unknown
+Sep  7 14:18:57 web01 sshd[2168]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.79
+Sep  7 14:18:59 web01 sshd[2168]: Failed password for invalid user ubuntu from 198.51.100.79 port 55941 ssh2
+Sep  7 14:19:00 web01 sshd[2168]: Received disconnect from 198.51.100.79 port 55941:11: Bye Bye [preauth]
+Sep  7 14:19:00 web01 sshd[2168]: Disconnected from invalid user ubuntu 198.51.100.79 port 55941 [preauth]
+Sep  7 15:06:18 web01 sshd[2173]: Invalid user nagios from 198.51.100.63 port 58525
+Sep  7 15:06:18 web01 sshd[2173]: pam_unix(sshd:auth): check pass; user unknown
+Sep  7 15:06:18 web01 sshd[2173]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.63
+Sep  7 15:06:20 web01 sshd[2173]: Failed password for invalid user nagios from 198.51.100.63 port 58525 ssh2
+Sep  7 15:06:20 web01 sshd[2173]: Received disconnect from 198.51.100.63 port 58525:11: Bye Bye [preauth]
+Sep  7 15:06:20 web01 sshd[2173]: Disconnected from invalid user nagios 198.51.100.63 port 58525 [preauth]
+Sep  7 15:17:01 web01 CRON[2186]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 15:17:01 web01 CRON[2186]: pam_unix(cron:session): session closed for user root
+Sep  7 15:20:43 web01 sshd[2208]: Invalid user jenkins from 198.51.100.38 port 35971
+Sep  7 15:20:43 web01 sshd[2208]: pam_unix(sshd:auth): check pass; user unknown
+Sep  7 15:20:43 web01 sshd[2208]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.38
+Sep  7 15:20:46 web01 sshd[2208]: Failed password for invalid user jenkins from 198.51.100.38 port 35971 ssh2
+Sep  7 15:20:47 web01 sshd[2208]: Received disconnect from 198.51.100.38 port 35971:11: Bye Bye [preauth]
+Sep  7 15:20:47 web01 sshd[2208]: Disconnected from invalid user jenkins 198.51.100.38 port 35971 [preauth]
+Sep  7 15:24:19 web01 sshd[2239]: Connection closed by 203.0.113.213 port 38614 [preauth]
+Sep  7 15:31:12 web01 sshd[2272]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.79  user=root
+Sep  7 15:31:14 web01 sshd[2272]: Failed password for root from 198.51.100.79 port 44766 ssh2
+Sep  7 15:31:14 web01 sshd[2272]: Received disconnect from 198.51.100.79 port 44766:11: Bye Bye [preauth]
+Sep  7 15:31:14 web01 sshd[2272]: Disconnected from authenticating user root 198.51.100.79 port 44766 [preauth]
+Sep  7 15:38:42 web01 sshd[2281]: error: kex_exchange_identification: Connection closed by remote host
+Sep  7 15:38:42 web01 sshd[2281]: Connection closed by 198.51.100.244 port 46800
+Sep  7 16:17:01 web01 CRON[2299]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 16:17:01 web01 CRON[2299]: pam_unix(cron:session): session closed for user root
+Sep  7 16:17:12 web01 sshd[2317]: Unable to negotiate with 192.0.2.4 port 50221: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  7 16:33:01 web01 sshd[2351]: Invalid user hadoop from 198.51.100.245 port 60641
+Sep  7 16:33:01 web01 sshd[2351]: pam_unix(sshd:auth): check pass; user unknown
+Sep  7 16:33:01 web01 sshd[2351]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.245
+Sep  7 16:33:03 web01 sshd[2351]: Failed password for invalid user hadoop from 198.51.100.245 port 60641 ssh2
+Sep  7 16:33:03 web01 sshd[2351]: Received disconnect from 198.51.100.245 port 60641:11: Bye Bye [preauth]
+Sep  7 16:33:03 web01 sshd[2351]: Disconnected from invalid user hadoop 198.51.100.245 port 60641 [preauth]
+Sep  7 16:51:25 web01 sshd[2085]: Received disconnect from 10.0.1.23 port 45459:11: disconnected by user
+Sep  7 16:51:25 web01 sshd[2085]: Disconnected from user alice 10.0.1.23 port 45459
+Sep  7 16:51:25 web01 sshd[2085]: pam_unix(sshd:session): session closed for user alice
+Sep  7 16:51:25 web01 systemd-logind[612]: Session 222 logged out. Waiting for processes to exit.
+Sep  7 16:51:25 web01 systemd-logind[612]: Removed session 222.
+Sep  7 17:17:01 web01 CRON[2361]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 17:17:01 web01 CRON[2361]: pam_unix(cron:session): session closed for user root
+Sep  7 17:53:57 web01 sshd[2393]: Invalid user steam from 192.0.2.4 port 38231
+Sep  7 17:53:57 web01 sshd[2393]: pam_unix(sshd:auth): check pass; user unknown
+Sep  7 17:53:57 web01 sshd[2393]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.4
+Sep  7 17:53:59 web01 sshd[2393]: Failed password for invalid user steam from 192.0.2.4 port 38231 ssh2
+Sep  7 17:53:59 web01 sshd[2393]: Received disconnect from 192.0.2.4 port 38231:11: Bye Bye [preauth]
+Sep  7 17:53:59 web01 sshd[2393]: Disconnected from invalid user steam 192.0.2.4 port 38231 [preauth]
+Sep  7 18:17:01 web01 CRON[2415]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 18:17:02 web01 CRON[2415]: pam_unix(cron:session): session closed for user root
+Sep  7 18:21:46 web01 sshd[2444]: Invalid user dev from 198.51.100.244 port 49088
+Sep  7 18:21:47 web01 sshd[2444]: Connection closed by invalid user dev 198.51.100.244 port 49088 [preauth]
+Sep  7 19:17:01 web01 CRON[2463]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 19:17:02 web01 CRON[2463]: pam_unix(cron:session): session closed for user root
+Sep  7 20:09:20 web01 sshd[2480]: Invalid user pi from 198.51.100.60 port 39541
+Sep  7 20:09:20 web01 sshd[2480]: pam_unix(sshd:auth): check pass; user unknown
+Sep  7 20:09:20 web01 sshd[2480]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.60
+Sep  7 20:09:23 web01 sshd[2480]: Failed password for invalid user pi from 198.51.100.60 port 39541 ssh2
+Sep  7 20:09:23 web01 sshd[2480]: Received disconnect from 198.51.100.60 port 39541:11: Bye Bye [preauth]
+Sep  7 20:09:23 web01 sshd[2480]: Disconnected from invalid user pi 198.51.100.60 port 39541 [preauth]
+Sep  7 20:17:01 web01 CRON[2489]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 20:17:02 web01 CRON[2489]: pam_unix(cron:session): session closed for user root
+Sep  7 20:19:52 web01 sshd[2511]: Accepted publickey for carol from 10.8.0.14 port 56388 ssh2: RSA SHA256:jSYqOSB8+WrzrIUtzefLoPus+Khu3iROj4TEzpbDQ/h
+Sep  7 20:19:52 web01 sshd[2511]: pam_unix(sshd:session): session opened for user carol(uid=1003) by (uid=0)
+Sep  7 20:19:52 web01 systemd-logind[612]: New session 223 of user carol.
+Sep  7 21:09:12 web01 sshd[2548]: error: kex_exchange_identification: Connection closed by remote host
+Sep  7 21:09:12 web01 sshd[2548]: Connection closed by 198.51.100.80 port 47509
+Sep  7 21:17:01 web01 CRON[2567]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 21:17:02 web01 CRON[2567]: pam_unix(cron:session): session closed for user root
+Sep  7 21:21:52 web01 sshd[2511]: Received disconnect from 10.8.0.14 port 56388:11: disconnected by user
+Sep  7 21:21:52 web01 sshd[2511]: Disconnected from user carol 10.8.0.14 port 56388
+Sep  7 21:21:52 web01 sshd[2511]: pam_unix(sshd:session): session closed for user carol
+Sep  7 21:21:52 web01 systemd-logind[612]: Session 223 logged out. Waiting for processes to exit.
+Sep  7 21:21:52 web01 systemd-logind[612]: Removed session 223.
+Sep  7 21:37:13 web01 sshd[2605]: Connection closed by 192.0.2.190 port 46649 [preauth]
+Sep  7 22:17:01 web01 CRON[2642]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 22:17:02 web01 CRON[2642]: pam_unix(cron:session): session closed for user root
+Sep  7 22:57:57 web01 sshd[2660]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.116  user=root
+Sep  7 22:58:00 web01 sshd[2660]: Failed password for root from 192.0.2.116 port 43421 ssh2
+Sep  7 22:58:01 web01 sshd[2660]: Received disconnect from 192.0.2.116 port 43421:11: Bye Bye [preauth]
+Sep  7 22:58:01 web01 sshd[2660]: Disconnected from authenticating user root 192.0.2.116 port 43421 [preauth]
+Sep  7 23:17:01 web01 CRON[2693]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  7 23:17:02 web01 CRON[2693]: pam_unix(cron:session): session closed for user root
+Sep  8 00:17:01 web01 CRON[2726]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 00:17:01 web01 CRON[2726]: pam_unix(cron:session): session closed for user root
+Sep  8 00:33:49 web01 sshd[2751]: Invalid user oracle from 192.0.2.166 port 49909
+Sep  8 00:33:50 web01 sshd[2751]: Connection closed by invalid user oracle 192.0.2.166 port 49909 [preauth]
+Sep  8 00:36:18 web01 sshd[2781]: Invalid user hadoop from 203.0.113.92 port 49939
+Sep  8 00:36:18 web01 sshd[2781]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 00:36:18 web01 sshd[2781]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.92
+Sep  8 00:36:20 web01 sshd[2781]: Failed password for invalid user hadoop from 203.0.113.92 port 49939 ssh2
+Sep  8 00:36:20 web01 sshd[2781]: Received disconnect from 203.0.113.92 port 49939:11: Bye Bye [preauth]
+Sep  8 00:36:20 web01 sshd[2781]: Disconnected from invalid user hadoop 203.0.113.92 port 49939 [preauth]
+Sep  8 01:17:01 web01 CRON[2788]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 01:17:02 web01 CRON[2788]: pam_unix(cron:session): session closed for user root
+Sep  8 02:14:07 web01 sshd[2829]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45  user=root
+Sep  8 02:14:10 web01 sshd[2829]: Failed password for root from 203.0.113.45 port 38588 ssh2
+Sep  8 02:14:14 web01 sshd[2829]: message repeated 2 times: [ Failed password for root from 203.0.113.45 port 38588 ssh2]
+Sep  8 02:14:15 web01 sshd[2829]: Received disconnect from 203.0.113.45 port 38588:11: Bye Bye [preauth]
+Sep  8 02:14:15 web01 sshd[2829]: Disconnected from authenticating user root 203.0.113.45 port 38588 [preauth]
+Sep  8 02:14:15 web01 sshd[2829]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45  user=root
+Sep  8 02:14:18 web01 sshd[2844]: Invalid user admin from 203.0.113.45 port 37257
+Sep  8 02:14:18 web01 sshd[2844]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:14:18 web01 sshd[2844]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:14:21 web01 sshd[2844]: Failed password for invalid user admin from 203.0.113.45 port 37257 ssh2
+Sep  8 02:14:23 web01 sshd[2844]: Received disconnect from 203.0.113.45 port 37257:11: Bye Bye [preauth]
+Sep  8 02:14:23 web01 sshd[2844]: Disconnected from invalid user admin 203.0.113.45 port 37257 [preauth]
+Sep  8 02:14:27 web01 sshd[2883]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45  user=root
+Sep  8 02:14:30 web01 sshd[2883]: Failed password for root from 203.0.113.45 port 55931 ssh2
+Sep  8 02:14:40 web01 sshd[2883]: message repeated 5 times: [ Failed password for root from 203.0.113.45 port 55931 ssh2]
+Sep  8 02:14:42 web01 sshd[2883]: error: maximum authentication attempts exceeded for root from 203.0.113.45 port 55931 ssh2 [preauth]
+Sep  8 02:14:42 web01 sshd[2883]: Disconnecting authenticating user root 203.0.113.45 port 55931: Too many authentication failures [preauth]
+Sep  8 02:14:42 web01 sshd[2883]: PAM 5 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45  user=root
+Sep  8 02:14:48 web01 sshd[2902]: Invalid user test from 203.0.113.45 port 44196
+Sep  8 02:14:48 web01 sshd[2902]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:14:48 web01 sshd[2902]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:14:51 web01 sshd[2902]: Failed password for invalid user test from 203.0.113.45 port 44196 ssh2
+Sep  8 02:14:51 web01 sshd[2902]: Received disconnect from 203.0.113.45 port 44196:11: Bye Bye [preauth]
+Sep  8 02:14:51 web01 sshd[2902]: Disconnected from invalid user test 203.0.113.45 port 44196 [preauth]
+Sep  8 02:14:52 web01 sshd[2932]: Invalid user ubuntu from 203.0.113.45 port 59655
+Sep  8 02:14:52 web01 sshd[2932]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:14:52 web01 sshd[2932]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:14:55 web01 sshd[2932]: Failed password for invalid user ubuntu from 203.0.113.45 port 59655 ssh2
+Sep  8 02:14:57 web01 sshd[2932]: Received disconnect from 203.0.113.45 port 59655:11: Bye Bye [preauth]
+Sep  8 02:14:57 web01 sshd[2932]: Disconnected from invalid user ubuntu 203.0.113.45 port 59655 [preauth]
+Sep  8 02:14:58 web01 sshd[2966]: Invalid user oracle from 203.0.113.45 port 36228
+Sep  8 02:14:58 web01 sshd[2966]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:14:58 web01 sshd[2966]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:15:01 web01 sshd[2966]: Failed password for invalid user oracle from 203.0.113.45 port 36228 ssh2
+Sep  8 02:15:01 web01 sshd[2966]: Received disconnect from 203.0.113.45 port 36228:11: Bye Bye [preauth]
+Sep  8 02:15:01 web01 sshd[2966]: Disconnected from invalid user oracle 203.0.113.45 port 36228 [preauth]
+Sep  8 02:15:02 web01 sshd[2972]: Invalid user postgres from 203.0.113.45 port 60218
+Sep  8 02:15:02 web01 sshd[2972]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:15:02 web01 sshd[2972]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:15:05 web01 sshd[2972]: Failed password for invalid user postgres from 203.0.113.45 port 60218 ssh2
+Sep  8 02:15:06 web01 sshd[2972]: Received disconnect from 203.0.113.45 port 60218:11: Bye Bye [preauth]
+Sep  8 02:15:06 web01 sshd[2972]: Disconnected from invalid user postgres 203.0.113.45 port 60218 [preauth]
+Sep  8 02:15:09 web01 sshd[3003]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45  user=root
+Sep  8 02:15:11 web01 sshd[3003]: Failed password for root from 203.0.113.45 port 39577 ssh2
+Sep  8 02:15:17 web01 sshd[3003]: message repeated 2 times: [ Failed password for root from 203.0.113.45 port 39577 ssh2]
+Sep  8 02:15:19 web01 sshd[3003]: Received disconnect from 203.0.113.45 port 39577:11: Bye Bye [preauth]
+Sep  8 02:15:19 web01 sshd[3003]: Disconnected from authenticating user root 203.0.113.45 port 39577 [preauth]
+Sep  8 02:15:19 web01 sshd[3003]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45  user=root
+Sep  8 02:15:21 web01 sshd[3038]: Invalid user user from 203.0.113.45 port 36660
+Sep  8 02:15:21 web01 sshd[3038]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:15:21 web01 sshd[3038]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:15:24 web01 sshd[3038]: Failed password for invalid user user from 203.0.113.45 port 36660 ssh2
+Sep  8 02:15:26 web01 sshd[3038]: Received disconnect from 203.0.113.45 port 36660:11: Bye Bye [preauth]
+Sep  8 02:15:26 web01 sshd[3038]: Disconnected from invalid user user 203.0.113.45 port 36660 [preauth]
+Sep  8 02:15:31 web01 sshd[3045]: Invalid user git from 203.0.113.45 port 60244
+Sep  8 02:15:31 web01 sshd[3045]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:15:31 web01 sshd[3045]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:15:34 web01 sshd[3045]: Failed password for invalid user git from 203.0.113.45 port 60244 ssh2
+Sep  8 02:15:35 web01 sshd[3045]: Received disconnect from 203.0.113.45 port 60244:11: Bye Bye [preauth]
+Sep  8 02:15:35 web01 sshd[3045]: Disconnected from invalid user git 203.0.113.45 port 60244 [preauth]
+Sep  8 02:15:36 web01 sshd[3054]: Invalid user ftpuser from 203.0.113.45 port 49364
+Sep  8 02:15:36 web01 sshd[3054]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:15:36 web01 sshd[3054]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:15:38 web01 sshd[3054]: Failed password for invalid user ftpuser from 203.0.113.45 port 49364 ssh2
+Sep  8 02:15:39 web01 sshd[3054]: Received disconnect from 203.0.113.45 port 49364:11: Bye Bye [preauth]
+Sep  8 02:15:39 web01 sshd[3054]: Disconnected from invalid user ftpuser 203.0.113.45 port 49364 [preauth]
+Sep  8 02:15:44 web01 sshd[3075]: Invalid user pi from 203.0.113.45 port 33903
+Sep  8 02:15:44 web01 sshd[3075]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:15:44 web01 sshd[3075]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:15:47 web01 sshd[3075]: Failed password for invalid user pi from 203.0.113.45 port 33903 ssh2
+Sep  8 02:15:48 web01 sshd[3075]: Received disconnect from 203.0.113.45 port 33903:11: Bye Bye [preauth]
+Sep  8 02:15:48 web01 sshd[3075]: Disconnected from invalid user pi 203.0.113.45 port 33903 [preauth]
+Sep  8 02:15:54 web01 sshd[3104]: Invalid user guest from 203.0.113.45 port 55144
+Sep  8 02:15:54 web01 sshd[3104]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:15:54 web01 sshd[3104]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:15:57 web01 sshd[3104]: Failed password for invalid user guest from 203.0.113.45 port 55144 ssh2
+Sep  8 02:15:57 web01 sshd[3104]: Received disconnect from 203.0.113.45 port 55144:11: Bye Bye [preauth]
+Sep  8 02:15:57 web01 sshd[3104]: Disconnected from invalid user guest 203.0.113.45 port 55144 [preauth]
+Sep  8 02:15:59 web01 sshd[3114]: Invalid user admin from 203.0.113.45 port 46828
+Sep  8 02:15:59 web01 sshd[3114]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:15:59 web01 sshd[3114]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:16:01 web01 sshd[3114]: Failed password for invalid user admin from 203.0.113.45 port 46828 ssh2
+Sep  8 02:16:07 web01 sshd[3114]: message repeated 2 times: [ Failed password for invalid user admin from 203.0.113.45 port 46828 ssh2]
+Sep  8 02:16:08 web01 sshd[3114]: Received disconnect from 203.0.113.45 port 46828:11: Bye Bye [preauth]
+Sep  8 02:16:08 web01 sshd[3114]: Disconnected from invalid user admin 203.0.113.45 port 46828 [preauth]
+Sep  8 02:16:08 web01 sshd[3114]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:16:13 web01 sshd[3155]: Invalid user support from 203.0.113.45 port 47746
+Sep  8 02:16:13 web01 sshd[3155]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:16:13 web01 sshd[3155]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:16:16 web01 sshd[3155]: Failed password for invalid user support from 203.0.113.45 port 47746 ssh2
+Sep  8 02:16:18 web01 sshd[3155]: Received disconnect from 203.0.113.45 port 47746:11: Bye Bye [preauth]
+Sep  8 02:16:18 web01 sshd[3155]: Disconnected from invalid user support 203.0.113.45 port 47746 [preauth]
+Sep  8 02:16:24 web01 sshd[3172]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45  user=root
+Sep  8 02:16:27 web01 sshd[3172]: Failed password for root from 203.0.113.45 port 37462 ssh2
+Sep  8 02:16:42 web01 sshd[3172]: message repeated 5 times: [ Failed password for root from 203.0.113.45 port 37462 ssh2]
+Sep  8 02:16:43 web01 sshd[3172]: error: maximum authentication attempts exceeded for root from 203.0.113.45 port 37462 ssh2 [preauth]
+Sep  8 02:16:43 web01 sshd[3172]: Disconnecting authenticating user root 203.0.113.45 port 37462: Too many authentication failures [preauth]
+Sep  8 02:16:43 web01 sshd[3172]: PAM 5 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45  user=root
+Sep  8 02:16:45 web01 sshd[3196]: Invalid user hadoop from 203.0.113.45 port 47453
+Sep  8 02:16:45 web01 sshd[3196]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:16:45 web01 sshd[3196]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:16:48 web01 sshd[3196]: Failed password for invalid user hadoop from 203.0.113.45 port 47453 ssh2
+Sep  8 02:16:48 web01 sshd[3196]: Received disconnect from 203.0.113.45 port 47453:11: Bye Bye [preauth]
+Sep  8 02:16:48 web01 sshd[3196]: Disconnected from invalid user hadoop 203.0.113.45 port 47453 [preauth]
+Sep  8 02:16:52 web01 sshd[3223]: Invalid user jenkins from 203.0.113.45 port 42933
+Sep  8 02:16:52 web01 sshd[3223]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:16:52 web01 sshd[3223]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:16:55 web01 sshd[3223]: Failed password for invalid user jenkins from 203.0.113.45 port 42933 ssh2
+Sep  8 02:16:55 web01 sshd[3223]: Received disconnect from 203.0.113.45 port 42933:11: Bye Bye [preauth]
+Sep  8 02:16:55 web01 sshd[3223]: Disconnected from invalid user jenkins 203.0.113.45 port 42933 [preauth]
+Sep  8 02:16:56 web01 sshd[3254]: Invalid user test1 from 203.0.113.45 port 43546
+Sep  8 02:16:56 web01 sshd[3254]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:16:56 web01 sshd[3254]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:16:59 web01 sshd[3254]: Failed password for invalid user test1 from 203.0.113.45 port 43546 ssh2
+Sep  8 02:17:00 web01 sshd[3254]: Received disconnect from 203.0.113.45 port 43546:11: Bye Bye [preauth]
+Sep  8 02:17:00 web01 sshd[3254]: Disconnected from invalid user test1 203.0.113.45 port 43546 [preauth]
+Sep  8 02:17:01 web01 CRON[3280]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 02:17:02 web01 CRON[3280]: pam_unix(cron:session): session closed for user root
+Sep  8 02:17:06 web01 sshd[3288]: Invalid user administrator from 203.0.113.45 port 44807
+Sep  8 02:17:06 web01 sshd[3288]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 02:17:06 web01 sshd[3288]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.45
+Sep  8 02:17:08 web01 sshd[3288]: Failed password for invalid user administrator from 203.0.113.45 port 44807 ssh2
+Sep  8 02:17:09 web01 sshd[3288]: Received disconnect from 203.0.113.45 port 44807:11: Bye Bye [preauth]
+Sep  8 02:17:09 web01 sshd[3288]: Disconnected from invalid user administrator 203.0.113.45 port 44807 [preauth]
+Sep  8 02:28:48 web01 sshd[3315]: error: kex_exchange_identification: Connection closed by remote host
+Sep  8 02:28:48 web01 sshd[3315]: Connection closed by 192.0.2.103 port 48524
+Sep  8 02:50:19 web01 sshd[3326]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.74  user=root
+Sep  8 02:50:21 web01 sshd[3326]: Failed password for root from 198.51.100.74 port 56771 ssh2
+Sep  8 02:50:23 web01 sshd[3326]: Received disconnect from 198.51.100.74 port 56771:11: Bye Bye [preauth]
+Sep  8 02:50:23 web01 sshd[3326]: Disconnected from authenticating user root 198.51.100.74 port 56771 [preauth]
+Sep  8 03:08:43 web01 sshd[3356]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.178  user=root
+Sep  8 03:08:46 web01 sshd[3356]: Failed password for root from 192.0.2.178 port 41895 ssh2
+Sep  8 03:08:46 web01 sshd[3356]: Received disconnect from 192.0.2.178 port 41895:11: Bye Bye [preauth]
+Sep  8 03:08:46 web01 sshd[3356]: Disconnected from authenticating user root 192.0.2.178 port 41895 [preauth]
+Sep  8 03:17:01 web01 CRON[3394]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 03:17:02 web01 CRON[3394]: pam_unix(cron:session): session closed for user root
+Sep  8 04:17:01 web01 CRON[3432]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 04:17:02 web01 CRON[3432]: pam_unix(cron:session): session closed for user root
+Sep  8 04:51:06 web01 sshd[3439]: Unable to negotiate with 192.0.2.181 port 39435: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 05:17:01 web01 CRON[3450]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 05:17:02 web01 CRON[3450]: pam_unix(cron:session): session closed for user root
+Sep  8 05:23:07 web01 sshd[3491]: Connection closed by 192.0.2.181 port 43415 [preauth]
+Sep  8 05:30:06 web01 sshd[3515]: Accepted publickey for deploy from 10.0.5.10 port 54412 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  8 05:30:06 web01 sshd[3515]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  8 05:30:06 web01 systemd-logind[612]: New session 224 of user deploy.
+Sep  8 05:31:01 web01 sudo:   deploy : TTY=pts/3 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/local/bin/db-backup.sh
+Sep  8 05:31:01 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  8 05:31:13 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  8 05:32:06 web01 sshd[3515]: Received disconnect from 10.0.5.10 port 54412:11: disconnected by user
+Sep  8 05:32:06 web01 sshd[3515]: Disconnected from user deploy 10.0.5.10 port 54412
+Sep  8 05:32:06 web01 sshd[3515]: pam_unix(sshd:session): session closed for user deploy
+Sep  8 05:32:06 web01 systemd-logind[612]: Session 224 logged out. Waiting for processes to exit.
+Sep  8 05:32:06 web01 systemd-logind[612]: Removed session 224.
+Sep  8 05:39:41 web01 sshd[3542]: Unable to negotiate with 198.51.100.26 port 58934: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 06:17:01 web01 CRON[3563]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 06:17:01 web01 CRON[3563]: pam_unix(cron:session): session closed for user root
+Sep  8 06:21:16 web01 sshd[3585]: Unable to negotiate with 198.51.100.79 port 50474: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 06:25:01 web01 CRON[3601]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 06:25:02 web01 CRON[3601]: pam_unix(cron:session): session closed for user root
+Sep  8 06:46:17 web01 sshd[3607]: error: kex_exchange_identification: Connection closed by remote host
+Sep  8 06:46:17 web01 sshd[3607]: Connection closed by 192.0.2.250 port 41984
+Sep  8 07:17:01 web01 CRON[3645]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 07:17:01 web01 CRON[3645]: pam_unix(cron:session): session closed for user root
+Sep  8 08:12:04 web01 sshd[3661]: Unable to negotiate with 198.51.100.30 port 53798: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 08:17:01 web01 CRON[3676]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 08:17:02 web01 CRON[3676]: pam_unix(cron:session): session closed for user root
+Sep  8 08:25:31 web01 sshd[3693]: Connection closed by 203.0.113.36 port 56949 [preauth]
+Sep  8 08:46:54 web01 sshd[3716]: Accepted publickey for alice from 10.0.1.23 port 37846 ssh2: ED25519 SHA256:ZxoHLgbtngZEEnlg3ouJTqxeIDc7B4ATB1ejdXOATe2
+Sep  8 08:46:54 web01 sshd[3716]: pam_unix(sshd:session): session opened for user alice(uid=1001) by (uid=0)
+Sep  8 08:46:54 web01 systemd-logind[612]: New session 225 of user alice.
+Sep  8 08:51:54 web01 sshd[3743]: Unable to negotiate with 203.0.113.49 port 59737: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 09:10:15 web01 sshd[3772]: Accepted publickey for dave from 10.0.1.81 port 37225 ssh2: ED25519 SHA256:z1lM9vKv0caUXc2KSQMu7/vcm0FG/uGvdMBgI7N02tN
+Sep  8 09:10:15 web01 sshd[3772]: pam_unix(sshd:session): session opened for user dave(uid=1004) by (uid=0)
+Sep  8 09:10:15 web01 systemd-logind[612]: New session 226 of user dave.
+Sep  8 09:10:36 web01 sshd[3785]: Invalid user user from 198.51.100.244 port 50469
+Sep  8 09:10:37 web01 sshd[3785]: Connection closed by invalid user user 198.51.100.244 port 50469 [preauth]
+Sep  8 09:17:01 web01 CRON[3793]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 09:17:02 web01 CRON[3793]: pam_unix(cron:session): session closed for user root
+Sep  8 09:23:29 web01 sudo:     dave : TTY=pts/1 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/du -sh /var/lib/postgresql
+Sep  8 09:23:29 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep  8 09:23:45 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  8 09:24:30 web01 sshd[3806]: Accepted password for bob from 10.0.1.57 port 43687 ssh2
+Sep  8 09:24:30 web01 sshd[3806]: pam_unix(sshd:session): session opened for user bob(uid=1002) by (uid=0)
+Sep  8 09:24:30 web01 systemd-logind[612]: New session 227 of user bob.
+Sep  8 09:39:00 web01 sshd[3825]: error: kex_exchange_identification: Connection closed by remote host
+Sep  8 09:39:00 web01 sshd[3825]: Connection closed by 203.0.113.23 port 46882
+Sep  8 10:17:01 web01 CRON[3857]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 10:17:02 web01 CRON[3857]: pam_unix(cron:session): session closed for user root
+Sep  8 10:23:38 web01 sshd[3878]: Unable to negotiate with 203.0.113.4 port 52263: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 10:39:37 web01 sshd[3890]: Accepted publickey for carol from 10.8.0.14 port 54508 ssh2: RSA SHA256:jSYqOSB8+WrzrIUtzefLoPus+Khu3iROj4TEzpbDQ/h
+Sep  8 10:39:37 web01 sshd[3890]: pam_unix(sshd:session): session opened for user carol(uid=1003) by (uid=0)
+Sep  8 10:39:37 web01 systemd-logind[612]: New session 228 of user carol.
+Sep  8 10:58:46 web01 sudo:    alice : TTY=pts/3 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/tail -n 200 /var/log/nginx/error.log
+Sep  8 10:58:46 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by alice(uid=1001)
+Sep  8 10:58:56 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  8 11:03:19 web01 sshd[3899]: Invalid user jenkins from 203.0.113.23 port 42967
+Sep  8 11:03:19 web01 sshd[3899]: Connection closed by invalid user jenkins 203.0.113.23 port 42967 [preauth]
+Sep  8 11:17:01 web01 CRON[3937]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 11:17:01 web01 CRON[3937]: pam_unix(cron:session): session closed for user root
+Sep  8 11:25:30 web01 sshd[3806]: Received disconnect from 10.0.1.57 port 43687:11: disconnected by user
+Sep  8 11:25:30 web01 sshd[3806]: Disconnected from user bob 10.0.1.57 port 43687
+Sep  8 11:25:30 web01 sshd[3806]: pam_unix(sshd:session): session closed for user bob
+Sep  8 11:25:30 web01 systemd-logind[612]: Session 227 logged out. Waiting for processes to exit.
+Sep  8 11:25:30 web01 systemd-logind[612]: Removed session 227.
+Sep  8 11:33:04 web01 sshd[3955]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.102  user=root
+Sep  8 11:33:07 web01 sshd[3955]: Failed password for root from 198.51.100.102 port 36284 ssh2
+Sep  8 11:33:09 web01 sshd[3955]: Received disconnect from 198.51.100.102 port 36284:11: Bye Bye [preauth]
+Sep  8 11:33:09 web01 sshd[3955]: Disconnected from authenticating user root 198.51.100.102 port 36284 [preauth]
+Sep  8 11:41:42 web01 sshd[3973]: Unable to negotiate with 198.51.100.92 port 38476: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 11:52:54 web01 sshd[3716]: Received disconnect from 10.0.1.23 port 37846:11: disconnected by user
+Sep  8 11:52:54 web01 sshd[3716]: Disconnected from user alice 10.0.1.23 port 37846
+Sep  8 11:52:54 web01 sshd[3716]: pam_unix(sshd:session): session closed for user alice
+Sep  8 11:52:54 web01 systemd-logind[612]: Session 225 logged out. Waiting for processes to exit.
+Sep  8 11:52:54 web01 systemd-logind[612]: Removed session 225.
+Sep  8 11:54:18 web01 sshd[4011]: Accepted publickey for deploy from 10.0.5.10 port 56046 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  8 11:54:18 web01 sshd[4011]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  8 11:54:18 web01 systemd-logind[612]: New session 229 of user deploy.
+Sep  8 11:55:59 web01 sudo:   deploy : TTY=pts/3 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  8 11:55:59 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  8 11:56:09 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  8 11:58:18 web01 sshd[4011]: Received disconnect from 10.0.5.10 port 56046:11: disconnected by user
+Sep  8 11:58:18 web01 sshd[4011]: Disconnected from user deploy 10.0.5.10 port 56046
+Sep  8 11:58:18 web01 sshd[4011]: pam_unix(sshd:session): session closed for user deploy
+Sep  8 11:58:18 web01 systemd-logind[612]: Session 229 logged out. Waiting for processes to exit.
+Sep  8 11:58:18 web01 systemd-logind[612]: Removed session 229.
+Sep  8 12:11:44 web01 sshd[4031]: Invalid user ftpuser from 198.51.100.140 port 53699
+Sep  8 12:11:45 web01 sshd[4031]: Connection closed by invalid user ftpuser 198.51.100.140 port 53699 [preauth]
+Sep  8 12:17:01 web01 CRON[4034]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 12:17:02 web01 CRON[4034]: pam_unix(cron:session): session closed for user root
+Sep  8 12:25:37 web01 sshd[3890]: Received disconnect from 10.8.0.14 port 54508:11: disconnected by user
+Sep  8 12:25:37 web01 sshd[3890]: Disconnected from user carol 10.8.0.14 port 54508
+Sep  8 12:25:37 web01 sshd[3890]: pam_unix(sshd:session): session closed for user carol
+Sep  8 12:25:37 web01 systemd-logind[612]: Session 228 logged out. Waiting for processes to exit.
+Sep  8 12:25:37 web01 systemd-logind[612]: Removed session 228.
+Sep  8 12:46:32 web01 sudo:     dave : TTY=pts/1 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/systemctl status postgresql
+Sep  8 12:46:32 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep  8 12:46:49 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  8 12:50:31 web01 sshd[4052]: Accepted publickey for deploy from 10.0.5.10 port 34561 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  8 12:50:31 web01 sshd[4052]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  8 12:50:31 web01 systemd-logind[612]: New session 230 of user deploy.
+Sep  8 12:53:08 web01 sudo:   deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  8 12:53:08 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  8 12:53:25 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  8 12:54:31 web01 sshd[4052]: Received disconnect from 10.0.5.10 port 34561:11: disconnected by user
+Sep  8 12:54:31 web01 sshd[4052]: Disconnected from user deploy 10.0.5.10 port 34561
+Sep  8 12:54:31 web01 sshd[4052]: pam_unix(sshd:session): session closed for user deploy
+Sep  8 12:54:31 web01 systemd-logind[612]: Session 230 logged out. Waiting for processes to exit.
+Sep  8 12:54:31 web01 systemd-logind[612]: Removed session 230.
+Sep  8 13:08:36 web01 sshd[4065]: Invalid user ubuntu from 192.0.2.181 port 41738
+Sep  8 13:08:37 web01 sshd[4065]: Connection closed by invalid user ubuntu 192.0.2.181 port 41738 [preauth]
+Sep  8 13:09:25 web01 sshd[4095]: Accepted publickey for alice from 10.0.1.23 port 58961 ssh2: ED25519 SHA256:ZxoHLgbtngZEEnlg3ouJTqxeIDc7B4ATB1ejdXOATe2
+Sep  8 13:09:25 web01 sshd[4095]: pam_unix(sshd:session): session opened for user alice(uid=1001) by (uid=0)
+Sep  8 13:09:25 web01 systemd-logind[612]: New session 231 of user alice.
+Sep  8 13:13:23 web01 sshd[4130]: Invalid user git from 198.51.100.246 port 51501
+Sep  8 13:13:23 web01 sshd[4130]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 13:13:23 web01 sshd[4130]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.246
+Sep  8 13:13:26 web01 sshd[4130]: Failed password for invalid user git from 198.51.100.246 port 51501 ssh2
+Sep  8 13:13:28 web01 sshd[4130]: Received disconnect from 198.51.100.246 port 51501:11: Bye Bye [preauth]
+Sep  8 13:13:28 web01 sshd[4130]: Disconnected from invalid user git 198.51.100.246 port 51501 [preauth]
+Sep  8 13:17:01 web01 CRON[4165]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 13:17:01 web01 CRON[4165]: pam_unix(cron:session): session closed for user root
+Sep  8 13:19:37 web01 sshd[4204]: Invalid user postgres from 198.51.100.244 port 49316
+Sep  8 13:19:37 web01 sshd[4204]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 13:19:37 web01 sshd[4204]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.244
+Sep  8 13:19:39 web01 sshd[4204]: Failed password for invalid user postgres from 198.51.100.244 port 49316 ssh2
+Sep  8 13:19:40 web01 sshd[4204]: Received disconnect from 198.51.100.244 port 49316:11: Bye Bye [preauth]
+Sep  8 13:19:40 web01 sshd[4204]: Disconnected from invalid user postgres 198.51.100.244 port 49316 [preauth]
+Sep  8 13:31:30 web01 sshd[4225]: error: kex_exchange_identification: Connection closed by remote host
+Sep  8 13:31:30 web01 sshd[4225]: Connection closed by 192.0.2.250 port 36946
+Sep  8 13:49:15 web01 sshd[3772]: Received disconnect from 10.0.1.81 port 37225:11: disconnected by user
+Sep  8 13:49:15 web01 sshd[3772]: Disconnected from user dave 10.0.1.81 port 37225
+Sep  8 13:49:15 web01 sshd[3772]: pam_unix(sshd:session): session closed for user dave
+Sep  8 13:49:15 web01 systemd-logind[612]: Session 226 logged out. Waiting for processes to exit.
+Sep  8 13:49:15 web01 systemd-logind[612]: Removed session 226.
+Sep  8 14:07:09 web01 sshd[4255]: error: kex_exchange_identification: Connection closed by remote host
+Sep  8 14:07:09 web01 sshd[4255]: Connection closed by 198.51.100.244 port 45377
+Sep  8 14:17:01 web01 CRON[4293]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 14:17:02 web01 CRON[4293]: pam_unix(cron:session): session closed for user root
+Sep  8 14:22:22 web01 sshd[4300]: Accepted password for bob from 10.0.1.57 port 36310 ssh2
+Sep  8 14:22:22 web01 sshd[4300]: pam_unix(sshd:session): session opened for user bob(uid=1002) by (uid=0)
+Sep  8 14:22:22 web01 systemd-logind[612]: New session 232 of user bob.
+Sep  8 14:30:01 web01 sshd[4304]: error: kex_exchange_identification: Connection closed by remote host
+Sep  8 14:30:01 web01 sshd[4304]: Connection closed by 203.0.113.71 port 52244
+Sep  8 14:30:58 web01 sshd[4330]: Invalid user dev from 198.51.100.30 port 38776
+Sep  8 14:30:58 web01 sshd[4330]: Connection closed by invalid user dev 198.51.100.30 port 38776 [preauth]
+Sep  8 15:06:22 web01 sshd[4300]: Received disconnect from 10.0.1.57 port 36310:11: disconnected by user
+Sep  8 15:06:22 web01 sshd[4300]: Disconnected from user bob 10.0.1.57 port 36310
+Sep  8 15:06:22 web01 sshd[4300]: pam_unix(sshd:session): session closed for user bob
+Sep  8 15:06:22 web01 systemd-logind[612]: Session 232 logged out. Waiting for processes to exit.
+Sep  8 15:06:22 web01 systemd-logind[612]: Removed session 232.
+Sep  8 15:17:01 web01 CRON[4341]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 15:17:01 web01 CRON[4341]: pam_unix(cron:session): session closed for user root
+Sep  8 15:25:41 web01 sshd[4348]: Accepted publickey for deploy from 10.0.5.10 port 59588 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  8 15:25:41 web01 sshd[4348]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  8 15:25:41 web01 systemd-logind[612]: New session 233 of user deploy.
+Sep  8 15:28:04 web01 sudo:   deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  8 15:28:04 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  8 15:28:15 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  8 15:28:41 web01 sshd[4348]: Received disconnect from 10.0.5.10 port 59588:11: disconnected by user
+Sep  8 15:28:41 web01 sshd[4348]: Disconnected from user deploy 10.0.5.10 port 59588
+Sep  8 15:28:41 web01 sshd[4348]: pam_unix(sshd:session): session closed for user deploy
+Sep  8 15:28:41 web01 systemd-logind[612]: Session 233 logged out. Waiting for processes to exit.
+Sep  8 15:28:41 web01 systemd-logind[612]: Removed session 233.
+Sep  8 16:16:12 web01 sshd[4363]: Connection closed by 198.51.100.129 port 52790 [preauth]
+Sep  8 16:17:01 web01 CRON[4384]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 16:17:02 web01 CRON[4384]: pam_unix(cron:session): session closed for user root
+Sep  8 16:22:12 web01 sshd[4422]: Unable to negotiate with 198.51.100.79 port 39889: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 16:26:58 web01 sshd[4448]: Invalid user guest from 203.0.113.206 port 39170
+Sep  8 16:26:59 web01 sshd[4448]: Connection closed by invalid user guest 203.0.113.206 port 39170 [preauth]
+Sep  8 16:35:55 web01 sshd[4485]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.29  user=root
+Sep  8 16:35:58 web01 sshd[4485]: Failed password for root from 198.51.100.29 port 33674 ssh2
+Sep  8 16:35:59 web01 sshd[4485]: Received disconnect from 198.51.100.29 port 33674:11: Bye Bye [preauth]
+Sep  8 16:35:59 web01 sshd[4485]: Disconnected from authenticating user root 198.51.100.29 port 33674 [preauth]
+Sep  8 16:36:25 web01 sshd[4095]: Received disconnect from 10.0.1.23 port 58961:11: disconnected by user
+Sep  8 16:36:25 web01 sshd[4095]: Disconnected from user alice 10.0.1.23 port 58961
+Sep  8 16:36:25 web01 sshd[4095]: pam_unix(sshd:session): session closed for user alice
+Sep  8 16:36:25 web01 systemd-logind[612]: Session 231 logged out. Waiting for processes to exit.
+Sep  8 16:36:25 web01 systemd-logind[612]: Removed session 231.
+Sep  8 17:17:01 web01 CRON[4498]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 17:17:01 web01 CRON[4498]: pam_unix(cron:session): session closed for user root
+Sep  8 17:28:14 web01 sshd[4538]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.26  user=root
+Sep  8 17:28:16 web01 sshd[4538]: Failed password for root from 198.51.100.26 port 42806 ssh2
+Sep  8 17:28:17 web01 sshd[4538]: Received disconnect from 198.51.100.26 port 42806:11: Bye Bye [preauth]
+Sep  8 17:28:17 web01 sshd[4538]: Disconnected from authenticating user root 198.51.100.26 port 42806 [preauth]
+Sep  8 17:30:24 web01 sshd[4551]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.93  user=root
+Sep  8 17:30:26 web01 sshd[4551]: Failed password for root from 203.0.113.93 port 49283 ssh2
+Sep  8 17:30:27 web01 sshd[4551]: Received disconnect from 203.0.113.93 port 49283:11: Bye Bye [preauth]
+Sep  8 17:30:27 web01 sshd[4551]: Disconnected from authenticating user root 203.0.113.93 port 49283 [preauth]
+Sep  8 17:35:45 web01 sshd[4566]: Invalid user guest from 203.0.113.49 port 54875
+Sep  8 17:35:45 web01 sshd[4566]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 17:35:45 web01 sshd[4566]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.49
+Sep  8 17:35:47 web01 sshd[4566]: Failed password for invalid user guest from 203.0.113.49 port 54875 ssh2
+Sep  8 17:35:47 web01 sshd[4566]: Received disconnect from 203.0.113.49 port 54875:11: Bye Bye [preauth]
+Sep  8 17:35:47 web01 sshd[4566]: Disconnected from invalid user guest 203.0.113.49 port 54875 [preauth]
+Sep  8 18:08:17 web01 sshd[4597]: Unable to negotiate with 203.0.113.243 port 56039: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 18:17:01 web01 CRON[4607]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 18:17:01 web01 CRON[4607]: pam_unix(cron:session): session closed for user root
+Sep  8 18:48:53 web01 sshd[4613]: error: kex_exchange_identification: Connection closed by remote host
+Sep  8 18:48:53 web01 sshd[4613]: Connection closed by 203.0.113.92 port 60701
+Sep  8 19:14:27 web01 sshd[4619]: Unable to negotiate with 203.0.113.206 port 60215: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 19:17:01 web01 CRON[4622]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 19:17:01 web01 CRON[4622]: pam_unix(cron:session): session closed for user root
+Sep  8 20:12:11 web01 sshd[4638]: Accepted publickey for carol from 10.8.0.14 port 39798 ssh2: RSA SHA256:jSYqOSB8+WrzrIUtzefLoPus+Khu3iROj4TEzpbDQ/h
+Sep  8 20:12:11 web01 sshd[4638]: pam_unix(sshd:session): session opened for user carol(uid=1003) by (uid=0)
+Sep  8 20:12:11 web01 systemd-logind[612]: New session 234 of user carol.
+Sep  8 20:17:01 web01 CRON[4648]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 20:17:02 web01 CRON[4648]: pam_unix(cron:session): session closed for user root
+Sep  8 20:17:38 web01 sshd[4658]: Connection closed by 203.0.113.93 port 49749 [preauth]
+Sep  8 20:45:27 web01 sshd[4683]: Invalid user postgres from 203.0.113.229 port 36661
+Sep  8 20:45:27 web01 sshd[4683]: pam_unix(sshd:auth): check pass; user unknown
+Sep  8 20:45:27 web01 sshd[4683]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.229
+Sep  8 20:45:29 web01 sshd[4683]: Failed password for invalid user postgres from 203.0.113.229 port 36661 ssh2
+Sep  8 20:45:29 web01 sshd[4683]: Received disconnect from 203.0.113.229 port 36661:11: Bye Bye [preauth]
+Sep  8 20:45:29 web01 sshd[4683]: Disconnected from invalid user postgres 203.0.113.229 port 36661 [preauth]
+Sep  8 21:17:01 web01 CRON[4708]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 21:17:02 web01 CRON[4708]: pam_unix(cron:session): session closed for user root
+Sep  8 21:27:11 web01 sshd[4638]: Received disconnect from 10.8.0.14 port 39798:11: disconnected by user
+Sep  8 21:27:11 web01 sshd[4638]: Disconnected from user carol 10.8.0.14 port 39798
+Sep  8 21:27:11 web01 sshd[4638]: pam_unix(sshd:session): session closed for user carol
+Sep  8 21:27:11 web01 systemd-logind[612]: Session 234 logged out. Waiting for processes to exit.
+Sep  8 21:27:11 web01 systemd-logind[612]: Removed session 234.
+Sep  8 21:28:33 web01 sshd[4733]: Unable to negotiate with 203.0.113.4 port 52269: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  8 21:38:08 web01 sshd[4756]: Invalid user guest from 192.0.2.217 port 44363
+Sep  8 21:38:09 web01 sshd[4756]: Connection closed by invalid user guest 192.0.2.217 port 44363 [preauth]
+Sep  8 22:17:01 web01 CRON[4766]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 22:17:02 web01 CRON[4766]: pam_unix(cron:session): session closed for user root
+Sep  8 23:17:01 web01 CRON[4792]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  8 23:17:02 web01 CRON[4792]: pam_unix(cron:session): session closed for user root
+Sep  8 23:46:49 web01 sshd[4799]: Invalid user nagios from 198.51.100.73 port 46667
+Sep  8 23:46:49 web01 sshd[4799]: Connection closed by invalid user nagios 198.51.100.73 port 46667 [preauth]
+Sep  9 00:08:22 web01 sshd[4816]: error: kex_exchange_identification: Connection closed by remote host
+Sep  9 00:08:22 web01 sshd[4816]: Connection closed by 198.51.100.244 port 47633
+Sep  9 00:17:01 web01 CRON[4836]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 00:17:02 web01 CRON[4836]: pam_unix(cron:session): session closed for user root
+Sep  9 00:35:00 web01 sshd[4861]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.130  user=root
+Sep  9 00:35:03 web01 sshd[4861]: Failed password for root from 203.0.113.130 port 44404 ssh2
+Sep  9 00:35:04 web01 sshd[4861]: Received disconnect from 203.0.113.130 port 44404:11: Bye Bye [preauth]
+Sep  9 00:35:04 web01 sshd[4861]: Disconnected from authenticating user root 203.0.113.130 port 44404 [preauth]
+Sep  9 00:40:37 web01 sshd[4873]: Connection closed by 198.51.100.6 port 46527 [preauth]
+Sep  9 00:43:21 web01 sshd[4895]: Connection closed by 192.0.2.4 port 46263 [preauth]
+Sep  9 01:17:01 web01 CRON[4936]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 01:17:01 web01 CRON[4936]: pam_unix(cron:session): session closed for user root
+Sep  9 01:29:49 web01 sshd[4966]: Invalid user guest from 198.51.100.244 port 54476
+Sep  9 01:29:49 web01 sshd[4966]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 01:29:49 web01 sshd[4966]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.244
+Sep  9 01:29:52 web01 sshd[4966]: Failed password for invalid user guest from 198.51.100.244 port 54476 ssh2
+Sep  9 01:29:52 web01 sshd[4966]: Received disconnect from 198.51.100.244 port 54476:11: Bye Bye [preauth]
+Sep  9 01:29:52 web01 sshd[4966]: Disconnected from invalid user guest 198.51.100.244 port 54476 [preauth]
+Sep  9 02:17:01 web01 CRON[4982]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 02:17:01 web01 CRON[4982]: pam_unix(cron:session): session closed for user root
+Sep  9 02:21:11 web01 sshd[4999]: Invalid user user from 198.51.100.29 port 51296
+Sep  9 02:21:11 web01 sshd[4999]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 02:21:11 web01 sshd[4999]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.29
+Sep  9 02:21:14 web01 sshd[4999]: Failed password for invalid user user from 198.51.100.29 port 51296 ssh2
+Sep  9 02:21:15 web01 sshd[4999]: Received disconnect from 198.51.100.29 port 51296:11: Bye Bye [preauth]
+Sep  9 02:21:15 web01 sshd[4999]: Disconnected from invalid user user 198.51.100.29 port 51296 [preauth]
+Sep  9 02:26:59 web01 sshd[5003]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.213  user=root
+Sep  9 02:27:01 web01 sshd[5003]: Failed password for root from 203.0.113.213 port 43122 ssh2
+Sep  9 02:27:03 web01 sshd[5003]: Received disconnect from 203.0.113.213 port 43122:11: Bye Bye [preauth]
+Sep  9 02:27:03 web01 sshd[5003]: Disconnected from authenticating user root 203.0.113.213 port 43122 [preauth]
+Sep  9 02:55:32 web01 sshd[5038]: Invalid user minecraft from 198.51.100.38 port 40258
+Sep  9 02:55:33 web01 sshd[5038]: Connection closed by invalid user minecraft 198.51.100.38 port 40258 [preauth]
+Sep  9 03:17:01 web01 CRON[5074]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 03:17:01 web01 CRON[5074]: pam_unix(cron:session): session closed for user root
+Sep  9 03:21:38 web01 sshd[5108]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=root
+Sep  9 03:21:40 web01 sshd[5108]: Failed password for root from 198.51.100.23 port 44161 ssh2
+Sep  9 03:21:41 web01 sshd[5108]: Received disconnect from 198.51.100.23 port 44161:11: Bye Bye [preauth]
+Sep  9 03:21:41 web01 sshd[5108]: Disconnected from authenticating user root 198.51.100.23 port 44161 [preauth]
+Sep  9 03:22:40 web01 sshd[5135]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=root
+Sep  9 03:22:43 web01 sshd[5135]: Failed password for root from 198.51.100.23 port 52994 ssh2
+Sep  9 03:22:44 web01 sshd[5135]: Received disconnect from 198.51.100.23 port 52994:11: Bye Bye [preauth]
+Sep  9 03:22:44 web01 sshd[5135]: Disconnected from authenticating user root 198.51.100.23 port 52994 [preauth]
+Sep  9 03:23:19 web01 sshd[5175]: Invalid user pi from 198.51.100.102 port 36844
+Sep  9 03:23:19 web01 sshd[5175]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 03:23:19 web01 sshd[5175]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.102
+Sep  9 03:23:21 web01 sshd[5175]: Failed password for invalid user pi from 198.51.100.102 port 36844 ssh2
+Sep  9 03:23:22 web01 sshd[5175]: Received disconnect from 198.51.100.102 port 36844:11: Bye Bye [preauth]
+Sep  9 03:23:22 web01 sshd[5175]: Disconnected from invalid user pi 198.51.100.102 port 36844 [preauth]
+Sep  9 03:23:57 web01 sshd[5185]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:23:59 web01 sshd[5185]: Failed password for deploy from 198.51.100.23 port 50749 ssh2
+Sep  9 03:23:59 web01 sshd[5185]: Received disconnect from 198.51.100.23 port 50749:11: Bye Bye [preauth]
+Sep  9 03:23:59 web01 sshd[5185]: Disconnected from authenticating user deploy 198.51.100.23 port 50749 [preauth]
+Sep  9 03:24:58 web01 sshd[5224]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:25:00 web01 sshd[5224]: Failed password for deploy from 198.51.100.23 port 48285 ssh2
+Sep  9 03:25:02 web01 sshd[5224]: Received disconnect from 198.51.100.23 port 48285:11: Bye Bye [preauth]
+Sep  9 03:25:02 web01 sshd[5224]: Disconnected from authenticating user deploy 198.51.100.23 port 48285 [preauth]
+Sep  9 03:26:08 web01 sshd[5242]: Connection closed by 198.51.100.63 port 40249 [preauth]
+Sep  9 03:26:27 web01 sshd[5267]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:26:30 web01 sshd[5267]: Failed password for deploy from 198.51.100.23 port 38053 ssh2
+Sep  9 03:26:31 web01 sshd[5267]: Received disconnect from 198.51.100.23 port 38053:11: Bye Bye [preauth]
+Sep  9 03:26:31 web01 sshd[5267]: Disconnected from authenticating user deploy 198.51.100.23 port 38053 [preauth]
+Sep  9 03:27:30 web01 sshd[5284]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:27:33 web01 sshd[5284]: Failed password for deploy from 198.51.100.23 port 46224 ssh2
+Sep  9 03:27:34 web01 sshd[5284]: Received disconnect from 198.51.100.23 port 46224:11: Bye Bye [preauth]
+Sep  9 03:27:34 web01 sshd[5284]: Disconnected from authenticating user deploy 198.51.100.23 port 46224 [preauth]
+Sep  9 03:29:03 web01 sshd[5287]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:29:05 web01 sshd[5287]: Failed password for deploy from 198.51.100.23 port 33441 ssh2
+Sep  9 03:29:05 web01 sshd[5287]: Received disconnect from 198.51.100.23 port 33441:11: Bye Bye [preauth]
+Sep  9 03:29:05 web01 sshd[5287]: Disconnected from authenticating user deploy 198.51.100.23 port 33441 [preauth]
+Sep  9 03:30:06 web01 sshd[5295]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:30:08 web01 sshd[5295]: Failed password for deploy from 198.51.100.23 port 53422 ssh2
+Sep  9 03:30:09 web01 sshd[5295]: Received disconnect from 198.51.100.23 port 53422:11: Bye Bye [preauth]
+Sep  9 03:30:09 web01 sshd[5295]: Disconnected from authenticating user deploy 198.51.100.23 port 53422 [preauth]
+Sep  9 03:31:00 web01 sshd[5326]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:31:02 web01 sshd[5326]: Failed password for deploy from 198.51.100.23 port 52884 ssh2
+Sep  9 03:31:04 web01 sshd[5326]: Received disconnect from 198.51.100.23 port 52884:11: Bye Bye [preauth]
+Sep  9 03:31:04 web01 sshd[5326]: Disconnected from authenticating user deploy 198.51.100.23 port 52884 [preauth]
+Sep  9 03:32:03 web01 sshd[5335]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:32:05 web01 sshd[5335]: Failed password for deploy from 198.51.100.23 port 58094 ssh2
+Sep  9 03:32:05 web01 sshd[5335]: Received disconnect from 198.51.100.23 port 58094:11: Bye Bye [preauth]
+Sep  9 03:32:05 web01 sshd[5335]: Disconnected from authenticating user deploy 198.51.100.23 port 58094 [preauth]
+Sep  9 03:33:10 web01 sshd[5369]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:33:12 web01 sshd[5369]: Failed password for deploy from 198.51.100.23 port 38176 ssh2
+Sep  9 03:33:12 web01 sshd[5369]: Received disconnect from 198.51.100.23 port 38176:11: Bye Bye [preauth]
+Sep  9 03:33:12 web01 sshd[5369]: Disconnected from authenticating user deploy 198.51.100.23 port 38176 [preauth]
+Sep  9 03:34:42 web01 sshd[5378]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:34:44 web01 sshd[5378]: Failed password for deploy from 198.51.100.23 port 59453 ssh2
+Sep  9 03:34:45 web01 sshd[5378]: Received disconnect from 198.51.100.23 port 59453:11: Bye Bye [preauth]
+Sep  9 03:34:45 web01 sshd[5378]: Disconnected from authenticating user deploy 198.51.100.23 port 59453 [preauth]
+Sep  9 03:36:13 web01 sshd[5419]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:36:15 web01 sshd[5419]: Failed password for deploy from 198.51.100.23 port 33253 ssh2
+Sep  9 03:36:17 web01 sshd[5419]: Received disconnect from 198.51.100.23 port 33253:11: Bye Bye [preauth]
+Sep  9 03:36:17 web01 sshd[5419]: Disconnected from authenticating user deploy 198.51.100.23 port 33253 [preauth]
+Sep  9 03:37:39 web01 sshd[5457]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.23  user=deploy
+Sep  9 03:37:41 web01 sshd[5457]: Failed password for deploy from 198.51.100.23 port 37408 ssh2
+Sep  9 03:37:43 web01 sshd[5457]: Received disconnect from 198.51.100.23 port 37408:11: Bye Bye [preauth]
+Sep  9 03:37:43 web01 sshd[5457]: Disconnected from authenticating user deploy 198.51.100.23 port 37408 [preauth]
+Sep  9 03:39:12 web01 sshd[5465]: Accepted password for deploy from 198.51.100.23 port 33951 ssh2
+Sep  9 03:39:12 web01 sshd[5465]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  9 03:39:12 web01 systemd-logind[612]: New session 235 of user deploy.
+Sep  9 03:39:50 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/id
+Sep  9 03:39:50 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  9 03:40:04 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 03:40:56 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash -G sudo sysupdate
+Sep  9 03:40:56 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  9 03:40:56 web01 useradd[5474]: new group: name=sysupdate, GID=1101
+Sep  9 03:40:56 web01 useradd[5474]: new user: name=sysupdate, UID=1101, GID=1101, home=/home/sysupdate, shell=/bin/bash, from=/dev/pts/1
+Sep  9 03:40:56 web01 useradd[5474]: add 'sysupdate' to group 'sudo'
+Sep  9 03:40:56 web01 useradd[5474]: add 'sysupdate' to shadow group 'sudo'
+Sep  9 03:41:05 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 03:41:23 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/passwd sysupdate
+Sep  9 03:41:23 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  9 03:41:31 web01 passwd[5496]: pam_unix(passwd:chauthtok): password changed for sysupdate
+Sep  9 03:41:38 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 03:42:27 web01 sshd[5526]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.74  user=root
+Sep  9 03:42:30 web01 sshd[5526]: Failed password for root from 192.0.2.74 port 44860 ssh2
+Sep  9 03:42:30 web01 sshd[5526]: Received disconnect from 192.0.2.74 port 44860:11: Bye Bye [preauth]
+Sep  9 03:42:30 web01 sshd[5526]: Disconnected from authenticating user root 192.0.2.74 port 44860 [preauth]
+Sep  9 03:49:41 web01 sshd[5536]: Unable to negotiate with 198.51.100.140 port 45478: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  9 03:50:12 web01 sshd[5465]: Received disconnect from 198.51.100.23 port 33951:11: disconnected by user
+Sep  9 03:50:12 web01 sshd[5465]: Disconnected from user deploy 198.51.100.23 port 33951
+Sep  9 03:50:12 web01 sshd[5465]: pam_unix(sshd:session): session closed for user deploy
+Sep  9 03:50:12 web01 systemd-logind[612]: Session 235 logged out. Waiting for processes to exit.
+Sep  9 03:50:12 web01 systemd-logind[612]: Removed session 235.
+Sep  9 04:17:01 web01 CRON[5540]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 04:17:02 web01 CRON[5540]: pam_unix(cron:session): session closed for user root
+Sep  9 05:17:01 web01 CRON[5571]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 05:17:01 web01 CRON[5571]: pam_unix(cron:session): session closed for user root
+Sep  9 05:26:06 web01 sshd[5607]: Unable to negotiate with 198.51.100.102 port 54356: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  9 05:30:08 web01 sshd[5615]: Accepted publickey for deploy from 10.0.5.10 port 47729 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  9 05:30:08 web01 sshd[5615]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  9 05:30:08 web01 systemd-logind[612]: New session 236 of user deploy.
+Sep  9 05:30:46 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/local/bin/db-backup.sh
+Sep  9 05:30:46 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  9 05:30:54 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 05:32:08 web01 sshd[5615]: Received disconnect from 10.0.5.10 port 47729:11: disconnected by user
+Sep  9 05:32:08 web01 sshd[5615]: Disconnected from user deploy 10.0.5.10 port 47729
+Sep  9 05:32:08 web01 sshd[5615]: pam_unix(sshd:session): session closed for user deploy
+Sep  9 05:32:08 web01 systemd-logind[612]: Session 236 logged out. Waiting for processes to exit.
+Sep  9 05:32:08 web01 systemd-logind[612]: Removed session 236.
+Sep  9 06:17:01 web01 CRON[5643]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 06:17:01 web01 CRON[5643]: pam_unix(cron:session): session closed for user root
+Sep  9 06:25:01 web01 CRON[5659]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 06:25:02 web01 CRON[5659]: pam_unix(cron:session): session closed for user root
+Sep  9 07:17:01 web01 CRON[5696]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 07:17:01 web01 CRON[5696]: pam_unix(cron:session): session closed for user root
+Sep  9 08:17:01 web01 CRON[5734]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 08:17:02 web01 CRON[5734]: pam_unix(cron:session): session closed for user root
+Sep  9 08:44:36 web01 sshd[5759]: Accepted publickey for alice from 10.0.1.23 port 41033 ssh2: ED25519 SHA256:ZxoHLgbtngZEEnlg3ouJTqxeIDc7B4ATB1ejdXOATe2
+Sep  9 08:44:36 web01 sshd[5759]: pam_unix(sshd:session): session opened for user alice(uid=1001) by (uid=0)
+Sep  9 08:44:36 web01 systemd-logind[612]: New session 237 of user alice.
+Sep  9 09:02:57 web01 sshd[5790]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.0.1.57  user=bob
+Sep  9 09:02:59 web01 sshd[5790]: Failed password for bob from 10.0.1.57 port 59003 ssh2
+Sep  9 09:03:04 web01 sshd[5790]: Accepted password for bob from 10.0.1.57 port 59003 ssh2
+Sep  9 09:03:04 web01 sshd[5790]: pam_unix(sshd:session): session opened for user bob(uid=1002) by (uid=0)
+Sep  9 09:03:04 web01 systemd-logind[612]: New session 238 of user bob.
+Sep  9 09:06:59 web01 sudo:    alice : TTY=pts/2 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/journalctl -u webapp --since today
+Sep  9 09:06:59 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by alice(uid=1001)
+Sep  9 09:07:03 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 09:15:27 web01 sshd[5804]: Invalid user minecraft from 192.0.2.103 port 49742
+Sep  9 09:15:27 web01 sshd[5804]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 09:15:27 web01 sshd[5804]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.103
+Sep  9 09:15:30 web01 sshd[5804]: Failed password for invalid user minecraft from 192.0.2.103 port 49742 ssh2
+Sep  9 09:15:31 web01 sshd[5804]: Received disconnect from 192.0.2.103 port 49742:11: Bye Bye [preauth]
+Sep  9 09:15:31 web01 sshd[5804]: Disconnected from invalid user minecraft 192.0.2.103 port 49742 [preauth]
+Sep  9 09:17:01 web01 CRON[5823]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 09:17:01 web01 CRON[5823]: pam_unix(cron:session): session closed for user root
+Sep  9 09:42:03 web01 sshd[5863]: Accepted publickey for dave from 10.0.1.81 port 60311 ssh2: ED25519 SHA256:z1lM9vKv0caUXc2KSQMu7/vcm0FG/uGvdMBgI7N02tN
+Sep  9 09:42:03 web01 sshd[5863]: pam_unix(sshd:session): session opened for user dave(uid=1004) by (uid=0)
+Sep  9 09:42:03 web01 systemd-logind[612]: New session 239 of user dave.
+Sep  9 10:17:01 web01 CRON[5883]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 10:17:02 web01 CRON[5883]: pam_unix(cron:session): session closed for user root
+Sep  9 10:22:38 web01 sshd[5915]: Invalid user minecraft from 192.0.2.250 port 34756
+Sep  9 10:22:39 web01 sshd[5915]: Connection closed by invalid user minecraft 192.0.2.250 port 34756 [preauth]
+Sep  9 10:25:50 web01 sshd[5927]: Accepted publickey for deploy from 10.0.5.10 port 39662 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  9 10:25:50 web01 sshd[5927]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  9 10:25:50 web01 systemd-logind[612]: New session 240 of user deploy.
+Sep  9 10:27:32 web01 sshd[5967]: Accepted publickey for carol from 2001:db8:4a2::1c port 45386 ssh2: RSA SHA256:jSYqOSB8+WrzrIUtzefLoPus+Khu3iROj4TEzpbDQ/h
+Sep  9 10:27:32 web01 sshd[5967]: pam_unix(sshd:session): session opened for user carol(uid=1003) by (uid=0)
+Sep  9 10:27:32 web01 systemd-logind[612]: New session 241 of user carol.
+Sep  9 10:28:56 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  9 10:28:56 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  9 10:29:14 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 10:29:50 web01 sshd[5927]: Received disconnect from 10.0.5.10 port 39662:11: disconnected by user
+Sep  9 10:29:50 web01 sshd[5927]: Disconnected from user deploy 10.0.5.10 port 39662
+Sep  9 10:29:50 web01 sshd[5927]: pam_unix(sshd:session): session closed for user deploy
+Sep  9 10:29:50 web01 systemd-logind[612]: Session 240 logged out. Waiting for processes to exit.
+Sep  9 10:29:50 web01 systemd-logind[612]: Removed session 240.
+Sep  9 10:48:45 web01 sshd[5971]: Unable to negotiate with 198.51.100.73 port 39766: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  9 11:00:00 web01 sudo:    alice : TTY=pts/2 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/tail -n 200 /var/log/nginx/error.log
+Sep  9 11:00:00 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by alice(uid=1001)
+Sep  9 11:00:08 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 11:01:57 web01 sshd[5790]: Received disconnect from 10.0.1.57 port 59003:11: disconnected by user
+Sep  9 11:01:57 web01 sshd[5790]: Disconnected from user bob 10.0.1.57 port 59003
+Sep  9 11:01:57 web01 sshd[5790]: pam_unix(sshd:session): session closed for user bob
+Sep  9 11:01:57 web01 systemd-logind[612]: Session 238 logged out. Waiting for processes to exit.
+Sep  9 11:01:57 web01 systemd-logind[612]: Removed session 238.
+Sep  9 11:10:30 web01 sshd[5983]: Invalid user minecraft from 192.0.2.175 port 43790
+Sep  9 11:10:30 web01 sshd[5983]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 11:10:30 web01 sshd[5983]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.175
+Sep  9 11:10:33 web01 sshd[5983]: Failed password for invalid user minecraft from 192.0.2.175 port 43790 ssh2
+Sep  9 11:10:33 web01 sshd[5983]: Received disconnect from 192.0.2.175 port 43790:11: Bye Bye [preauth]
+Sep  9 11:10:33 web01 sshd[5983]: Disconnected from invalid user minecraft 192.0.2.175 port 43790 [preauth]
+Sep  9 11:12:21 web01 sudo:     dave : TTY=pts/2 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/du -sh /var/lib/postgresql
+Sep  9 11:12:21 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep  9 11:12:23 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 11:15:36 web01 sshd[5759]: Received disconnect from 10.0.1.23 port 41033:11: disconnected by user
+Sep  9 11:15:36 web01 sshd[5759]: Disconnected from user alice 10.0.1.23 port 41033
+Sep  9 11:15:36 web01 sshd[5759]: pam_unix(sshd:session): session closed for user alice
+Sep  9 11:15:36 web01 systemd-logind[612]: Session 237 logged out. Waiting for processes to exit.
+Sep  9 11:15:36 web01 systemd-logind[612]: Removed session 237.
+Sep  9 11:17:01 web01 CRON[6020]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 11:17:01 web01 CRON[6020]: pam_unix(cron:session): session closed for user root
+Sep  9 11:22:47 web01 sshd[6035]: Invalid user user from 192.0.2.55 port 52777
+Sep  9 11:22:47 web01 sshd[6035]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 11:22:47 web01 sshd[6035]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.55
+Sep  9 11:22:50 web01 sshd[6035]: Failed password for invalid user user from 192.0.2.55 port 52777 ssh2
+Sep  9 11:22:52 web01 sshd[6035]: Received disconnect from 192.0.2.55 port 52777:11: Bye Bye [preauth]
+Sep  9 11:22:52 web01 sshd[6035]: Disconnected from invalid user user 192.0.2.55 port 52777 [preauth]
+Sep  9 11:58:55 web01 sshd[6074]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.92  user=root
+Sep  9 11:58:58 web01 sshd[6074]: Failed password for root from 198.51.100.92 port 44378 ssh2
+Sep  9 11:58:58 web01 sshd[6074]: Received disconnect from 198.51.100.92 port 44378:11: Bye Bye [preauth]
+Sep  9 11:58:58 web01 sshd[6074]: Disconnected from authenticating user root 198.51.100.92 port 44378 [preauth]
+Sep  9 12:05:50 web01 sshd[6103]: Unable to negotiate with 203.0.113.152 port 54757: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  9 12:14:32 web01 sshd[5967]: Received disconnect from 2001:db8:4a2::1c port 45386:11: disconnected by user
+Sep  9 12:14:32 web01 sshd[5967]: Disconnected from user carol 2001:db8:4a2::1c port 45386
+Sep  9 12:14:32 web01 sshd[5967]: pam_unix(sshd:session): session closed for user carol
+Sep  9 12:14:32 web01 systemd-logind[612]: Session 241 logged out. Waiting for processes to exit.
+Sep  9 12:14:32 web01 systemd-logind[612]: Removed session 241.
+Sep  9 12:17:01 web01 CRON[6114]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 12:17:02 web01 CRON[6114]: pam_unix(cron:session): session closed for user root
+Sep  9 12:21:25 web01 sshd[6135]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.92  user=root
+Sep  9 12:21:27 web01 sshd[6135]: Failed password for root from 203.0.113.92 port 46287 ssh2
+Sep  9 12:21:28 web01 sshd[6135]: Received disconnect from 203.0.113.92 port 46287:11: Bye Bye [preauth]
+Sep  9 12:21:28 web01 sshd[6135]: Disconnected from authenticating user root 203.0.113.92 port 46287 [preauth]
+Sep  9 12:38:08 web01 sshd[6151]: Invalid user git from 192.0.2.75 port 33671
+Sep  9 12:38:08 web01 sshd[6151]: Connection closed by invalid user git 192.0.2.75 port 33671 [preauth]
+Sep  9 13:04:44 web01 sudo:     dave : TTY=pts/2 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/apt upgrade -y
+Sep  9 13:04:44 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep  9 13:04:50 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 13:06:51 web01 sshd[6177]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.79  user=root
+Sep  9 13:06:54 web01 sshd[6177]: Failed password for root from 192.0.2.79 port 52124 ssh2
+Sep  9 13:06:54 web01 sshd[6177]: Received disconnect from 192.0.2.79 port 52124:11: Bye Bye [preauth]
+Sep  9 13:06:54 web01 sshd[6177]: Disconnected from authenticating user root 192.0.2.79 port 52124 [preauth]
+Sep  9 13:10:18 web01 sudo:     dave : TTY=pts/2 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/ufw status
+Sep  9 13:10:18 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep  9 13:10:35 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 13:13:32 web01 sshd[6200]: Accepted publickey for alice from 10.0.1.23 port 43610 ssh2: ED25519 SHA256:ZxoHLgbtngZEEnlg3ouJTqxeIDc7B4ATB1ejdXOATe2
+Sep  9 13:13:32 web01 sshd[6200]: pam_unix(sshd:session): session opened for user alice(uid=1001) by (uid=0)
+Sep  9 13:13:32 web01 systemd-logind[612]: New session 242 of user alice.
+Sep  9 13:17:01 web01 CRON[6206]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 13:17:01 web01 CRON[6206]: pam_unix(cron:session): session closed for user root
+Sep  9 13:38:35 web01 sshd[6213]: error: kex_exchange_identification: Connection closed by remote host
+Sep  9 13:38:35 web01 sshd[6213]: Connection closed by 198.51.100.38 port 59657
+Sep  9 13:44:22 web01 sshd[6243]: Invalid user postgres from 192.0.2.250 port 47763
+Sep  9 13:44:23 web01 sshd[6243]: Connection closed by invalid user postgres 192.0.2.250 port 47763 [preauth]
+Sep  9 13:50:13 web01 sshd[6274]: Accepted publickey for deploy from 10.0.5.10 port 47677 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  9 13:50:13 web01 sshd[6274]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  9 13:50:13 web01 systemd-logind[612]: New session 243 of user deploy.
+Sep  9 13:50:21 web01 sshd[6280]: Accepted publickey for deploy from 10.0.5.10 port 52619 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep  9 13:50:21 web01 sshd[6280]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep  9 13:50:21 web01 systemd-logind[612]: New session 244 of user deploy.
+Sep  9 13:51:50 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  9 13:51:50 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  9 13:52:10 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 13:52:32 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep  9 13:52:32 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep  9 13:52:38 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 13:53:03 web01 sshd[5863]: Received disconnect from 10.0.1.81 port 60311:11: disconnected by user
+Sep  9 13:53:03 web01 sshd[5863]: Disconnected from user dave 10.0.1.81 port 60311
+Sep  9 13:53:03 web01 sshd[5863]: pam_unix(sshd:session): session closed for user dave
+Sep  9 13:53:03 web01 systemd-logind[612]: Session 239 logged out. Waiting for processes to exit.
+Sep  9 13:53:03 web01 systemd-logind[612]: Removed session 239.
+Sep  9 13:53:13 web01 sshd[6274]: Received disconnect from 10.0.5.10 port 47677:11: disconnected by user
+Sep  9 13:53:13 web01 sshd[6274]: Disconnected from user deploy 10.0.5.10 port 47677
+Sep  9 13:53:13 web01 sshd[6274]: pam_unix(sshd:session): session closed for user deploy
+Sep  9 13:53:13 web01 systemd-logind[612]: Session 243 logged out. Waiting for processes to exit.
+Sep  9 13:53:13 web01 systemd-logind[612]: Removed session 243.
+Sep  9 13:53:21 web01 sshd[6280]: Received disconnect from 10.0.5.10 port 52619:11: disconnected by user
+Sep  9 13:53:21 web01 sshd[6280]: Disconnected from user deploy 10.0.5.10 port 52619
+Sep  9 13:53:21 web01 sshd[6280]: pam_unix(sshd:session): session closed for user deploy
+Sep  9 13:53:21 web01 systemd-logind[612]: Session 244 logged out. Waiting for processes to exit.
+Sep  9 13:53:21 web01 systemd-logind[612]: Removed session 244.
+Sep  9 14:17:01 web01 CRON[6312]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 14:17:02 web01 CRON[6312]: pam_unix(cron:session): session closed for user root
+Sep  9 14:20:54 web01 sshd[6347]: Invalid user steam from 192.0.2.209 port 44982
+Sep  9 14:20:54 web01 sshd[6347]: Connection closed by invalid user steam 192.0.2.209 port 44982 [preauth]
+Sep  9 14:28:46 web01 sshd[6377]: Invalid user jenkins from 203.0.113.151 port 46843
+Sep  9 14:28:46 web01 sshd[6377]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 14:28:46 web01 sshd[6377]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.151
+Sep  9 14:28:48 web01 sshd[6377]: Failed password for invalid user jenkins from 203.0.113.151 port 46843 ssh2
+Sep  9 14:28:48 web01 sshd[6377]: Received disconnect from 203.0.113.151 port 46843:11: Bye Bye [preauth]
+Sep  9 14:28:48 web01 sshd[6377]: Disconnected from invalid user jenkins 203.0.113.151 port 46843 [preauth]
+Sep  9 14:54:48 web01 sshd[6415]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.166  user=root
+Sep  9 14:54:50 web01 sshd[6415]: Failed password for root from 192.0.2.166 port 52848 ssh2
+Sep  9 14:54:51 web01 sshd[6415]: Received disconnect from 192.0.2.166 port 52848:11: Bye Bye [preauth]
+Sep  9 14:54:51 web01 sshd[6415]: Disconnected from authenticating user root 192.0.2.166 port 52848 [preauth]
+Sep  9 15:14:15 web01 sshd[6431]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.240  user=root
+Sep  9 15:14:17 web01 sshd[6431]: Failed password for root from 198.51.100.240 port 41966 ssh2
+Sep  9 15:14:17 web01 sshd[6431]: Received disconnect from 198.51.100.240 port 41966:11: Bye Bye [preauth]
+Sep  9 15:14:17 web01 sshd[6431]: Disconnected from authenticating user root 198.51.100.240 port 41966 [preauth]
+Sep  9 15:17:01 web01 CRON[6452]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 15:17:01 web01 CRON[6452]: pam_unix(cron:session): session closed for user root
+Sep  9 15:17:21 web01 sshd[6473]: Unable to negotiate with 198.51.100.30 port 53673: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep  9 15:17:25 web01 sshd[6493]: error: kex_exchange_identification: Connection closed by remote host
+Sep  9 15:17:25 web01 sshd[6493]: Connection closed by 198.51.100.32 port 45157
+Sep  9 15:21:45 web01 sshd[6504]: Connection closed by 203.0.113.151 port 45621 [preauth]
+Sep  9 15:24:56 web01 sudo:    alice : TTY=pts/3 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+Sep  9 15:24:56 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by alice(uid=1001)
+Sep  9 15:25:00 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep  9 15:57:16 web01 sshd[6529]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.74  user=root
+Sep  9 15:57:18 web01 sshd[6529]: Failed password for root from 192.0.2.74 port 50138 ssh2
+Sep  9 15:57:19 web01 sshd[6529]: Received disconnect from 192.0.2.74 port 50138:11: Bye Bye [preauth]
+Sep  9 15:57:19 web01 sshd[6529]: Disconnected from authenticating user root 192.0.2.74 port 50138 [preauth]
+Sep  9 16:12:18 web01 sshd[6534]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.166  user=root
+Sep  9 16:12:20 web01 sshd[6534]: Failed password for root from 192.0.2.166 port 58413 ssh2
+Sep  9 16:12:22 web01 sshd[6534]: Received disconnect from 192.0.2.166 port 58413:11: Bye Bye [preauth]
+Sep  9 16:12:22 web01 sshd[6534]: Disconnected from authenticating user root 192.0.2.166 port 58413 [preauth]
+Sep  9 16:17:01 web01 CRON[6557]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 16:17:02 web01 CRON[6557]: pam_unix(cron:session): session closed for user root
+Sep  9 16:26:10 web01 sshd[6592]: Invalid user nagios from 203.0.113.152 port 50848
+Sep  9 16:26:10 web01 sshd[6592]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 16:26:10 web01 sshd[6592]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.152
+Sep  9 16:26:13 web01 sshd[6592]: Failed password for invalid user nagios from 203.0.113.152 port 50848 ssh2
+Sep  9 16:26:15 web01 sshd[6592]: Received disconnect from 203.0.113.152 port 50848:11: Bye Bye [preauth]
+Sep  9 16:26:15 web01 sshd[6592]: Disconnected from invalid user nagios 203.0.113.152 port 50848 [preauth]
+Sep  9 16:33:32 web01 sshd[6200]: Received disconnect from 10.0.1.23 port 43610:11: disconnected by user
+Sep  9 16:33:32 web01 sshd[6200]: Disconnected from user alice 10.0.1.23 port 43610
+Sep  9 16:33:32 web01 sshd[6200]: pam_unix(sshd:session): session closed for user alice
+Sep  9 16:33:32 web01 systemd-logind[612]: Session 242 logged out. Waiting for processes to exit.
+Sep  9 16:33:32 web01 systemd-logind[612]: Removed session 242.
+Sep  9 16:47:12 web01 sshd[6621]: Invalid user oracle from 203.0.113.213 port 57449
+Sep  9 16:47:12 web01 sshd[6621]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 16:47:12 web01 sshd[6621]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.213
+Sep  9 16:47:15 web01 sshd[6621]: Failed password for invalid user oracle from 203.0.113.213 port 57449 ssh2
+Sep  9 16:47:15 web01 sshd[6621]: Received disconnect from 203.0.113.213 port 57449:11: Bye Bye [preauth]
+Sep  9 16:47:15 web01 sshd[6621]: Disconnected from invalid user oracle 203.0.113.213 port 57449 [preauth]
+Sep  9 17:17:01 web01 CRON[6648]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 17:17:01 web01 CRON[6648]: pam_unix(cron:session): session closed for user root
+Sep  9 17:40:49 web01 sshd[6668]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.32  user=root
+Sep  9 17:40:51 web01 sshd[6668]: Failed password for root from 198.51.100.32 port 59735 ssh2
+Sep  9 17:40:53 web01 sshd[6668]: Received disconnect from 198.51.100.32 port 59735:11: Bye Bye [preauth]
+Sep  9 17:40:53 web01 sshd[6668]: Disconnected from authenticating user root 198.51.100.32 port 59735 [preauth]
+Sep  9 17:42:06 web01 sshd[6672]: error: kex_exchange_identification: Connection closed by remote host
+Sep  9 17:42:06 web01 sshd[6672]: Connection closed by 203.0.113.4 port 35447
+Sep  9 18:13:14 web01 sshd[6680]: Invalid user test from 203.0.113.49 port 40661
+Sep  9 18:13:14 web01 sshd[6680]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 18:13:14 web01 sshd[6680]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.49
+Sep  9 18:13:16 web01 sshd[6680]: Failed password for invalid user test from 203.0.113.49 port 40661 ssh2
+Sep  9 18:13:18 web01 sshd[6680]: Received disconnect from 203.0.113.49 port 40661:11: Bye Bye [preauth]
+Sep  9 18:13:18 web01 sshd[6680]: Disconnected from invalid user test 203.0.113.49 port 40661 [preauth]
+Sep  9 18:17:01 web01 CRON[6687]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 18:17:02 web01 CRON[6687]: pam_unix(cron:session): session closed for user root
+Sep  9 18:20:02 web01 sshd[6691]: Invalid user test from 192.0.2.55 port 57757
+Sep  9 18:20:02 web01 sshd[6691]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 18:20:02 web01 sshd[6691]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.55
+Sep  9 18:20:04 web01 sshd[6691]: Failed password for invalid user test from 192.0.2.55 port 57757 ssh2
+Sep  9 18:20:06 web01 sshd[6691]: Received disconnect from 192.0.2.55 port 57757:11: Bye Bye [preauth]
+Sep  9 18:20:06 web01 sshd[6691]: Disconnected from invalid user test 192.0.2.55 port 57757 [preauth]
+Sep  9 19:17:01 web01 CRON[6727]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 19:17:01 web01 CRON[6727]: pam_unix(cron:session): session closed for user root
+Sep  9 19:23:14 web01 sshd[6736]: Connection closed by 198.51.100.147 port 54122 [preauth]
+Sep  9 20:17:01 web01 CRON[6750]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 20:17:02 web01 CRON[6750]: pam_unix(cron:session): session closed for user root
+Sep  9 20:26:14 web01 sshd[6753]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.175  user=root
+Sep  9 20:26:17 web01 sshd[6753]: Failed password for root from 192.0.2.175 port 40584 ssh2
+Sep  9 20:26:17 web01 sshd[6753]: Received disconnect from 192.0.2.175 port 40584:11: Bye Bye [preauth]
+Sep  9 20:26:17 web01 sshd[6753]: Disconnected from authenticating user root 192.0.2.175 port 40584 [preauth]
+Sep  9 20:28:40 web01 sshd[6760]: Invalid user ubuntu from 198.51.100.237 port 41641
+Sep  9 20:28:40 web01 sshd[6760]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 20:28:40 web01 sshd[6760]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.237
+Sep  9 20:28:42 web01 sshd[6760]: Failed password for invalid user ubuntu from 198.51.100.237 port 41641 ssh2
+Sep  9 20:28:43 web01 sshd[6760]: Received disconnect from 198.51.100.237 port 41641:11: Bye Bye [preauth]
+Sep  9 20:28:43 web01 sshd[6760]: Disconnected from invalid user ubuntu 198.51.100.237 port 41641 [preauth]
+Sep  9 20:41:47 web01 sshd[6791]: Accepted publickey for carol from 10.8.0.14 port 58367 ssh2: RSA SHA256:jSYqOSB8+WrzrIUtzefLoPus+Khu3iROj4TEzpbDQ/h
+Sep  9 20:41:47 web01 sshd[6791]: pam_unix(sshd:session): session opened for user carol(uid=1003) by (uid=0)
+Sep  9 20:41:47 web01 systemd-logind[612]: New session 245 of user carol.
+Sep  9 21:11:36 web01 sshd[6807]: Invalid user pi from 198.51.100.32 port 41740
+Sep  9 21:11:36 web01 sshd[6807]: pam_unix(sshd:auth): check pass; user unknown
+Sep  9 21:11:36 web01 sshd[6807]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.32
+Sep  9 21:11:38 web01 sshd[6807]: Failed password for invalid user pi from 198.51.100.32 port 41740 ssh2
+Sep  9 21:11:40 web01 sshd[6807]: Received disconnect from 198.51.100.32 port 41740:11: Bye Bye [preauth]
+Sep  9 21:11:40 web01 sshd[6807]: Disconnected from invalid user pi 198.51.100.32 port 41740 [preauth]
+Sep  9 21:17:01 web01 CRON[6848]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 21:17:02 web01 CRON[6848]: pam_unix(cron:session): session closed for user root
+Sep  9 22:13:47 web01 sshd[6791]: Received disconnect from 10.8.0.14 port 58367:11: disconnected by user
+Sep  9 22:13:47 web01 sshd[6791]: Disconnected from user carol 10.8.0.14 port 58367
+Sep  9 22:13:47 web01 sshd[6791]: pam_unix(sshd:session): session closed for user carol
+Sep  9 22:13:47 web01 systemd-logind[612]: Session 245 logged out. Waiting for processes to exit.
+Sep  9 22:13:47 web01 systemd-logind[612]: Removed session 245.
+Sep  9 22:17:01 web01 CRON[6860]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 22:17:02 web01 CRON[6860]: pam_unix(cron:session): session closed for user root
+Sep  9 22:38:57 web01 sshd[6870]: error: kex_exchange_identification: Connection closed by remote host
+Sep  9 22:38:57 web01 sshd[6870]: Connection closed by 203.0.113.49 port 52556
+Sep  9 23:17:01 web01 CRON[6898]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep  9 23:17:01 web01 CRON[6898]: pam_unix(cron:session): session closed for user root
+Sep 10 00:17:01 web01 CRON[6929]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 00:17:02 web01 CRON[6929]: pam_unix(cron:session): session closed for user root
+Sep 10 00:43:14 web01 sshd[6967]: Invalid user admin from 192.0.2.103 port 43307
+Sep 10 00:43:14 web01 sshd[6967]: Connection closed by invalid user admin 192.0.2.103 port 43307 [preauth]
+Sep 10 01:17:01 web01 CRON[6997]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 01:17:02 web01 CRON[6997]: pam_unix(cron:session): session closed for user root
+Sep 10 01:52:13 web01 sshd[7034]: Accepted publickey for dave from 10.8.0.22 port 50843 ssh2: ED25519 SHA256:z1lM9vKv0caUXc2KSQMu7/vcm0FG/uGvdMBgI7N02tN
+Sep 10 01:52:13 web01 sshd[7034]: pam_unix(sshd:session): session opened for user dave(uid=1004) by (uid=0)
+Sep 10 01:52:13 web01 systemd-logind[612]: New session 246 of user dave.
+Sep 10 01:55:03 web01 sudo:     dave : TTY=pts/0 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/journalctl -u postgresql -n 100
+Sep 10 01:55:03 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep 10 01:55:05 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 01:55:39 web01 sshd[7072]: error: kex_exchange_identification: Connection closed by remote host
+Sep 10 01:55:39 web01 sshd[7072]: Connection closed by 203.0.113.36 port 41517
+Sep 10 01:57:18 web01 sudo:     dave : TTY=pts/0 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/systemctl restart postgresql
+Sep 10 01:57:18 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep 10 01:57:23 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 02:11:52 web01 sshd[7080]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.243  user=root
+Sep 10 02:11:54 web01 sshd[7080]: Failed password for root from 203.0.113.243 port 38891 ssh2
+Sep 10 02:11:56 web01 sshd[7080]: Received disconnect from 203.0.113.243 port 38891:11: Bye Bye [preauth]
+Sep 10 02:11:56 web01 sshd[7080]: Disconnected from authenticating user root 203.0.113.243 port 38891 [preauth]
+Sep 10 02:16:13 web01 sshd[7034]: Received disconnect from 10.8.0.22 port 50843:11: disconnected by user
+Sep 10 02:16:13 web01 sshd[7034]: Disconnected from user dave 10.8.0.22 port 50843
+Sep 10 02:16:13 web01 sshd[7034]: pam_unix(sshd:session): session closed for user dave
+Sep 10 02:16:13 web01 systemd-logind[612]: Session 246 logged out. Waiting for processes to exit.
+Sep 10 02:16:13 web01 systemd-logind[612]: Removed session 246.
+Sep 10 02:17:01 web01 CRON[7091]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 02:17:02 web01 CRON[7091]: pam_unix(cron:session): session closed for user root
+Sep 10 02:23:11 web01 sshd[7113]: Connection closed by 198.51.100.73 port 34519 [preauth]
+Sep 10 03:08:27 web01 sshd[7135]: Invalid user postgres from 198.51.100.63 port 33945
+Sep 10 03:08:28 web01 sshd[7135]: Connection closed by invalid user postgres 198.51.100.63 port 33945 [preauth]
+Sep 10 03:17:01 web01 CRON[7159]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 03:17:01 web01 CRON[7159]: pam_unix(cron:session): session closed for user root
+Sep 10 04:07:02 web01 sshd[7173]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.38  user=root
+Sep 10 04:07:05 web01 sshd[7173]: Failed password for root from 198.51.100.38 port 47825 ssh2
+Sep 10 04:07:05 web01 sshd[7173]: Received disconnect from 198.51.100.38 port 47825:11: Bye Bye [preauth]
+Sep 10 04:07:05 web01 sshd[7173]: Disconnected from authenticating user root 198.51.100.38 port 47825 [preauth]
+Sep 10 04:17:01 web01 CRON[7196]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 04:17:01 web01 CRON[7196]: pam_unix(cron:session): session closed for user root
+Sep 10 04:46:57 web01 sshd[7231]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.92  user=root
+Sep 10 04:46:59 web01 sshd[7231]: Failed password for root from 198.51.100.92 port 59692 ssh2
+Sep 10 04:47:00 web01 sshd[7231]: Received disconnect from 198.51.100.92 port 59692:11: Bye Bye [preauth]
+Sep 10 04:47:00 web01 sshd[7231]: Disconnected from authenticating user root 198.51.100.92 port 59692 [preauth]
+Sep 10 05:17:01 web01 CRON[7264]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 05:17:02 web01 CRON[7264]: pam_unix(cron:session): session closed for user root
+Sep 10 05:21:53 web01 sshd[7300]: Invalid user oracle from 192.0.2.79 port 35708
+Sep 10 05:21:53 web01 sshd[7300]: pam_unix(sshd:auth): check pass; user unknown
+Sep 10 05:21:53 web01 sshd[7300]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.79
+Sep 10 05:21:55 web01 sshd[7300]: Failed password for invalid user oracle from 192.0.2.79 port 35708 ssh2
+Sep 10 05:21:56 web01 sshd[7300]: Received disconnect from 192.0.2.79 port 35708:11: Bye Bye [preauth]
+Sep 10 05:21:56 web01 sshd[7300]: Disconnected from invalid user oracle 192.0.2.79 port 35708 [preauth]
+Sep 10 05:30:08 web01 sshd[7320]: Accepted publickey for deploy from 10.0.5.10 port 33042 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep 10 05:30:08 web01 sshd[7320]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep 10 05:30:08 web01 systemd-logind[612]: New session 247 of user deploy.
+Sep 10 05:31:18 web01 sudo:   deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/local/bin/db-backup.sh
+Sep 10 05:31:18 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep 10 05:31:33 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 05:32:08 web01 sshd[7320]: Received disconnect from 10.0.5.10 port 33042:11: disconnected by user
+Sep 10 05:32:08 web01 sshd[7320]: Disconnected from user deploy 10.0.5.10 port 33042
+Sep 10 05:32:08 web01 sshd[7320]: pam_unix(sshd:session): session closed for user deploy
+Sep 10 05:32:08 web01 systemd-logind[612]: Session 247 logged out. Waiting for processes to exit.
+Sep 10 05:32:08 web01 systemd-logind[612]: Removed session 247.
+Sep 10 06:17:01 web01 CRON[7338]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 06:17:02 web01 CRON[7338]: pam_unix(cron:session): session closed for user root
+Sep 10 06:25:01 web01 CRON[7377]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 06:25:02 web01 CRON[7377]: pam_unix(cron:session): session closed for user root
+Sep 10 07:17:01 web01 CRON[7381]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 07:17:01 web01 CRON[7381]: pam_unix(cron:session): session closed for user root
+Sep 10 07:23:09 web01 sshd[7418]: Invalid user dev from 198.51.100.246 port 56934
+Sep 10 07:23:09 web01 sshd[7418]: Connection closed by invalid user dev 198.51.100.246 port 56934 [preauth]
+Sep 10 07:33:35 web01 sshd[7449]: Unable to negotiate with 192.0.2.79 port 36627: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep 10 07:40:37 web01 sshd[7482]: Invalid user oracle from 192.0.2.32 port 58945
+Sep 10 07:40:37 web01 sshd[7482]: pam_unix(sshd:auth): check pass; user unknown
+Sep 10 07:40:37 web01 sshd[7482]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.32
+Sep 10 07:40:40 web01 sshd[7482]: Failed password for invalid user oracle from 192.0.2.32 port 58945 ssh2
+Sep 10 07:40:40 web01 sshd[7482]: Received disconnect from 192.0.2.32 port 58945:11: Bye Bye [preauth]
+Sep 10 07:40:40 web01 sshd[7482]: Disconnected from invalid user oracle 192.0.2.32 port 58945 [preauth]
+Sep 10 08:16:42 web01 sshd[7523]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.103  user=root
+Sep 10 08:16:45 web01 sshd[7523]: Failed password for root from 192.0.2.103 port 35239 ssh2
+Sep 10 08:16:47 web01 sshd[7523]: Received disconnect from 192.0.2.103 port 35239:11: Bye Bye [preauth]
+Sep 10 08:16:47 web01 sshd[7523]: Disconnected from authenticating user root 192.0.2.103 port 35239 [preauth]
+Sep 10 08:17:01 web01 CRON[7532]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 08:17:02 web01 CRON[7532]: pam_unix(cron:session): session closed for user root
+Sep 10 08:50:08 web01 sshd[7542]: Accepted publickey for alice from 10.0.1.23 port 46658 ssh2: ED25519 SHA256:ZxoHLgbtngZEEnlg3ouJTqxeIDc7B4ATB1ejdXOATe2
+Sep 10 08:50:08 web01 sshd[7542]: pam_unix(sshd:session): session opened for user alice(uid=1001) by (uid=0)
+Sep 10 08:50:08 web01 systemd-logind[612]: New session 248 of user alice.
+Sep 10 09:10:55 web01 sudo:    alice : TTY=pts/0 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/journalctl -u webapp --since today
+Sep 10 09:10:55 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by alice(uid=1001)
+Sep 10 09:11:06 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 09:17:01 web01 CRON[7551]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 09:17:01 web01 CRON[7551]: pam_unix(cron:session): session closed for user root
+Sep 10 09:19:31 web01 sshd[7578]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=10.0.1.57  user=bob
+Sep 10 09:19:32 web01 sshd[7578]: Failed password for bob from 10.0.1.57 port 40309 ssh2
+Sep 10 09:19:38 web01 sshd[7578]: Accepted password for bob from 10.0.1.57 port 40309 ssh2
+Sep 10 09:19:38 web01 sshd[7578]: pam_unix(sshd:session): session opened for user bob(uid=1002) by (uid=0)
+Sep 10 09:19:38 web01 systemd-logind[612]: New session 249 of user bob.
+Sep 10 09:46:12 web01 sshd[7608]: Accepted publickey for dave from 10.0.1.81 port 45789 ssh2: ED25519 SHA256:z1lM9vKv0caUXc2KSQMu7/vcm0FG/uGvdMBgI7N02tN
+Sep 10 09:46:12 web01 sshd[7608]: pam_unix(sshd:session): session opened for user dave(uid=1004) by (uid=0)
+Sep 10 09:46:12 web01 systemd-logind[612]: New session 250 of user dave.
+Sep 10 10:17:01 web01 CRON[7627]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 10:17:01 web01 CRON[7627]: pam_unix(cron:session): session closed for user root
+Sep 10 10:32:06 web01 sshd[7662]: Accepted publickey for carol from 10.8.0.14 port 41389 ssh2: RSA SHA256:jSYqOSB8+WrzrIUtzefLoPus+Khu3iROj4TEzpbDQ/h
+Sep 10 10:32:06 web01 sshd[7662]: pam_unix(sshd:session): session opened for user carol(uid=1003) by (uid=0)
+Sep 10 10:32:06 web01 systemd-logind[612]: New session 251 of user carol.
+Sep 10 10:49:27 web01 sudo:     dave : TTY=pts/1 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/du -sh /var/lib/postgresql
+Sep 10 10:49:27 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep 10 10:49:32 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 11:15:31 web01 sshd[7578]: Received disconnect from 10.0.1.57 port 40309:11: disconnected by user
+Sep 10 11:15:31 web01 sshd[7578]: Disconnected from user bob 10.0.1.57 port 40309
+Sep 10 11:15:31 web01 sshd[7578]: pam_unix(sshd:session): session closed for user bob
+Sep 10 11:15:31 web01 systemd-logind[612]: Session 249 logged out. Waiting for processes to exit.
+Sep 10 11:15:31 web01 systemd-logind[612]: Removed session 249.
+Sep 10 11:17:01 web01 CRON[7665]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 11:17:01 web01 CRON[7665]: pam_unix(cron:session): session closed for user root
+Sep 10 11:20:05 web01 sshd[7692]: Accepted publickey for dave from 10.0.1.81 port 43314 ssh2: ED25519 SHA256:z1lM9vKv0caUXc2KSQMu7/vcm0FG/uGvdMBgI7N02tN
+Sep 10 11:20:05 web01 sshd[7692]: pam_unix(sshd:session): session opened for user dave(uid=1004) by (uid=0)
+Sep 10 11:20:05 web01 systemd-logind[612]: New session 252 of user dave.
+Sep 10 11:22:16 web01 sudo:     dave : TTY=pts/2 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/adduser erin
+Sep 10 11:22:16 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep 10 11:22:17 web01 groupadd[7727]: group added to /etc/group: name=erin, GID=1005
+Sep 10 11:22:17 web01 groupadd[7727]: group added to /etc/gshadow: name=erin
+Sep 10 11:22:17 web01 groupadd[7727]: new group: name=erin, GID=1005
+Sep 10 11:22:17 web01 useradd[7742]: new user: name=erin, UID=1005, GID=1005, home=/home/erin, shell=/bin/bash, from=/dev/pts/2
+Sep 10 11:22:35 web01 passwd[7772]: pam_unix(passwd:chauthtok): password changed for erin
+Sep 10 11:22:51 web01 chfn[7784]: changed user 'erin' information
+Sep 10 11:22:58 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 11:23:53 web01 sudo:     dave : TTY=pts/2 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/usermod -aG sudo erin
+Sep 10 11:23:53 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep 10 11:23:53 web01 usermod[7802]: add 'erin' to group 'sudo'
+Sep 10 11:23:53 web01 usermod[7802]: add 'erin' to shadow group 'sudo'
+Sep 10 11:23:54 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 11:24:56 web01 sudo:     dave : TTY=pts/2 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/usermod -aG docker bob
+Sep 10 11:24:56 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep 10 11:24:56 web01 usermod[7807]: add 'bob' to group 'docker'
+Sep 10 11:24:56 web01 usermod[7807]: add 'bob' to shadow group 'docker'
+Sep 10 11:24:57 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 11:45:05 web01 sshd[7692]: Received disconnect from 10.0.1.81 port 43314:11: disconnected by user
+Sep 10 11:45:05 web01 sshd[7692]: Disconnected from user dave 10.0.1.81 port 43314
+Sep 10 11:45:05 web01 sshd[7692]: pam_unix(sshd:session): session closed for user dave
+Sep 10 11:45:05 web01 systemd-logind[612]: Session 252 logged out. Waiting for processes to exit.
+Sep 10 11:45:05 web01 systemd-logind[612]: Removed session 252.
+Sep 10 12:01:51 web01 sshd[7811]: Unable to negotiate with 198.51.100.63 port 58608: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep 10 12:04:08 web01 sshd[7542]: Received disconnect from 10.0.1.23 port 46658:11: disconnected by user
+Sep 10 12:04:08 web01 sshd[7542]: Disconnected from user alice 10.0.1.23 port 46658
+Sep 10 12:04:08 web01 sshd[7542]: pam_unix(sshd:session): session closed for user alice
+Sep 10 12:04:08 web01 systemd-logind[612]: Session 248 logged out. Waiting for processes to exit.
+Sep 10 12:04:08 web01 systemd-logind[612]: Removed session 248.
+Sep 10 12:12:06 web01 sshd[7662]: Received disconnect from 10.8.0.14 port 41389:11: disconnected by user
+Sep 10 12:12:06 web01 sshd[7662]: Disconnected from user carol 10.8.0.14 port 41389
+Sep 10 12:12:06 web01 sshd[7662]: pam_unix(sshd:session): session closed for user carol
+Sep 10 12:12:06 web01 systemd-logind[612]: Session 251 logged out. Waiting for processes to exit.
+Sep 10 12:12:06 web01 systemd-logind[612]: Removed session 251.
+Sep 10 12:17:01 web01 CRON[7832]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 12:17:01 web01 CRON[7832]: pam_unix(cron:session): session closed for user root
+Sep 10 12:51:52 web01 sudo:     dave : TTY=pts/1 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/systemctl status postgresql
+Sep 10 12:51:52 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1004)
+Sep 10 12:52:10 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 12:52:33 web01 sshd[7839]: Accepted publickey for deploy from 10.0.5.10 port 50620 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep 10 12:52:33 web01 sshd[7839]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep 10 12:52:33 web01 systemd-logind[612]: New session 253 of user deploy.
+Sep 10 12:54:43 web01 sudo:   deploy : TTY=pts/3 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep 10 12:54:43 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep 10 12:54:51 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 12:56:33 web01 sshd[7839]: Received disconnect from 10.0.5.10 port 50620:11: disconnected by user
+Sep 10 12:56:33 web01 sshd[7839]: Disconnected from user deploy 10.0.5.10 port 50620
+Sep 10 12:56:33 web01 sshd[7839]: pam_unix(sshd:session): session closed for user deploy
+Sep 10 12:56:33 web01 systemd-logind[612]: Session 253 logged out. Waiting for processes to exit.
+Sep 10 12:56:33 web01 systemd-logind[612]: Removed session 253.
+Sep 10 13:06:13 web01 sshd[7842]: Accepted publickey for alice from 10.0.1.23 port 33414 ssh2: ED25519 SHA256:ZxoHLgbtngZEEnlg3ouJTqxeIDc7B4ATB1ejdXOATe2
+Sep 10 13:06:13 web01 sshd[7842]: pam_unix(sshd:session): session opened for user alice(uid=1001) by (uid=0)
+Sep 10 13:06:13 web01 systemd-logind[612]: New session 254 of user alice.
+Sep 10 13:17:01 web01 CRON[7865]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 13:17:01 web01 CRON[7865]: pam_unix(cron:session): session closed for user root
+Sep 10 13:39:42 web01 sshd[7877]: Invalid user pi from 198.51.100.240 port 40717
+Sep 10 13:39:42 web01 sshd[7877]: pam_unix(sshd:auth): check pass; user unknown
+Sep 10 13:39:42 web01 sshd[7877]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.240
+Sep 10 13:39:44 web01 sshd[7877]: Failed password for invalid user pi from 198.51.100.240 port 40717 ssh2
+Sep 10 13:39:45 web01 sshd[7877]: Received disconnect from 198.51.100.240 port 40717:11: Bye Bye [preauth]
+Sep 10 13:39:45 web01 sshd[7877]: Disconnected from invalid user pi 198.51.100.240 port 40717 [preauth]
+Sep 10 13:41:41 web01 sshd[7909]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.26  user=root
+Sep 10 13:41:44 web01 sshd[7909]: Failed password for root from 198.51.100.26 port 43720 ssh2
+Sep 10 13:41:46 web01 sshd[7909]: Received disconnect from 198.51.100.26 port 43720:11: Bye Bye [preauth]
+Sep 10 13:41:46 web01 sshd[7909]: Disconnected from authenticating user root 198.51.100.26 port 43720 [preauth]
+Sep 10 13:47:15 web01 sshd[7943]: Accepted publickey for deploy from 10.0.5.10 port 51019 ssh2: ED25519 SHA256:ZWtUVdZ/oudJ//dl+V3Pq00k1sjQCVJNU31hzVlJi7+
+Sep 10 13:47:15 web01 sshd[7943]: pam_unix(sshd:session): session opened for user deploy(uid=1100) by (uid=0)
+Sep 10 13:47:15 web01 systemd-logind[612]: New session 255 of user deploy.
+Sep 10 13:49:44 web01 sudo:   deploy : TTY=pts/2 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl restart webapp
+Sep 10 13:49:44 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1100)
+Sep 10 13:50:01 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 13:50:01 web01 sshd[7975]: error: kex_exchange_identification: Connection closed by remote host
+Sep 10 13:50:01 web01 sshd[7975]: Connection closed by 198.51.100.244 port 38378
+Sep 10 13:51:15 web01 sshd[7943]: Received disconnect from 10.0.5.10 port 51019:11: disconnected by user
+Sep 10 13:51:15 web01 sshd[7943]: Disconnected from user deploy 10.0.5.10 port 51019
+Sep 10 13:51:15 web01 sshd[7943]: pam_unix(sshd:session): session closed for user deploy
+Sep 10 13:51:15 web01 systemd-logind[612]: Session 255 logged out. Waiting for processes to exit.
+Sep 10 13:51:15 web01 systemd-logind[612]: Removed session 255.
+Sep 10 14:00:44 web01 sshd[7987]: Invalid user pi from 203.0.113.152 port 56871
+Sep 10 14:00:44 web01 sshd[7987]: pam_unix(sshd:auth): check pass; user unknown
+Sep 10 14:00:44 web01 sshd[7987]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.152
+Sep 10 14:00:46 web01 sshd[7987]: Failed password for invalid user pi from 203.0.113.152 port 56871 ssh2
+Sep 10 14:00:48 web01 sshd[7987]: Received disconnect from 203.0.113.152 port 56871:11: Bye Bye [preauth]
+Sep 10 14:00:48 web01 sshd[7987]: Disconnected from invalid user pi 203.0.113.152 port 56871 [preauth]
+Sep 10 14:03:51 web01 sshd[8009]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.77  user=root
+Sep 10 14:03:54 web01 sshd[8009]: Failed password for root from 192.0.2.77 port 55479 ssh2
+Sep 10 14:03:56 web01 sshd[8009]: Received disconnect from 192.0.2.77 port 55479:11: Bye Bye [preauth]
+Sep 10 14:03:56 web01 sshd[8009]: Disconnected from authenticating user root 192.0.2.77 port 55479 [preauth]
+Sep 10 14:04:25 web01 sshd[8016]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.77  user=root
+Sep 10 14:04:28 web01 sshd[8016]: Failed password for root from 192.0.2.77 port 52758 ssh2
+Sep 10 14:04:30 web01 sshd[8016]: Received disconnect from 192.0.2.77 port 52758:11: Bye Bye [preauth]
+Sep 10 14:04:30 web01 sshd[8016]: Disconnected from authenticating user root 192.0.2.77 port 52758 [preauth]
+Sep 10 14:04:55 web01 sshd[8041]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.77  user=root
+Sep 10 14:04:58 web01 sshd[8041]: Failed password for root from 192.0.2.77 port 53657 ssh2
+Sep 10 14:04:58 web01 sshd[8041]: Received disconnect from 192.0.2.77 port 53657:11: Bye Bye [preauth]
+Sep 10 14:04:58 web01 sshd[8041]: Disconnected from authenticating user root 192.0.2.77 port 53657 [preauth]
+Sep 10 14:05:38 web01 sshd[8076]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.77  user=root
+Sep 10 14:05:40 web01 sshd[8076]: Failed password for root from 192.0.2.77 port 46091 ssh2
+Sep 10 14:05:42 web01 sshd[8076]: Received disconnect from 192.0.2.77 port 46091:11: Bye Bye [preauth]
+Sep 10 14:05:42 web01 sshd[8076]: Disconnected from authenticating user root 192.0.2.77 port 46091 [preauth]
+Sep 10 14:17:01 web01 CRON[8116]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 14:17:01 web01 CRON[8116]: pam_unix(cron:session): session closed for user root
+Sep 10 14:22:50 web01 sshd[8150]: Connection closed by 203.0.113.92 port 42922 [preauth]
+Sep 10 14:24:42 web01 sshd[8173]: Unable to negotiate with 198.51.100.237 port 60420: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep 10 14:30:12 web01 sshd[7608]: Received disconnect from 10.0.1.81 port 45789:11: disconnected by user
+Sep 10 14:30:12 web01 sshd[7608]: Disconnected from user dave 10.0.1.81 port 45789
+Sep 10 14:30:12 web01 sshd[7608]: pam_unix(sshd:session): session closed for user dave
+Sep 10 14:30:12 web01 systemd-logind[612]: Session 250 logged out. Waiting for processes to exit.
+Sep 10 14:30:12 web01 systemd-logind[612]: Removed session 250.
+Sep 10 15:17:01 web01 CRON[8177]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 15:17:01 web01 CRON[8177]: pam_unix(cron:session): session closed for user root
+Sep 10 15:21:03 web01 sudo:    alice : TTY=pts/2 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/journalctl -u webapp --since today
+Sep 10 15:21:03 web01 sudo: pam_unix(sudo:session): session opened for user root(uid=0) by alice(uid=1001)
+Sep 10 15:21:12 web01 sudo: pam_unix(sudo:session): session closed for user root
+Sep 10 15:27:12 web01 sshd[8190]: error: kex_exchange_identification: Connection closed by remote host
+Sep 10 15:27:12 web01 sshd[8190]: Connection closed by 192.0.2.178 port 48568
+Sep 10 16:08:55 web01 sshd[8222]: error: kex_exchange_identification: Connection closed by remote host
+Sep 10 16:08:55 web01 sshd[8222]: Connection closed by 203.0.113.152 port 46120
+Sep 10 16:12:13 web01 sshd[7842]: Received disconnect from 10.0.1.23 port 33414:11: disconnected by user
+Sep 10 16:12:13 web01 sshd[7842]: Disconnected from user alice 10.0.1.23 port 33414
+Sep 10 16:12:13 web01 sshd[7842]: pam_unix(sshd:session): session closed for user alice
+Sep 10 16:12:13 web01 systemd-logind[612]: Session 254 logged out. Waiting for processes to exit.
+Sep 10 16:12:13 web01 systemd-logind[612]: Removed session 254.
+Sep 10 16:17:01 web01 CRON[8227]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 16:17:02 web01 CRON[8227]: pam_unix(cron:session): session closed for user root
+Sep 10 17:07:29 web01 sshd[8268]: Connection closed by 203.0.113.151 port 48102 [preauth]
+Sep 10 17:12:57 web01 sshd[8292]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.0.2.178  user=root
+Sep 10 17:12:59 web01 sshd[8292]: Failed password for root from 192.0.2.178 port 53183 ssh2
+Sep 10 17:13:00 web01 sshd[8292]: Received disconnect from 192.0.2.178 port 53183:11: Bye Bye [preauth]
+Sep 10 17:13:00 web01 sshd[8292]: Disconnected from authenticating user root 192.0.2.178 port 53183 [preauth]
+Sep 10 17:17:01 web01 CRON[8317]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 17:17:01 web01 CRON[8317]: pam_unix(cron:session): session closed for user root
+Sep 10 17:33:15 web01 sshd[8352]: Connection closed by 198.51.100.140 port 53941 [preauth]
+Sep 10 18:17:01 web01 CRON[8373]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 18:17:01 web01 CRON[8373]: pam_unix(cron:session): session closed for user root
+Sep 10 19:17:01 web01 CRON[8399]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 19:17:02 web01 CRON[8399]: pam_unix(cron:session): session closed for user root
+Sep 10 20:17:01 web01 CRON[8418]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 20:17:02 web01 CRON[8418]: pam_unix(cron:session): session closed for user root
+Sep 10 20:57:16 web01 sshd[8456]: Invalid user user from 192.0.2.103 port 45200
+Sep 10 20:57:17 web01 sshd[8456]: Connection closed by invalid user user 192.0.2.103 port 45200 [preauth]
+Sep 10 21:03:18 web01 sshd[8473]: Unable to negotiate with 198.51.100.73 port 33720: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep 10 21:11:50 web01 sshd[8480]: error: kex_exchange_identification: Connection closed by remote host
+Sep 10 21:11:50 web01 sshd[8480]: Connection closed by 192.0.2.74 port 51144
+Sep 10 21:17:01 web01 CRON[8496]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 21:17:01 web01 CRON[8496]: pam_unix(cron:session): session closed for user root
+Sep 10 22:13:50 web01 sshd[8522]: error: kex_exchange_identification: Connection closed by remote host
+Sep 10 22:13:50 web01 sshd[8522]: Connection closed by 203.0.113.243 port 48378
+Sep 10 22:17:01 web01 CRON[8538]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 22:17:02 web01 CRON[8538]: pam_unix(cron:session): session closed for user root
+Sep 10 22:29:57 web01 sshd[8541]: Unable to negotiate with 198.51.100.245 port 49391: no matching key exchange method found. Their offer: diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1 [preauth]
+Sep 10 22:49:59 web01 sshd[8555]: Invalid user minecraft from 198.51.100.30 port 42388
+Sep 10 22:49:59 web01 sshd[8555]: pam_unix(sshd:auth): check pass; user unknown
+Sep 10 22:49:59 web01 sshd[8555]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=198.51.100.30
+Sep 10 22:50:01 web01 sshd[8555]: Failed password for invalid user minecraft from 198.51.100.30 port 42388 ssh2
+Sep 10 22:50:03 web01 sshd[8555]: Received disconnect from 198.51.100.30 port 42388:11: Bye Bye [preauth]
+Sep 10 22:50:03 web01 sshd[8555]: Disconnected from invalid user minecraft 198.51.100.30 port 42388 [preauth]
+Sep 10 23:17:01 web01 CRON[8586]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Sep 10 23:17:02 web01 CRON[8586]: pam_unix(cron:session): session closed for user root

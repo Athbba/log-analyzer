@@ -1,0 +1,23 @@
+# Dependencies (none yet)
+node_modules/
+
+# Logs, including rotated ones (auth.log.1, auth.log.2.gz). Real auth logs hold
+# usernames and IP addresses, so any you analyze here stay out of the repo.
+# The synthetic sample is the one exception.
+*.log
+*.log.*
+!samples/auth.log
+
+# Test coverage
+coverage/
+*.lcov
+
+# Environment files
+.env
+.env.*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
