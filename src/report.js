@@ -4,40 +4,72 @@
 import { styleText } from 'node:util';
 import { SEVERITIES } from './detectors.js';
 
+/** @typedef {import('./types.js').Finding} Finding */
+/** @typedef {import('./types.js').Incident} Incident */
+/** @typedef {import('./types.js').Options} Options */
+/** @typedef {import('./types.js').ParseStats} ParseStats */
+/** @typedef {import('./types.js').Severity} Severity */
+/** @typedef {{ source: string, stats: ParseStats, options: Options, incidents: Incident[] }} Result */
+
+/** @type {Record<Finding['rule'], string>} */
 const LABELS = {
   'brute-force': 'brute force',
   'possible-breach': 'possible breach',
   'unusual-hour': 'unusual hour',
   'account-change': 'account change',
 };
+/** @type {Record<Severity, 'red' | 'yellow' | 'cyan'>} */
 const COLORS = { high: 'red', medium: 'yellow', low: 'cyan' };
 const INDENT = ' '.repeat(2 + 19 + 2 + 17);
 
+/** @param {number} ms */
 const stamp = (ms) => new Date(ms).toISOString().slice(0, 19).replace('T', ' ');
+/** @param {number} ms */
 const hhmm = (ms) => stamp(ms).slice(11, 16);
+/** @param {number} n */
 const pad2 = (n) => String(n).padStart(2, '0');
+/** @param {number} n */
 const num = (n) => n.toLocaleString('en-US');
+/** @param {number} n @param {string} word */
 const plural = (n, word) => `${num(n)} ${word}${n === 1 ? '' : 's'}`;
 
+/**
+ * A duration as "1h 2m 3s", leaving out zero parts.
+ * @param {number} ms
+ */
 export function duration(ms) {
   const s = Math.round(ms / 1000);
   if (s < 60) return `${s}s`;
-  return [[Math.floor(s / 3600), 'h'], [Math.floor(s / 60) % 60, 'm'], [s % 60, 's']]
+  /** @type {[number, string][]} */
+  const parts = [[Math.floor(s / 3600), 'h'], [Math.floor(s / 60) % 60, 'm'], [s % 60, 's']];
+  return parts
     .filter(([n]) => n > 0)
     .map(([n, unit]) => `${n}${unit}`)
     .join(' ');
 }
 
+/**
+ * @param {Incident[]} incidents
+ * @returns {Record<Severity, number>}
+ */
 export function countBySeverity(incidents) {
-  return Object.fromEntries(SEVERITIES.map((s) => [s, incidents.filter((i) => i.severity === s).length]));
+  return /** @type {Record<Severity, number>} */ (
+    Object.fromEntries(SEVERITIES.map((s) => [s, incidents.filter((i) => i.severity === s).length])));
 }
 
+/**
+ * The terminal report.
+ * @param {Result} result
+ * @param {{ color?: boolean }} [options]
+ */
 export function formatText({ source, stats, options, incidents }, { color = false } = {}) {
+  /** @param {Parameters<typeof styleText>[0]} style @param {string} text */
   const paint = (style, text) => (color ? styleText(style, text) : text);
   const [from, to] = options.night;
   const out = [
     paint('bold', `SSH auth log analysis: ${source}`),
-    `${plural(stats.lines, 'line')}` + (stats.first === null ? '' : `, ${stamp(stats.first)} to ${stamp(stats.last)}`),
+    `${plural(stats.lines, 'line')}` +
+      (stats.first === null || stats.last === null ? '' : `, ${stamp(stats.first)} to ${stamp(stats.last)}`),
     `${plural(stats.failures, 'failed login')}, ${plural(stats.successes, 'successful login')}`,
   ];
   if (stats.unrecognized > 0) {
@@ -73,6 +105,11 @@ export function formatText({ source, stats, options, incidents }, { color = fals
   return out.join('\n') + '\n';
 }
 
+/**
+ * The text lines describing one finding.
+ * @param {Finding} f
+ * @returns {string[]}
+ */
 function describe(f) {
   switch (f.rule) {
     case 'brute-force': {
@@ -115,6 +152,10 @@ function describe(f) {
   }
 }
 
+/**
+ * The JSON report. Times are printed as wall-clock ISO strings without a zone.
+ * @param {Result} result
+ */
 export function formatJson({ source, stats, options, incidents }) {
   const timeKeys = new Set(['time', 'until', 'firstFailure', 'first', 'last']);
   const report = {
@@ -129,6 +170,7 @@ export function formatJson({ source, stats, options, incidents }) {
     summary: countBySeverity(incidents),
     incidents,
   };
+  /** @param {string} key @param {unknown} value */
   const replacer = (key, value) =>
     timeKeys.has(key) && typeof value === 'number' ? new Date(value).toISOString().slice(0, 19) : value;
   return JSON.stringify(report, replacer, 2) + '\n';

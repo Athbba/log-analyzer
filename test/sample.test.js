@@ -15,6 +15,8 @@ const cli = (args, input) => spawnSync(process.execPath, [BIN, ...args], { input
 
 const { events, stats } = await parseLines(readFileSync(SAMPLE, 'utf8').split('\n'), { year: 2026 });
 const incidents = analyze(events);
+// Typed loosely on purpose: tests read fields specific to each rule.
+/** @param {string} ip @returns {any} */
 const incident = (ip) => incidents.find((i) => i.ip === ip);
 
 test('finds exactly the injected attacks in the sample log', () => {

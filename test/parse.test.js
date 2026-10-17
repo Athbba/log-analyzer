@@ -2,6 +2,12 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { parseLines } from '../src/parse.js';
 
+// Typed loosely on purpose: tests read fields specific to each event type.
+/**
+ * @param {string} text
+ * @param {{ year?: number }} [options]
+ * @returns {Promise<{ events: any[], stats: import('../src/types.js').ParseStats }>}
+ */
 const parse = (text, options = { year: 2026 }) => parseLines(text.trim().split('\n'), options);
 
 test('reads failed and accepted logins and skips the duplicate PAM lines', async () => {

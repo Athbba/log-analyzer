@@ -1,0 +1,21 @@
+{
+  // Type-checks the JavaScript sources from their JSDoc annotations. Nothing is
+  // emitted: the .js files run as they are. See docs/adr/0004.
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["es2023"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true
+  },
+  "include": ["bin", "src", "scripts", "*.js"]
+}
