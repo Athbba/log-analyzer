@@ -1,5 +1,25 @@
 # SSH Log Analyzer
 
+[![CI](https://github.com/Athbba/log-analyzer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Athbba/log-analyzer/actions/workflows/ci.yml)
+![Node.js 22.13+](https://img.shields.io/badge/node-%E2%89%A522.13-339933)
+![Runtime dependencies: 0](https://img.shields.io/badge/runtime%20dependencies-0-blue)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+**Turns a Linux SSH `auth.log` into attacker-by-attacker incidents (brute force, then the break-in, then the backdoor account), labelled with MITRE ATT&CK, from a finished file or a live log, in plain Node.js with no runtime dependencies.**
+
+```sh
+git clone https://github.com/Athbba/log-analyzer.git && cd log-analyzer
+node bin/analyze.js samples/auth.log --db runs.db   # report on a sample log, and store it
+npm run dashboard -- --db runs.db                    # browse it at http://127.0.0.1:4797/
+```
+
+- **8 detections**, each documented with its false positives and measured on labelled data ([detections](docs/detections.md), [evaluation](docs/evaluation.md)).
+- **Live mode** that survives log rotation, with rate-limited **Discord** alerts.
+- **SQLite storage** and a local, read-only, JavaScript-free **dashboard**.
+- **Hostile-input safe**: linear-time parsing, bounded memory, escaped output everywhere; validated against real OpenSSH in a Docker lab in CI.
+
+## What it detects
+
 A command-line tool that reads a Linux SSH `auth.log` and reports suspicious activity:
 
 1. **Brute force**: many failed logins from one IP in a short time.
@@ -229,13 +249,13 @@ The first four rules below are described in detail here. The rest, and the tunin
 
 ### Measured quality
 
-On a labelled corpus of 40 synthetic three-day logs (157 attacks, many deliberately below the thresholds, plus benign lookalikes) and on the Docker-lab recording, with default settings ([full results](docs/evaluation.md), regenerated and checked by CI):
+On a labelled corpus of 40 synthetic three-day logs (160 attacks, many deliberately below the thresholds, plus benign lookalikes) and on the Docker-lab recording, with default settings ([full results](docs/evaluation.md), regenerated and checked by CI):
 
 | Rule | Recall | Precision | Where it misses / what trips it |
 |---|---|---|---|
 | Brute force | 89% | 95% | misses 3–4 guesses; trips on several typos behind one NAT |
 | Password spray | 69% | 100% | misses sprays of 3–5 accounts (below the default of 6) |
-| Distributed brute force | 56% | 62% | misses 2–3 sources; trips on a misconfigured internal service (94% precision once internal networks are trusted) |
+| Distributed brute force | 56% | 62% | misses 2–3 sources; trips on a misconfigured internal service (100% precision once internal networks are trusted) |
 | New source | 100% | 38% | trips on travel and on the first users through an office NAT; inherent, hence never high |
 | Log tampering | 96% | 76% | misses holes shorter than 2 hours; trips on maintenance downtime |
 
@@ -311,7 +331,23 @@ Only the sudo user's sessions are considered. That way, if an admin makes a legi
 
 The code is a functional core with an imperative shell. Parsing and detection (`src/core/`) are pure and deterministic, with no I/O, no clock and no randomness, and a lint rule enforces that. Reading files, printing and exit codes live at the edges (`bin/`, `src/io/`).
 
-The four rules run on a **streaming engine**. Lines are read one at a time, parsed, and pushed into the engine; events are never collected into a list. Each rule keeps only the state it needs, such as one window of recent failures per IP or the SSH sessions currently open. That state is dropped as the log's own clock moves on, so memory doesn't grow with the length of the log. Findings appear as soon as a rule sees them and are updated when more evidence arrives. For example, a brute force is reported as medium and becomes high when the attacker logs in. This is what will let the same rules watch a live log.
+```mermaid
+flowchart LR
+  subgraph shell["Imperative shell (I/O)"]
+    IN["auth.log<br/>file, stdin or --follow"] --> RD["line reader<br/>length cap, rotation"]
+  end
+  subgraph core["Functional core (pure)"]
+    PA["parser<br/>year resolver"] --> EN["engine<br/>8 rules, bounded state"]
+    EN --> INC["incidents<br/>with ATT&CK labels"]
+  end
+  RD --> PA
+  INC --> OUT["terminal / JSON"]
+  INC --> DC["Discord"]
+  INC --> DB[("SQLite")]
+  DB --> DA["dashboard<br/>127.0.0.1, read-only"]
+```
+
+The rules run on a **streaming engine**. Lines are read one at a time, parsed, and pushed into the engine; events are never collected into a list. Each rule keeps only the state it needs, such as one window of recent failures per IP or the SSH sessions currently open. That state is dropped as the log's own clock moves on, so memory doesn't grow with the length of the log. Findings appear as soon as a rule sees them and are updated when more evidence arrives. For example, a brute force is reported as medium and becomes high when the attacker logs in. This is what lets the same rules read a finished file and watch a live log.
 
 Every kind of state also has a hard ceiling: 100,000 tracked IPs per rule, 5,000 recent failures per IP, 1,000 usernames per attack. Attacker IPs, breaches, and sessions with no logout are remembered for 7 days. If a ceiling is ever reached, for example by a botnet using more addresses than that, the oldest state is dropped and the report warns that activity may have been missed.
 
@@ -329,14 +365,14 @@ The engine was checked against the original implementation, which is kept unchan
 
 ### Speed and memory
 
-`npm run bench` generates a deliberately hostile synthetic log in memory: 70% of lines are single guesses from ever-new random IPs, as from a large botnet, mixed with brute-force bursts, logins, logouts and sudo noise. It then analyzes it. Measured on my Windows laptop with Node 24.21:
+`npm run bench` generates a deliberately hostile synthetic log in memory: 70% of lines are single guesses from ever-new random IPs, as from a large botnet, mixed with brute-force bursts, logins, logouts and sudo noise. It then analyzes it. Measured on my Windows laptop with Node 24.21 for v1.0.0:
 
 | 1M lines, all eight rules | time | live heap after GC at 25 / 50 / 75 / 100% |
 |---|---|---|
-| streaming (current) | 11.2 s, ~89,000 lines/s | 45 / 47 / 45 / 43 MB |
-| collect, then analyze (the v0.1.0 approach) | 8.3 s | 93 / 182 / 270 / 360 MB |
+| streaming (current) | 9.0–9.1 s, ~110,000 lines/s | 45 / 47 / 45 / 44 MB |
+| collect, then analyze (the v0.1.0 approach) | 9.5 s | 93 / 182 / 270 / 360 MB |
 
-Streaming trades some speed for flat memory. Part of the gap is that the collect path can't run the log-tampering rule, which needs every line rather than only authentication events. With the original four rules only, the streaming run took 8.4 s. At 4M lines the streaming run's live heap is 43 / 50 / 56 / 57 MB at each million. The slow rise fits the findings kept for the final report, which grow with the number of attacks rather than lines (not yet measured separately). Resident memory (RSS) is higher than the live heap in both cases, because V8 holds on to memory it has freed.
+The streaming time is from two repeat runs; the first run after a rebuild took 13.7 s. Memory is what matters here: streaming stays flat while collecting grows with the log. The collect path also can't run the log-tampering rule, which needs every line rather than only authentication events. At 4M lines the streaming run took 38.8 s (~103,000 lines/s), and its live heap was 43 / 50 / 56 / 57 MB at each million. The slow rise fits the findings kept for the final report, which grow with the number of attacks rather than lines (not yet measured separately). Resident memory (RSS) is higher than the live heap in both cases, because V8 holds on to memory it has freed.
 
 ## Testing
 
@@ -371,7 +407,7 @@ The synthetic sample only contains formats the generator knows about, so the ana
 
 ### Test suites
 
-120 tests using Node's built-in `node:test`. Run them with `npm test`.
+136 tests using Node's built-in `node:test`. Run them with `npm test`. On Windows one is skipped (the SIGTERM test, since Windows has no catchable SIGTERM); CI runs all of them on Linux.
 
 - `test/parse.test.js`: each line type, `message repeated` counting, spoofed usernames, IPv6, RFC 3339, the December-to-January year change, unreadable lines.
 - `test/detectors.test.js`: each rule's thresholds and boundaries (4 vs 5 failures, a window exactly 10 minutes wide, 00:59 vs 01:00 vs 05:00), plus each way an account change can or can't be linked to a break-in.
@@ -385,6 +421,8 @@ The synthetic sample only contains formats the generator knows about, so the ana
 - `test/live-incidents.test.js`, `test/live.test.js`: incident events (one opened, one escalated), shutdown, truncation as tampering, the CLI with `--follow --json` and SIGTERM, `--discord` with the URL from `.env`, and a 100,000-line soak run with state bounded.
 - `test/discord.test.js`: the Discord sink against a local mock webhook: dedup, hostile content kept inert, 429 with `retry_after`, 5xx retries, 4xx not retried, a slow server not blocking the caller, the rate limit, a full queue, and a hanging server at shutdown.
 - `test/store.test.js`, `test/sql-rules.test.js`: what `--db` stores, drill-down from a finding to its raw lines, hostile strings stored as data, the schema version, read-only access, live mode storage, and the SQL rules matching the JavaScript ones.
+- `test/dashboard.test.js`: hostile usernames rendered inert on every page, security headers on every response, methods, Host and cross-site refusal, result caps, and loopback-only binding.
+- `test/attack.test.js`: the ATT&CK technique of every rule and kind of account change, and the labels in the terminal, JSON, live JSON lines and SQLite, plus the links in `docs/detections.md`.
 - `test/sample.test.js`: an end-to-end check that the sample log produces exactly the incidents in the table above, plus the command line (exit codes, `--json`, stdin, bad arguments).
 
 ### Planted-bug testing
@@ -440,8 +478,8 @@ The plan and the reasoning behind it live in [SPEC.md](SPEC.md) (goals, non-goal
 
 ```text
 bin/analyze.js                  command line: options, reading the file or stdin, exit codes
-src/core/                       the pure core: parser, year inference, engine, rules, incidents
-src/core/rules/                 brute force, possible breach, unusual hour, account change
+src/core/                       the pure core: parser, year inference, engine, rules, incidents, ATT&CK mapping
+src/core/rules/                 one file per detection (eight rules)
 src/io/                         reading lines from files and stdin; the streaming analysis
 src/io/follow.js, src/io/live.js  following a log through rotation; live mode
 src/io/sinks/                   live outputs: terminal, JSON lines, Discord
