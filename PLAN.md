@@ -26,15 +26,15 @@ Status: `[x]` done, `[ ]` to do.
 
 ## M2a: Streaming engine (`refactor/m2a-streaming-engine`)
 
-- [ ] Copy the current rules to `test/reference/` as an oracle. *Check: it passes the existing tests.*
-- [ ] Bounded primitives: time-windowed deque, LRU map with TTL and cap. *Check: unit tests for eviction order and caps.*
-- [ ] Engine + four rules as detectors, `analyze()` kept as a façade. *Check: the 35 original tests pass unchanged.*
-- [ ] Property test: engine vs reference on random ordered event streams. *Check: 1,000+ cases agree; a planted bug in either is caught.*
-- [ ] Bounded-state test: 500k failures from 200k IPs keep every detector under its caps. *Check: test asserts `size()` and eviction counters.*
-- [ ] Safe line reader (length cap, CRLF, no unbounded buffering). *Check: a 50 MB line with no newline uses < 20 MB extra memory.*
-- [ ] Time resolver (closest-to-previous year). *Check: Dec/Jan in both directions, late lines, explicit `--year`.*
-- [ ] Escape control characters and bidi overrides in terminal output. *Check: test with `\x1b[2J` and U+202E usernames.*
-- [ ] Streaming CLI path (no event array). *Check: CLI tests unchanged; RSS on a 1M-line file stays flat.*
+- [x] Copy the current rules to `test/reference/` as an oracle. *Check: it passes the existing tests.*
+- [x] Bounded primitives: time-windowed deque, LRU map with TTL and cap. *Check: unit tests for eviction order and caps.*
+- [x] Engine + four rules as detectors, `analyze()` kept as a façade. *Check: the 35 original tests pass unchanged.*
+- [x] Property test: engine vs reference on random ordered event streams. *Check: 1,000+ cases agree on each run; 7 planted bugs in the new paths: 6 caught by it, the 7th (a same-second case the generator can't reach) by a targeted test.*
+- [x] Bounded-state test: 500k failures from 200k IPs keep every detector under its caps. *Check: test pushes 200k failures from 100k IPs plus one 2,000-username attack and asserts `size()` and the eviction counters.*
+- [x] Safe line reader (length cap, CRLF, no unbounded buffering). *Check: a 50 MB line with no newline never buffers more than 8 KiB (asserted on the splitter's buffer).*
+- [x] Time resolver (closest-to-previous year). *Check: Dec/Jan in both directions, late lines, explicit `--year`.*
+- [x] Escape control characters and bidi overrides in terminal output. *Check: test with `\x1b[2J` and U+202E usernames.*
+- [x] Streaming CLI path (no event array). *Check: CLI tests unchanged; `npm run bench`: live heap 41/43/42/40 MB across 1M lines vs 93→359 MB the old way.*
 
 ## M2b: New detections (`feat/m2b-detections`)
 

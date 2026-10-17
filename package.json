@@ -13,11 +13,12 @@
   },
   "scripts": {
     "analyze": "node bin/analyze.js",
-    "test": "node --test",
+    "test": "node --test \"test/**/*.test.js\"",
     "lint": "eslint .",
     "typecheck": "tsc -p . && tsc -p test",
     "check": "npm run lint && npm run typecheck && npm test",
     "generate-sample": "node scripts/generate-sample-log.js",
+    "bench": "node --expose-gc scripts/bench.js",
     "lab": "node scripts/lab.js run",
     "lab:fixture": "node scripts/lab.js run --out test/fixtures/lab/auth.log"
   },
@@ -25,6 +26,7 @@
     "@eslint/js": "10.0.1",
     "@types/node": "22.20.5",
     "eslint": "10.12.0",
+    "fast-check": "4.10.2",
     "typescript": "6.0.3"
   }
 }

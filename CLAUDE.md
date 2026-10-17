@@ -10,7 +10,7 @@ npm test             # unit, end-to-end and fixture tests (node:test)
 npm run lint         # ESLint
 npm run typecheck    # tsc --checkJs on JSDoc types, strict
 npm run check        # all three, as CI runs them
-npm run bench        # speed and memory benchmark            (lands in M7)
+npm run bench        # speed and memory benchmark (--lines N, --collect, --json)
 npm run lab          # Docker lab: play the scenarios, collect and check auth.log
 npm run lab:fixture  # same, but refresh test/fixtures/lab/auth.log
 ```
