@@ -407,7 +407,7 @@ The synthetic sample only contains formats the generator knows about, so the ana
 
 ### Test suites
 
-136 tests using Node's built-in `node:test`. Run them with `npm test`. On Windows one is skipped (the SIGTERM test, since Windows has no catchable SIGTERM); CI runs all of them on Linux.
+137 tests using Node's built-in `node:test`. Run them with `npm test`. On Windows one is skipped (the SIGTERM test, since Windows has no catchable SIGTERM); CI runs all of them on Linux.
 
 - `test/parse.test.js`: each line type, `message repeated` counting, spoofed usernames, IPv6, RFC 3339, the December-to-January year change, unreadable lines.
 - `test/detectors.test.js`: each rule's thresholds and boundaries (4 vs 5 failures, a window exactly 10 minutes wide, 00:59 vs 01:00 vs 05:00), plus each way an account change can or can't be linked to a break-in.

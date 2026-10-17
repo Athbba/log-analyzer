@@ -6,6 +6,20 @@ All notable changes, by milestone. The format follows
 request; [SPEC.md](SPEC.md) has the acceptance criteria and
 [docs/adr/](docs/adr/) the decisions behind them.
 
+## [1.0.1] - 2026-10-17
+
+### Fixed
+
+- `--window` and `--lookback` crashed with a ReferenceError on any valid
+  value (for example `--window 1h`); they now work as documented. A test
+  covers valid values, not only invalid ones.
+
+### Changed
+
+- Internal refactoring with no change in output: one error helper for both
+  command-line tools, one JSON time replacer, one SQLite transaction helper,
+  a shorter terminal report function, and less duplication in the CLI.
+
 ## [1.0.0] - 2026-10-17
 
 The first release: milestones M0 to M6 on top of v0.1.0. CLI flags, exit
@@ -91,4 +105,5 @@ codes and JSON fields from v0.1.0 still work; everything new is additive.
   unusual hour and account change, with terminal and JSON reports and a
   synthetic sample log with an answer key.
 
+[1.0.1]: https://github.com/Athbba/log-analyzer/releases/tag/v1.0.1
 [1.0.0]: https://github.com/Athbba/log-analyzer/releases/tag/v1.0.0
