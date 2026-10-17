@@ -1,24 +1,103 @@
 {
-  "description": "One run of the Docker lab (lab/compose.yaml, scripts/lab.js): OpenSSH 10.0 and rsyslog on Debian 13, RFC 3339 timestamps. Lab clock set to about 10:00, so no login falls in the unusual-hour window.",
+  "description": "One run of the Docker lab (five scenarios) (lab/compose.yaml, scripts/lab.js): OpenSSH 10.0 and rsyslog on Debian 13, RFC 3339 timestamps. Lab clock set to about 10:00, so no login falls in the unusual-hour window.",
   "exhaustive": true,
   "incidents": [
     {
       "scenario": "break-in",
       "ip": "172.30.0.77",
-      "findings": ["brute-force:high", "possible-breach:high", "account-change:high"],
+      "findings": [
+        "brute-force:high",
+        "possible-breach:high",
+        "account-change:high"
+      ],
       "notes": "10 wrong guesses (2 root, 8 deploy), the right password, then sudo useradd -G sudo sysupdate from the same session."
     },
     {
       "scenario": "guessing",
       "ip": "172.30.0.66",
-      "findings": ["brute-force:medium"],
+      "findings": [
+        "brute-force:medium"
+      ],
       "notes": "20 guesses at root and common service accounts, four connections at a time. Never logs in."
     },
     {
       "scenario": "admin-work",
       "ip": "172.30.0.20",
-      "findings": ["possible-breach:low", "account-change:low", "account-change:medium"],
+      "findings": [
+        "possible-breach:low",
+        "account-change:low",
+        "account-change:medium"
+      ],
       "notes": "bob mistypes once, then logs in (low). dave's key login 2 s later from the same workstation is not reported: a key login after other users' failures from a shared IP is not a guessed password (this false positive was found by the lab in M1 and fixed in M2b). dave creates erin (low) and adds her to sudo (medium); bob joining docker is ignored."
+    },
+    {
+      "scenario": "spray",
+      "ip": "172.30.0.88",
+      "findings": [
+        "password-spray:medium",
+        "brute-force:medium"
+      ],
+      "notes": "One guess at each of ten real accounts. Ten failures in under a minute is a brute force too."
+    },
+    {
+      "scenario": "distributed",
+      "subject": "user dave",
+      "findings": [
+        "distributed-brute-force:medium"
+      ],
+      "notes": "Two guesses at dave from each of five sources, none of which reaches the brute-force threshold."
+    }
+  ],
+  "truth": [
+    {
+      "id": "guessing",
+      "kind": "dictionary attack",
+      "primary": "brute-force",
+      "accept": [
+        "password-spray"
+      ],
+      "key": "172.30.0.66",
+      "from": "2026-10-17T10:46:15",
+      "to": "2026-10-17T10:46:33"
+    },
+    {
+      "id": "break-in",
+      "kind": "brute force then break-in",
+      "primary": "brute-force",
+      "accept": [],
+      "key": "172.30.0.77",
+      "from": "2026-10-17T10:46:37",
+      "to": "2026-10-17T10:47:11"
+    },
+    {
+      "id": "spray",
+      "kind": "password spray",
+      "primary": "password-spray",
+      "accept": [
+        "brute-force"
+      ],
+      "key": "172.30.0.88",
+      "from": "2026-10-17T10:47:14",
+      "to": "2026-10-17T10:47:44"
+    },
+    {
+      "id": "distributed",
+      "kind": "distributed brute force",
+      "primary": "distributed-brute-force",
+      "accept": [
+        "brute-force"
+      ],
+      "key": "user dave",
+      "from": "2026-10-17T10:47:48",
+      "to": "2026-10-17T10:48:21"
+    }
+  ],
+  "benign": [
+    {
+      "kind": "office workstation",
+      "key": "172.30.0.20",
+      "from": "2026-10-17T10:46:01",
+      "to": "2026-10-17T10:46:14"
     }
   ]
 }

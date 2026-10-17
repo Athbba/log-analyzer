@@ -106,6 +106,7 @@
  * @property {number} prefixV4  Network size that counts as "the same place" for IPv4…
  * @property {number} prefixV6  …and for IPv6.
  * @property {number} rememberMs  How long a known network stays known without logins.
+ * @property {number} sharedNetworkUsers  A network this many other users log in from is known for everyone (0 = off).
  */
 
 /**

@@ -1,187 +1,267 @@
-2026-10-17T10:15:39.248542+10:00 lab-target sshd[1]: Server listening on 0.0.0.0 port 22.
-2026-10-17T10:15:39.248610+10:00 lab-target sshd[1]: Server listening on :: port 22.
-2026-10-17T10:15:42.258196+10:00 lab-target sshd-session[32]: Accepted publickey for alice from 172.30.0.20 port 36040 ssh2: ED25519 SHA256:GWafrCnVtdgNDAt0ulBZYvWkEAzZZgQOAim/sIT5QIo
-2026-10-17T10:15:42.260785+10:00 lab-target sshd-session[32]: pam_unix(sshd:session): session opened for user alice(uid=1000) by alice(uid=0)
-2026-10-17T10:15:42.271213+10:00 lab-target sshd-session[32]: pam_env(sshd:session): Unable to open env file: /etc/default/locale
-2026-10-17T10:15:42.283811+10:00 lab-target sshd-session[39]: Received disconnect from 172.30.0.20 port 36040:11: disconnected by user
-2026-10-17T10:15:42.283954+10:00 lab-target sshd-session[39]: Disconnected from user alice 172.30.0.20 port 36040
-2026-10-17T10:15:42.284468+10:00 lab-target sshd-session[32]: pam_unix(sshd:session): session closed for user alice
-2026-10-17T10:15:42.389036+10:00 lab-target unix_chkpwd[51]: password check failed for user (bob)
-2026-10-17T10:15:42.389317+10:00 lab-target sshd-session[49]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.20  user=bob
-2026-10-17T10:15:44.656698+10:00 lab-target sshd-session[49]: Failed password for bob from 172.30.0.20 port 36052 ssh2
-2026-10-17T10:15:45.278334+10:00 lab-target sshd-session[49]: Connection closed by authenticating user bob 172.30.0.20 port 36052 [preauth]
-2026-10-17T10:15:47.395921+10:00 lab-target sshd-session[76]: Accepted password for bob from 172.30.0.20 port 34312 ssh2
-2026-10-17T10:15:47.397357+10:00 lab-target sshd-session[76]: pam_unix(sshd:session): session opened for user bob(uid=1001) by bob(uid=0)
-2026-10-17T10:15:47.401014+10:00 lab-target sshd-session[76]: pam_env(sshd:session): Unable to open env file: /etc/default/locale
-2026-10-17T10:15:49.408513+10:00 lab-target sshd-session[84]: Received disconnect from 172.30.0.20 port 34312:11: disconnected by user
-2026-10-17T10:15:49.408648+10:00 lab-target sshd-session[84]: Disconnected from user bob 172.30.0.20 port 34312
-2026-10-17T10:15:49.409053+10:00 lab-target sshd-session[76]: pam_unix(sshd:session): session closed for user bob
-2026-10-17T10:15:49.491608+10:00 lab-target sshd-session[99]: Accepted publickey for dave from 172.30.0.20 port 34318 ssh2: ED25519 SHA256:+JLlXRL6kTv9+eQbW1TdgzozF9DKZbFN88UaMO/x5M0
-2026-10-17T10:15:49.492373+10:00 lab-target sshd-session[99]: pam_unix(sshd:session): session opened for user dave(uid=1002) by dave(uid=0)
-2026-10-17T10:15:49.495514+10:00 lab-target sshd-session[99]: pam_env(sshd:session): Unable to open env file: /etc/default/locale
-2026-10-17T10:15:49.568285+10:00 lab-target sudo:     dave : PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash erin
-2026-10-17T10:15:49.568554+10:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1002)
-2026-10-17T10:15:49.637105+10:00 lab-target useradd[119]: new group: name=erin, GID=1004
-2026-10-17T10:15:49.637192+10:00 lab-target useradd[119]: new user: name=erin, UID=1004, GID=1004, home=/home/erin, shell=/bin/bash, from=none
-2026-10-17T10:15:49.700019+10:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
-2026-10-17T10:15:51.708539+10:00 lab-target sudo:     dave : PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/usermod -aG sudo erin
-2026-10-17T10:15:51.708778+10:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1002)
-2026-10-17T10:15:51.735130+10:00 lab-target usermod[140]: add 'erin' to group 'sudo'
-2026-10-17T10:15:51.735169+10:00 lab-target usermod[140]: add 'erin' to shadow group 'sudo'
-2026-10-17T10:15:51.757991+10:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
-2026-10-17T10:15:53.773258+10:00 lab-target sudo:     dave : PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/usermod -aG docker bob
-2026-10-17T10:15:53.773580+10:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1002)
-2026-10-17T10:15:53.805861+10:00 lab-target usermod[161]: add 'bob' to group 'docker'
-2026-10-17T10:15:53.805909+10:00 lab-target usermod[161]: add 'bob' to shadow group 'docker'
-2026-10-17T10:15:53.836636+10:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
-2026-10-17T10:15:54.840064+10:00 lab-target sshd-session[106]: Received disconnect from 172.30.0.20 port 34318:11: disconnected by user
-2026-10-17T10:15:54.840293+10:00 lab-target sshd-session[106]: Disconnected from user dave 172.30.0.20 port 34318
-2026-10-17T10:15:54.841299+10:00 lab-target sshd-session[99]: pam_unix(sshd:session): session closed for user dave
-2026-10-17T10:15:56.567267+10:00 lab-target sshd-session[179]: Invalid user admin from 172.30.0.66 port 38144
-2026-10-17T10:15:56.567268+10:00 lab-target sshd-session[178]: Invalid user test from 172.30.0.66 port 38140
-2026-10-17T10:15:56.569227+10:00 lab-target sshd-session[178]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:15:56.569227+10:00 lab-target sshd-session[179]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:15:56.569276+10:00 lab-target sshd-session[179]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:15:56.569280+10:00 lab-target sshd-session[178]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:15:56.574604+10:00 lab-target unix_chkpwd[186]: password check failed for user (root)
-2026-10-17T10:15:56.574944+10:00 lab-target sshd-session[180]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
-2026-10-17T10:15:56.579145+10:00 lab-target unix_chkpwd[187]: password check failed for user (root)
-2026-10-17T10:15:56.579415+10:00 lab-target sshd-session[181]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
-2026-10-17T10:15:58.222087+10:00 lab-target sshd-session[178]: Failed password for invalid user test from 172.30.0.66 port 38140 ssh2
-2026-10-17T10:15:58.528017+10:00 lab-target sshd-session[180]: Failed password for root from 172.30.0.66 port 38156 ssh2
-2026-10-17T10:15:58.609745+10:00 lab-target sshd-session[181]: Failed password for root from 172.30.0.66 port 38168 ssh2
-2026-10-17T10:15:58.689792+10:00 lab-target sshd-session[178]: Connection closed by invalid user test 172.30.0.66 port 38140 [preauth]
-2026-10-17T10:15:59.268386+10:00 lab-target sshd-session[179]: Failed password for invalid user admin from 172.30.0.66 port 38144 ssh2
-2026-10-17T10:15:59.331365+10:00 lab-target sshd-session[180]: Connection closed by authenticating user root 172.30.0.66 port 38156 [preauth]
-2026-10-17T10:15:59.335618+10:00 lab-target sshd-session[181]: Connection closed by authenticating user root 172.30.0.66 port 38168 [preauth]
-2026-10-17T10:16:00.530463+10:00 lab-target sshd-session[179]: Connection closed by invalid user admin 172.30.0.66 port 38144 [preauth]
-2026-10-17T10:16:00.619478+10:00 lab-target sshd-session[212]: Invalid user oracle from 172.30.0.66 port 38180
-2026-10-17T10:16:00.622144+10:00 lab-target sshd-session[212]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:00.622217+10:00 lab-target sshd-session[212]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:00.624322+10:00 lab-target unix_chkpwd[221]: password check failed for user (root)
-2026-10-17T10:16:00.624646+10:00 lab-target sshd-session[214]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
-2026-10-17T10:16:00.626231+10:00 lab-target unix_chkpwd[220]: password check failed for user (root)
-2026-10-17T10:16:00.626810+10:00 lab-target sshd-session[213]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
-2026-10-17T10:16:00.627543+10:00 lab-target sshd-session[215]: Invalid user ubuntu from 172.30.0.66 port 38192
-2026-10-17T10:16:00.630324+10:00 lab-target sshd-session[215]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:00.630394+10:00 lab-target sshd-session[215]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:02.182027+10:00 lab-target sshd-session[215]: Failed password for invalid user ubuntu from 172.30.0.66 port 38192 ssh2
-2026-10-17T10:16:02.523942+10:00 lab-target sshd-session[213]: Failed password for root from 172.30.0.66 port 38184 ssh2
-2026-10-17T10:16:02.712886+10:00 lab-target sshd-session[214]: Failed password for root from 172.30.0.66 port 38190 ssh2
-2026-10-17T10:16:02.819580+10:00 lab-target sshd-session[215]: Connection closed by invalid user ubuntu 172.30.0.66 port 38192 [preauth]
-2026-10-17T10:16:03.162698+10:00 lab-target sshd-session[212]: Failed password for invalid user oracle from 172.30.0.66 port 38180 ssh2
-2026-10-17T10:16:03.380499+10:00 lab-target sshd-session[213]: Connection closed by authenticating user root 172.30.0.66 port 38184 [preauth]
-2026-10-17T10:16:03.380499+10:00 lab-target sshd-session[214]: Connection closed by authenticating user root 172.30.0.66 port 38190 [preauth]
-2026-10-17T10:16:04.490676+10:00 lab-target sshd-session[212]: Connection closed by invalid user oracle 172.30.0.66 port 38180 [preauth]
-2026-10-17T10:16:04.573598+10:00 lab-target sshd-session[246]: Invalid user postgres from 172.30.0.66 port 51866
-2026-10-17T10:16:04.575793+10:00 lab-target sshd-session[248]: Invalid user pi from 172.30.0.66 port 51868
-2026-10-17T10:16:04.578518+10:00 lab-target sshd-session[248]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:04.578622+10:00 lab-target sshd-session[248]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:04.578670+10:00 lab-target sshd-session[246]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:04.578721+10:00 lab-target sshd-session[246]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:04.582942+10:00 lab-target unix_chkpwd[254]: password check failed for user (root)
-2026-10-17T10:16:04.583206+10:00 lab-target sshd-session[249]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
-2026-10-17T10:16:04.583292+10:00 lab-target sshd-session[247]: Invalid user guest from 172.30.0.66 port 51858
-2026-10-17T10:16:04.585286+10:00 lab-target sshd-session[247]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:04.585328+10:00 lab-target sshd-session[247]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:06.019010+10:00 lab-target sshd-session[249]: Failed password for root from 172.30.0.66 port 51870 ssh2
-2026-10-17T10:16:06.045855+10:00 lab-target sshd-session[248]: Failed password for invalid user pi from 172.30.0.66 port 51868 ssh2
-2026-10-17T10:16:06.933556+10:00 lab-target sshd-session[246]: Failed password for invalid user postgres from 172.30.0.66 port 51866 ssh2
-2026-10-17T10:16:06.950689+10:00 lab-target sshd-session[247]: Failed password for invalid user guest from 172.30.0.66 port 51858 ssh2
-2026-10-17T10:16:07.152277+10:00 lab-target sshd-session[248]: Connection closed by invalid user pi 172.30.0.66 port 51868 [preauth]
-2026-10-17T10:16:07.339155+10:00 lab-target sshd-session[249]: Connection closed by authenticating user root 172.30.0.66 port 51870 [preauth]
-2026-10-17T10:16:07.846780+10:00 lab-target sshd-session[247]: Connection closed by invalid user guest 172.30.0.66 port 51858 [preauth]
-2026-10-17T10:16:08.964133+10:00 lab-target sshd-session[246]: Connection closed by invalid user postgres 172.30.0.66 port 51866 [preauth]
-2026-10-17T10:16:09.039693+10:00 lab-target sshd-session[281]: Invalid user admin from 172.30.0.66 port 51894
-2026-10-17T10:16:09.039694+10:00 lab-target sshd-session[280]: Invalid user git from 172.30.0.66 port 51878
-2026-10-17T10:16:09.042749+10:00 lab-target sshd-session[281]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:09.042818+10:00 lab-target sshd-session[281]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:09.042857+10:00 lab-target sshd-session[280]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:09.042877+10:00 lab-target sshd-session[280]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:09.043561+10:00 lab-target sshd-session[282]: Invalid user ftpuser from 172.30.0.66 port 51902
-2026-10-17T10:16:09.045596+10:00 lab-target unix_chkpwd[287]: password check failed for user (root)
-2026-10-17T10:16:09.046124+10:00 lab-target sshd-session[279]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
-2026-10-17T10:16:09.046709+10:00 lab-target sshd-session[282]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:09.046788+10:00 lab-target sshd-session[282]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:10.859585+10:00 lab-target sshd-session[280]: Failed password for invalid user git from 172.30.0.66 port 51878 ssh2
-2026-10-17T10:16:10.948849+10:00 lab-target sshd-session[280]: Connection closed by invalid user git 172.30.0.66 port 51878 [preauth]
-2026-10-17T10:16:11.201525+10:00 lab-target sshd-session[282]: Failed password for invalid user ftpuser from 172.30.0.66 port 51902 ssh2
-2026-10-17T10:16:11.237989+10:00 lab-target sshd-session[281]: Failed password for invalid user admin from 172.30.0.66 port 51894 ssh2
-2026-10-17T10:16:11.765702+10:00 lab-target sshd-session[279]: Failed password for root from 172.30.0.66 port 51884 ssh2
-2026-10-17T10:16:11.799927+10:00 lab-target sshd-session[279]: Connection closed by authenticating user root 172.30.0.66 port 51884 [preauth]
-2026-10-17T10:16:12.473711+10:00 lab-target sshd-session[282]: Connection closed by invalid user ftpuser 172.30.0.66 port 51902 [preauth]
-2026-10-17T10:16:13.002174+10:00 lab-target sshd-session[281]: Connection closed by invalid user admin 172.30.0.66 port 51894 [preauth]
-2026-10-17T10:16:13.075242+10:00 lab-target sshd-session[315]: Invalid user admin from 172.30.0.66 port 46352
-2026-10-17T10:16:13.075242+10:00 lab-target sshd-session[313]: Invalid user user from 172.30.0.66 port 46340
-2026-10-17T10:16:13.077175+10:00 lab-target sshd-session[313]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:13.077223+10:00 lab-target sshd-session[313]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:13.077454+10:00 lab-target sshd-session[315]: pam_unix(sshd:auth): check pass; user unknown
-2026-10-17T10:16:13.077501+10:00 lab-target sshd-session[315]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
-2026-10-17T10:16:13.078402+10:00 lab-target unix_chkpwd[322]: password check failed for user (root)
-2026-10-17T10:16:13.078418+10:00 lab-target unix_chkpwd[321]: password check failed for user (root)
-2026-10-17T10:16:13.078607+10:00 lab-target sshd-session[316]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
-2026-10-17T10:16:13.078719+10:00 lab-target sshd-session[314]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
-2026-10-17T10:16:14.661855+10:00 lab-target sshd-session[313]: Failed password for invalid user user from 172.30.0.66 port 46340 ssh2
-2026-10-17T10:16:14.974416+10:00 lab-target sshd-session[314]: Failed password for root from 172.30.0.66 port 46326 ssh2
-2026-10-17T10:16:15.146325+10:00 lab-target sshd-session[313]: Connection closed by invalid user user 172.30.0.66 port 46340 [preauth]
-2026-10-17T10:16:15.191610+10:00 lab-target sshd-session[315]: Failed password for invalid user admin from 172.30.0.66 port 46352 ssh2
-2026-10-17T10:16:15.703262+10:00 lab-target sshd-session[316]: Failed password for root from 172.30.0.66 port 46356 ssh2
-2026-10-17T10:16:15.833754+10:00 lab-target sshd-session[314]: Connection closed by authenticating user root 172.30.0.66 port 46326 [preauth]
-2026-10-17T10:16:15.833754+10:00 lab-target sshd-session[316]: Connection closed by authenticating user root 172.30.0.66 port 46356 [preauth]
-2026-10-17T10:16:17.036385+10:00 lab-target sshd-session[315]: Connection closed by invalid user admin 172.30.0.66 port 46352 [preauth]
-2026-10-17T10:16:18.756820+10:00 lab-target unix_chkpwd[361]: password check failed for user (root)
-2026-10-17T10:16:18.757026+10:00 lab-target sshd-session[359]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=root
-2026-10-17T10:16:20.232315+10:00 lab-target sshd-session[359]: Failed password for root from 172.30.0.77 port 51214 ssh2
-2026-10-17T10:16:21.513637+10:00 lab-target sshd-session[359]: Connection closed by authenticating user root 172.30.0.77 port 51214 [preauth]
-2026-10-17T10:16:21.580554+10:00 lab-target unix_chkpwd[376]: password check failed for user (root)
-2026-10-17T10:16:21.580753+10:00 lab-target sshd-session[374]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=root
-2026-10-17T10:16:23.962550+10:00 lab-target sshd-session[374]: Failed password for root from 172.30.0.77 port 51222 ssh2
-2026-10-17T10:16:24.337641+10:00 lab-target sshd-session[374]: Connection closed by authenticating user root 172.30.0.77 port 51222 [preauth]
-2026-10-17T10:16:24.431088+10:00 lab-target unix_chkpwd[397]: password check failed for user (deploy)
-2026-10-17T10:16:24.431350+10:00 lab-target sshd-session[395]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
-2026-10-17T10:16:26.146839+10:00 lab-target sshd-session[395]: Failed password for deploy from 172.30.0.77 port 44618 ssh2
-2026-10-17T10:16:27.854621+10:00 lab-target sshd-session[395]: Connection closed by authenticating user deploy 172.30.0.77 port 44618 [preauth]
-2026-10-17T10:16:27.951519+10:00 lab-target unix_chkpwd[418]: password check failed for user (deploy)
-2026-10-17T10:16:27.951774+10:00 lab-target sshd-session[416]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
-2026-10-17T10:16:30.097310+10:00 lab-target sshd-session[416]: Failed password for deploy from 172.30.0.77 port 44622 ssh2
-2026-10-17T10:16:31.377661+10:00 lab-target sshd-session[416]: Connection closed by authenticating user deploy 172.30.0.77 port 44622 [preauth]
-2026-10-17T10:16:31.472744+10:00 lab-target unix_chkpwd[445]: password check failed for user (deploy)
-2026-10-17T10:16:31.473036+10:00 lab-target sshd-session[443]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
-2026-10-17T10:16:33.799673+10:00 lab-target sshd-session[443]: Failed password for deploy from 172.30.0.77 port 44634 ssh2
-2026-10-17T10:16:34.898120+10:00 lab-target sshd-session[443]: Connection closed by authenticating user deploy 172.30.0.77 port 44634 [preauth]
-2026-10-17T10:16:35.006053+10:00 lab-target unix_chkpwd[466]: password check failed for user (deploy)
-2026-10-17T10:16:35.006576+10:00 lab-target sshd-session[464]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
-2026-10-17T10:16:37.277520+10:00 lab-target sshd-session[464]: Failed password for deploy from 172.30.0.77 port 40022 ssh2
-2026-10-17T10:16:38.426272+10:00 lab-target sshd-session[464]: Connection closed by authenticating user deploy 172.30.0.77 port 40022 [preauth]
-2026-10-17T10:16:38.568724+10:00 lab-target unix_chkpwd[493]: password check failed for user (deploy)
-2026-10-17T10:16:38.569410+10:00 lab-target sshd-session[491]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
-2026-10-17T10:16:40.855630+10:00 lab-target sshd-session[491]: Failed password for deploy from 172.30.0.77 port 40024 ssh2
-2026-10-17T10:16:41.966330+10:00 lab-target sshd-session[491]: Connection closed by authenticating user deploy 172.30.0.77 port 40024 [preauth]
-2026-10-17T10:16:42.060210+10:00 lab-target unix_chkpwd[514]: password check failed for user (deploy)
-2026-10-17T10:16:42.060612+10:00 lab-target sshd-session[512]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
-2026-10-17T10:16:44.311884+10:00 lab-target sshd-session[512]: Failed password for deploy from 172.30.0.77 port 40040 ssh2
-2026-10-17T10:16:45.480230+10:00 lab-target sshd-session[512]: Connection closed by authenticating user deploy 172.30.0.77 port 40040 [preauth]
-2026-10-17T10:16:45.571464+10:00 lab-target unix_chkpwd[535]: password check failed for user (deploy)
-2026-10-17T10:16:45.571730+10:00 lab-target sshd-session[533]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
-2026-10-17T10:16:47.236895+10:00 lab-target sshd-session[533]: Failed password for deploy from 172.30.0.77 port 53684 ssh2
-2026-10-17T10:16:47.270805+10:00 lab-target sshd-session[533]: Connection closed by authenticating user deploy 172.30.0.77 port 53684 [preauth]
-2026-10-17T10:16:47.380724+10:00 lab-target unix_chkpwd[550]: password check failed for user (deploy)
-2026-10-17T10:16:47.381302+10:00 lab-target sshd-session[548]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
-2026-10-17T10:16:49.664013+10:00 lab-target sshd-session[548]: Failed password for deploy from 172.30.0.77 port 53688 ssh2
-2026-10-17T10:16:50.788684+10:00 lab-target sshd-session[548]: Connection closed by authenticating user deploy 172.30.0.77 port 53688 [preauth]
-2026-10-17T10:16:50.908404+10:00 lab-target sshd-session[575]: Accepted password for deploy from 172.30.0.77 port 53702 ssh2
-2026-10-17T10:16:50.909260+10:00 lab-target sshd-session[575]: pam_unix(sshd:session): session opened for user deploy(uid=1003) by deploy(uid=0)
-2026-10-17T10:16:50.912388+10:00 lab-target sshd-session[575]: pam_env(sshd:session): Unable to open env file: /etc/default/locale
-2026-10-17T10:16:50.973638+10:00 lab-target sudo:   deploy : PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/id
-2026-10-17T10:16:50.973928+10:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1003)
-2026-10-17T10:16:50.975358+10:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
-2026-10-17T10:16:52.985080+10:00 lab-target sudo:   deploy : PWD=/home/deploy ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash -G sudo sysupdate
-2026-10-17T10:16:52.985438+10:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1003)
-2026-10-17T10:16:53.072616+10:00 lab-target useradd[607]: new group: name=sysupdate, GID=1005
-2026-10-17T10:16:53.072708+10:00 lab-target useradd[607]: new user: name=sysupdate, UID=1005, GID=1005, home=/home/sysupdate, shell=/bin/bash, from=none
-2026-10-17T10:16:53.072775+10:00 lab-target useradd[607]: add 'sysupdate' to group 'sudo'
-2026-10-17T10:16:53.072808+10:00 lab-target useradd[607]: add 'sysupdate' to shadow group 'sudo'
-2026-10-17T10:16:53.208267+10:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
-2026-10-17T10:16:55.210162+10:00 lab-target sshd-session[583]: Received disconnect from 172.30.0.77 port 53702:11: disconnected by user
-2026-10-17T10:16:55.210468+10:00 lab-target sshd-session[583]: Disconnected from user deploy 172.30.0.77 port 53702
-2026-10-17T10:16:55.211190+10:00 lab-target sshd-session[575]: pam_unix(sshd:session): session closed for user deploy
+2026-10-17T10:45:57.234972+00:00 lab-target sshd[1]: Server listening on 0.0.0.0 port 22.
+2026-10-17T10:45:57.235020+00:00 lab-target sshd[1]: Server listening on :: port 22.
+2026-10-17T10:46:01.485445+00:00 lab-target sshd-session[44]: Accepted publickey for alice from 172.30.0.20 port 43906 ssh2: ED25519 SHA256:GpDDrw+EsYw7K1uDyNBUu9glwF+hwE8s/8mEnsRocK4
+2026-10-17T10:46:01.486297+00:00 lab-target sshd-session[44]: pam_unix(sshd:session): session opened for user alice(uid=1000) by alice(uid=0)
+2026-10-17T10:46:01.492408+00:00 lab-target sshd-session[44]: pam_env(sshd:session): Unable to open env file: /etc/default/locale
+2026-10-17T10:46:01.500363+00:00 lab-target sshd-session[51]: Received disconnect from 172.30.0.20 port 43906:11: disconnected by user
+2026-10-17T10:46:01.500480+00:00 lab-target sshd-session[51]: Disconnected from user alice 172.30.0.20 port 43906
+2026-10-17T10:46:01.500847+00:00 lab-target sshd-session[44]: pam_unix(sshd:session): session closed for user alice
+2026-10-17T10:46:01.604742+00:00 lab-target unix_chkpwd[57]: password check failed for user (bob)
+2026-10-17T10:46:01.605041+00:00 lab-target sshd-session[55]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.20  user=bob
+2026-10-17T10:46:03.728179+00:00 lab-target sshd-session[55]: Failed password for bob from 172.30.0.20 port 43912 ssh2
+2026-10-17T10:46:04.492479+00:00 lab-target sshd-session[55]: Connection closed by authenticating user bob 172.30.0.20 port 43912 [preauth]
+2026-10-17T10:46:06.613274+00:00 lab-target sshd-session[88]: Accepted password for bob from 172.30.0.20 port 49938 ssh2
+2026-10-17T10:46:06.614141+00:00 lab-target sshd-session[88]: pam_unix(sshd:session): session opened for user bob(uid=1001) by bob(uid=0)
+2026-10-17T10:46:06.617324+00:00 lab-target sshd-session[88]: pam_env(sshd:session): Unable to open env file: /etc/default/locale
+2026-10-17T10:46:08.622466+00:00 lab-target sshd-session[96]: Received disconnect from 172.30.0.20 port 49938:11: disconnected by user
+2026-10-17T10:46:08.622591+00:00 lab-target sshd-session[96]: Disconnected from user bob 172.30.0.20 port 49938
+2026-10-17T10:46:08.622903+00:00 lab-target sshd-session[88]: pam_unix(sshd:session): session closed for user bob
+2026-10-17T10:46:08.709715+00:00 lab-target sshd-session[111]: Accepted publickey for dave from 172.30.0.20 port 49944 ssh2: ED25519 SHA256:gMgyNTXHgIE1pY3ZePXNyKEKmM8FEY+0N6Sla4eu8XE
+2026-10-17T10:46:08.710443+00:00 lab-target sshd-session[111]: pam_unix(sshd:session): session opened for user dave(uid=1002) by dave(uid=0)
+2026-10-17T10:46:08.713419+00:00 lab-target sshd-session[111]: pam_env(sshd:session): Unable to open env file: /etc/default/locale
+2026-10-17T10:46:08.778563+00:00 lab-target sudo:     dave : PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash erin
+2026-10-17T10:46:08.778794+00:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1002)
+2026-10-17T10:46:08.848603+00:00 lab-target useradd[125]: new group: name=erin, GID=1004
+2026-10-17T10:46:08.848679+00:00 lab-target useradd[125]: new user: name=erin, UID=1004, GID=1004, home=/home/erin, shell=/bin/bash, from=none
+2026-10-17T10:46:08.911138+00:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
+2026-10-17T10:46:10.918321+00:00 lab-target sudo:     dave : PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/usermod -aG sudo erin
+2026-10-17T10:46:10.918554+00:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1002)
+2026-10-17T10:46:10.940573+00:00 lab-target usermod[146]: add 'erin' to group 'sudo'
+2026-10-17T10:46:10.940606+00:00 lab-target usermod[146]: add 'erin' to shadow group 'sudo'
+2026-10-17T10:46:10.960902+00:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
+2026-10-17T10:46:12.967810+00:00 lab-target sudo:     dave : PWD=/home/dave ; USER=root ; COMMAND=/usr/sbin/usermod -aG docker bob
+2026-10-17T10:46:12.968032+00:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=1002)
+2026-10-17T10:46:12.990066+00:00 lab-target usermod[167]: add 'bob' to group 'docker'
+2026-10-17T10:46:12.990100+00:00 lab-target usermod[167]: add 'bob' to shadow group 'docker'
+2026-10-17T10:46:13.010938+00:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
+2026-10-17T10:46:14.012304+00:00 lab-target sshd-session[118]: Received disconnect from 172.30.0.20 port 49944:11: disconnected by user
+2026-10-17T10:46:14.012432+00:00 lab-target sshd-session[118]: Disconnected from user dave 172.30.0.20 port 49944
+2026-10-17T10:46:14.012774+00:00 lab-target sshd-session[111]: pam_unix(sshd:session): session closed for user dave
+2026-10-17T10:46:15.525416+00:00 lab-target sshd-session[187]: Invalid user test from 172.30.0.66 port 35294
+2026-10-17T10:46:15.525521+00:00 lab-target sshd-session[186]: Invalid user admin from 172.30.0.66 port 35278
+2026-10-17T10:46:15.527171+00:00 lab-target sshd-session[187]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:15.527208+00:00 lab-target sshd-session[187]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:15.527598+00:00 lab-target sshd-session[186]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:15.527643+00:00 lab-target sshd-session[186]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:15.528275+00:00 lab-target unix_chkpwd[192]: password check failed for user (root)
+2026-10-17T10:46:15.528447+00:00 lab-target sshd-session[184]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
+2026-10-17T10:46:15.528516+00:00 lab-target unix_chkpwd[193]: password check failed for user (root)
+2026-10-17T10:46:15.528690+00:00 lab-target sshd-session[185]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
+2026-10-17T10:46:16.831044+00:00 lab-target sshd-session[186]: Failed password for invalid user admin from 172.30.0.66 port 35278 ssh2
+2026-10-17T10:46:17.225384+00:00 lab-target sshd-session[185]: Failed password for root from 172.30.0.66 port 35256 ssh2
+2026-10-17T10:46:17.295742+00:00 lab-target sshd-session[187]: Failed password for invalid user test from 172.30.0.66 port 35294 ssh2
+2026-10-17T10:46:17.488808+00:00 lab-target sshd-session[184]: Failed password for root from 172.30.0.66 port 35272 ssh2
+2026-10-17T10:46:17.506035+00:00 lab-target sshd-session[186]: Connection closed by invalid user admin 172.30.0.66 port 35278 [preauth]
+2026-10-17T10:46:17.646364+00:00 lab-target sshd-session[187]: Connection closed by invalid user test 172.30.0.66 port 35294 [preauth]
+2026-10-17T10:46:18.284010+00:00 lab-target sshd-session[184]: Connection closed by authenticating user root 172.30.0.66 port 35272 [preauth]
+2026-10-17T10:46:18.284011+00:00 lab-target sshd-session[185]: Connection closed by authenticating user root 172.30.0.66 port 35256 [preauth]
+2026-10-17T10:46:18.352266+00:00 lab-target sshd-session[213]: Invalid user ubuntu from 172.30.0.66 port 35298
+2026-10-17T10:46:18.352277+00:00 lab-target sshd-session[215]: Invalid user oracle from 172.30.0.66 port 35320
+2026-10-17T10:46:18.353921+00:00 lab-target sshd-session[215]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:18.353948+00:00 lab-target sshd-session[213]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:18.353955+00:00 lab-target sshd-session[215]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:18.353961+00:00 lab-target sshd-session[213]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:18.355062+00:00 lab-target unix_chkpwd[221]: password check failed for user (root)
+2026-10-17T10:46:18.355075+00:00 lab-target unix_chkpwd[220]: password check failed for user (root)
+2026-10-17T10:46:18.355244+00:00 lab-target sshd-session[214]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
+2026-10-17T10:46:18.355246+00:00 lab-target sshd-session[212]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
+2026-10-17T10:46:20.032180+00:00 lab-target sshd-session[212]: Failed password for root from 172.30.0.66 port 35300 ssh2
+2026-10-17T10:46:20.143097+00:00 lab-target sshd-session[213]: Failed password for invalid user ubuntu from 172.30.0.66 port 35298 ssh2
+2026-10-17T10:46:20.446011+00:00 lab-target sshd-session[214]: Failed password for root from 172.30.0.66 port 35314 ssh2
+2026-10-17T10:46:20.493696+00:00 lab-target sshd-session[215]: Failed password for invalid user oracle from 172.30.0.66 port 35320 ssh2
+2026-10-17T10:46:20.544044+00:00 lab-target sshd-session[213]: Connection closed by invalid user ubuntu 172.30.0.66 port 35298 [preauth]
+2026-10-17T10:46:21.112036+00:00 lab-target sshd-session[214]: Connection closed by authenticating user root 172.30.0.66 port 35314 [preauth]
+2026-10-17T10:46:21.112061+00:00 lab-target sshd-session[212]: Connection closed by authenticating user root 172.30.0.66 port 35300 [preauth]
+2026-10-17T10:46:22.222362+00:00 lab-target sshd-session[215]: Connection closed by invalid user oracle 172.30.0.66 port 35320 [preauth]
+2026-10-17T10:46:22.292252+00:00 lab-target sshd-session[247]: Invalid user pi from 172.30.0.66 port 35332
+2026-10-17T10:46:22.292253+00:00 lab-target sshd-session[249]: Invalid user postgres from 172.30.0.66 port 35354
+2026-10-17T10:46:22.292297+00:00 lab-target sshd-session[248]: Invalid user guest from 172.30.0.66 port 35338
+2026-10-17T10:46:22.294279+00:00 lab-target sshd-session[249]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:22.294286+00:00 lab-target sshd-session[248]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:22.294310+00:00 lab-target sshd-session[248]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:22.294326+00:00 lab-target sshd-session[249]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:22.294461+00:00 lab-target sshd-session[247]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:22.294502+00:00 lab-target sshd-session[247]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:22.295749+00:00 lab-target unix_chkpwd[254]: password check failed for user (root)
+2026-10-17T10:46:22.295907+00:00 lab-target sshd-session[246]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
+2026-10-17T10:46:24.045669+00:00 lab-target sshd-session[248]: Failed password for invalid user guest from 172.30.0.66 port 35338 ssh2
+2026-10-17T10:46:24.235776+00:00 lab-target sshd-session[247]: Failed password for invalid user pi from 172.30.0.66 port 35332 ssh2
+2026-10-17T10:46:24.254930+00:00 lab-target sshd-session[249]: Failed password for invalid user postgres from 172.30.0.66 port 35354 ssh2
+2026-10-17T10:46:24.470064+00:00 lab-target sshd-session[246]: Failed password for root from 172.30.0.66 port 35330 ssh2
+2026-10-17T10:46:24.487388+00:00 lab-target sshd-session[249]: Connection closed by invalid user postgres 172.30.0.66 port 35354 [preauth]
+2026-10-17T10:46:24.868266+00:00 lab-target sshd-session[247]: Connection closed by invalid user pi 172.30.0.66 port 35332 [preauth]
+2026-10-17T10:46:25.051965+00:00 lab-target sshd-session[246]: Connection closed by authenticating user root 172.30.0.66 port 35330 [preauth]
+2026-10-17T10:46:25.555575+00:00 lab-target sshd-session[248]: Connection closed by invalid user guest 172.30.0.66 port 35338 [preauth]
+2026-10-17T10:46:25.620252+00:00 lab-target sshd-session[273]: Invalid user admin from 172.30.0.66 port 38588
+2026-10-17T10:46:25.621904+00:00 lab-target sshd-session[273]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:25.621940+00:00 lab-target sshd-session[273]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:25.622869+00:00 lab-target unix_chkpwd[281]: password check failed for user (root)
+2026-10-17T10:46:25.623034+00:00 lab-target sshd-session[274]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
+2026-10-17T10:46:25.624185+00:00 lab-target sshd-session[275]: Invalid user ftpuser from 172.30.0.66 port 38600
+2026-10-17T10:46:25.625650+00:00 lab-target sshd-session[275]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:25.625683+00:00 lab-target sshd-session[275]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:25.628163+00:00 lab-target sshd-session[276]: Invalid user git from 172.30.0.66 port 38616
+2026-10-17T10:46:25.629591+00:00 lab-target sshd-session[276]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:25.629626+00:00 lab-target sshd-session[276]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:27.107789+00:00 lab-target sshd-session[273]: Failed password for invalid user admin from 172.30.0.66 port 38588 ssh2
+2026-10-17T10:46:27.516769+00:00 lab-target sshd-session[274]: Failed password for root from 172.30.0.66 port 38598 ssh2
+2026-10-17T10:46:27.590204+00:00 lab-target sshd-session[276]: Failed password for invalid user git from 172.30.0.66 port 38616 ssh2
+2026-10-17T10:46:27.601935+00:00 lab-target sshd-session[273]: Connection closed by invalid user admin 172.30.0.66 port 38588 [preauth]
+2026-10-17T10:46:27.876694+00:00 lab-target sshd-session[275]: Failed password for invalid user ftpuser from 172.30.0.66 port 38600 ssh2
+2026-10-17T10:46:28.380015+00:00 lab-target sshd-session[274]: Connection closed by authenticating user root 172.30.0.66 port 38598 [preauth]
+2026-10-17T10:46:29.053634+00:00 lab-target sshd-session[275]: Connection closed by invalid user ftpuser 172.30.0.66 port 38600 [preauth]
+2026-10-17T10:46:29.444321+00:00 lab-target sshd-session[276]: Connection closed by invalid user git 172.30.0.66 port 38616 [preauth]
+2026-10-17T10:46:29.508212+00:00 lab-target sshd-session[306]: Invalid user user from 172.30.0.66 port 38628
+2026-10-17T10:46:29.509863+00:00 lab-target sshd-session[306]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:29.509898+00:00 lab-target sshd-session[306]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:29.516159+00:00 lab-target sshd-session[308]: Invalid user admin from 172.30.0.66 port 38648
+2026-10-17T10:46:29.517870+00:00 lab-target sshd-session[308]: pam_unix(sshd:auth): check pass; user unknown
+2026-10-17T10:46:29.517906+00:00 lab-target sshd-session[308]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66 
+2026-10-17T10:46:29.518851+00:00 lab-target unix_chkpwd[314]: password check failed for user (root)
+2026-10-17T10:46:29.518853+00:00 lab-target unix_chkpwd[315]: password check failed for user (root)
+2026-10-17T10:46:29.519028+00:00 lab-target sshd-session[307]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
+2026-10-17T10:46:29.519033+00:00 lab-target sshd-session[309]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.66  user=root
+2026-10-17T10:46:30.862779+00:00 lab-target sshd-session[308]: Failed password for invalid user admin from 172.30.0.66 port 38648 ssh2
+2026-10-17T10:46:31.497814+00:00 lab-target sshd-session[308]: Connection closed by invalid user admin 172.30.0.66 port 38648 [preauth]
+2026-10-17T10:46:31.951453+00:00 lab-target sshd-session[309]: Failed password for root from 172.30.0.66 port 38658 ssh2
+2026-10-17T10:46:32.115782+00:00 lab-target sshd-session[307]: Failed password for root from 172.30.0.66 port 38642 ssh2
+2026-10-17T10:46:32.231765+00:00 lab-target sshd-session[306]: Failed password for invalid user user from 172.30.0.66 port 38628 ssh2
+2026-10-17T10:46:32.275832+00:00 lab-target sshd-session[309]: Connection closed by authenticating user root 172.30.0.66 port 38658 [preauth]
+2026-10-17T10:46:32.275833+00:00 lab-target sshd-session[307]: Connection closed by authenticating user root 172.30.0.66 port 38642 [preauth]
+2026-10-17T10:46:33.651236+00:00 lab-target sshd-session[306]: Connection closed by invalid user user 172.30.0.66 port 38628 [preauth]
+2026-10-17T10:46:35.191067+00:00 lab-target unix_chkpwd[348]: password check failed for user (root)
+2026-10-17T10:46:35.191267+00:00 lab-target sshd-session[346]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=root
+2026-10-17T10:46:37.046279+00:00 lab-target sshd-session[346]: Failed password for root from 172.30.0.77 port 58370 ssh2
+2026-10-17T10:46:37.948068+00:00 lab-target sshd-session[346]: Connection closed by authenticating user root 172.30.0.77 port 58370 [preauth]
+2026-10-17T10:46:38.019124+00:00 lab-target unix_chkpwd[369]: password check failed for user (root)
+2026-10-17T10:46:38.019305+00:00 lab-target sshd-session[367]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=root
+2026-10-17T10:46:40.086674+00:00 lab-target sshd-session[367]: Failed password for root from 172.30.0.77 port 58378 ssh2
+2026-10-17T10:46:40.775987+00:00 lab-target sshd-session[367]: Connection closed by authenticating user root 172.30.0.77 port 58378 [preauth]
+2026-10-17T10:46:40.871242+00:00 lab-target unix_chkpwd[391]: password check failed for user (deploy)
+2026-10-17T10:46:40.871516+00:00 lab-target sshd-session[389]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
+2026-10-17T10:46:43.321881+00:00 lab-target sshd-session[389]: Failed password for deploy from 172.30.0.77 port 58380 ssh2
+2026-10-17T10:46:44.292663+00:00 lab-target sshd-session[389]: Connection closed by authenticating user deploy 172.30.0.77 port 58380 [preauth]
+2026-10-17T10:46:44.411881+00:00 lab-target unix_chkpwd[412]: password check failed for user (deploy)
+2026-10-17T10:46:44.412157+00:00 lab-target sshd-session[410]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
+2026-10-17T10:46:46.362137+00:00 lab-target sshd-session[410]: Failed password for deploy from 172.30.0.77 port 53862 ssh2
+2026-10-17T10:46:47.819077+00:00 lab-target sshd-session[410]: Connection closed by authenticating user deploy 172.30.0.77 port 53862 [preauth]
+2026-10-17T10:46:47.920189+00:00 lab-target unix_chkpwd[439]: password check failed for user (deploy)
+2026-10-17T10:46:47.920480+00:00 lab-target sshd-session[437]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
+2026-10-17T10:46:50.030215+00:00 lab-target sshd-session[437]: Failed password for deploy from 172.30.0.77 port 53876 ssh2
+2026-10-17T10:46:51.338895+00:00 lab-target sshd-session[437]: Connection closed by authenticating user deploy 172.30.0.77 port 53876 [preauth]
+2026-10-17T10:46:51.440628+00:00 lab-target unix_chkpwd[460]: password check failed for user (deploy)
+2026-10-17T10:46:51.440902+00:00 lab-target sshd-session[458]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
+2026-10-17T10:46:53.159446+00:00 lab-target sshd-session[458]: Failed password for deploy from 172.30.0.77 port 53890 ssh2
+2026-10-17T10:46:54.862706+00:00 lab-target sshd-session[458]: Connection closed by authenticating user deploy 172.30.0.77 port 53890 [preauth]
+2026-10-17T10:46:54.963969+00:00 lab-target unix_chkpwd[487]: password check failed for user (deploy)
+2026-10-17T10:46:54.964245+00:00 lab-target sshd-session[479]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
+2026-10-17T10:46:57.132532+00:00 lab-target sshd-session[479]: Failed password for deploy from 172.30.0.77 port 45022 ssh2
+2026-10-17T10:46:58.382727+00:00 lab-target sshd-session[479]: Connection closed by authenticating user deploy 172.30.0.77 port 45022 [preauth]
+2026-10-17T10:46:58.483872+00:00 lab-target unix_chkpwd[508]: password check failed for user (deploy)
+2026-10-17T10:46:58.484183+00:00 lab-target sshd-session[506]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
+2026-10-17T10:47:00.086212+00:00 lab-target sshd-session[506]: Failed password for deploy from 172.30.0.77 port 45028 ssh2
+2026-10-17T10:47:00.177212+00:00 lab-target sshd-session[506]: Connection closed by authenticating user deploy 172.30.0.77 port 45028 [preauth]
+2026-10-17T10:47:00.277369+00:00 lab-target unix_chkpwd[523]: password check failed for user (deploy)
+2026-10-17T10:47:00.277643+00:00 lab-target sshd-session[521]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
+2026-10-17T10:47:02.669332+00:00 lab-target sshd-session[521]: Failed password for deploy from 172.30.0.77 port 45040 ssh2
+2026-10-17T10:47:03.698809+00:00 lab-target sshd-session[521]: Connection closed by authenticating user deploy 172.30.0.77 port 45040 [preauth]
+2026-10-17T10:47:03.801140+00:00 lab-target unix_chkpwd[544]: password check failed for user (deploy)
+2026-10-17T10:47:03.801487+00:00 lab-target sshd-session[542]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.77  user=deploy
+2026-10-17T10:47:05.957058+00:00 lab-target sshd-session[542]: Failed password for deploy from 172.30.0.77 port 36372 ssh2
+2026-10-17T10:47:07.218907+00:00 lab-target sshd-session[542]: Connection closed by authenticating user deploy 172.30.0.77 port 36372 [preauth]
+2026-10-17T10:47:07.343309+00:00 lab-target sshd-session[563]: Accepted password for deploy from 172.30.0.77 port 36382 ssh2
+2026-10-17T10:47:07.344835+00:00 lab-target sshd-session[563]: pam_unix(sshd:session): session opened for user deploy(uid=1003) by deploy(uid=0)
+2026-10-17T10:47:07.349530+00:00 lab-target sshd-session[563]: pam_env(sshd:session): Unable to open env file: /etc/default/locale
+2026-10-17T10:47:07.441925+00:00 lab-target sudo:   deploy : PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/id
+2026-10-17T10:47:07.442255+00:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1003)
+2026-10-17T10:47:07.443806+00:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
+2026-10-17T10:47:09.451781+00:00 lab-target sudo:   deploy : PWD=/home/deploy ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash -G sudo sysupdate
+2026-10-17T10:47:09.452015+00:00 lab-target sudo: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1003)
+2026-10-17T10:47:09.494895+00:00 lab-target useradd[601]: new group: name=sysupdate, GID=1005
+2026-10-17T10:47:09.494977+00:00 lab-target useradd[601]: new user: name=sysupdate, UID=1005, GID=1005, home=/home/sysupdate, shell=/bin/bash, from=none
+2026-10-17T10:47:09.495059+00:00 lab-target useradd[601]: add 'sysupdate' to group 'sudo'
+2026-10-17T10:47:09.495092+00:00 lab-target useradd[601]: add 'sysupdate' to shadow group 'sudo'
+2026-10-17T10:47:09.559294+00:00 lab-target sudo: pam_unix(sudo:session): session closed for user root
+2026-10-17T10:47:11.560938+00:00 lab-target sshd-session[577]: Received disconnect from 172.30.0.77 port 36382:11: disconnected by user
+2026-10-17T10:47:11.561109+00:00 lab-target sshd-session[577]: Disconnected from user deploy 172.30.0.77 port 36382
+2026-10-17T10:47:11.561516+00:00 lab-target sshd-session[563]: pam_unix(sshd:session): session closed for user deploy
+2026-10-17T10:47:13.262097+00:00 lab-target unix_chkpwd[626]: password check failed for user (alice)
+2026-10-17T10:47:13.262658+00:00 lab-target sshd-session[624]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=alice
+2026-10-17T10:47:14.665988+00:00 lab-target sshd-session[624]: Failed password for alice from 172.30.0.88 port 37652 ssh2
+2026-10-17T10:47:14.966061+00:00 lab-target sshd-session[624]: Connection closed by authenticating user alice 172.30.0.88 port 37652 [preauth]
+2026-10-17T10:47:15.076384+00:00 lab-target unix_chkpwd[641]: password check failed for user (bob)
+2026-10-17T10:47:15.076789+00:00 lab-target sshd-session[639]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=bob
+2026-10-17T10:47:17.359331+00:00 lab-target sshd-session[639]: Failed password for bob from 172.30.0.88 port 37654 ssh2
+2026-10-17T10:47:17.956539+00:00 lab-target sshd-session[639]: Connection closed by authenticating user bob 172.30.0.88 port 37654 [preauth]
+2026-10-17T10:47:18.054695+00:00 lab-target unix_chkpwd[662]: password check failed for user (dave)
+2026-10-17T10:47:18.055130+00:00 lab-target sshd-session[660]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=dave
+2026-10-17T10:47:20.215879+00:00 lab-target sshd-session[660]: Failed password for dave from 172.30.0.88 port 37664 ssh2
+2026-10-17T10:47:21.700490+00:00 lab-target sshd-session[660]: Connection closed by authenticating user dave 172.30.0.88 port 37664 [preauth]
+2026-10-17T10:47:21.799926+00:00 lab-target unix_chkpwd[683]: password check failed for user (deploy)
+2026-10-17T10:47:21.800280+00:00 lab-target sshd-session[681]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=deploy
+2026-10-17T10:47:23.823219+00:00 lab-target sshd-session[681]: Failed password for deploy from 172.30.0.88 port 37678 ssh2
+2026-10-17T10:47:25.220723+00:00 lab-target sshd-session[681]: Connection closed by authenticating user deploy 172.30.0.88 port 37678 [preauth]
+2026-10-17T10:47:25.287528+00:00 lab-target unix_chkpwd[710]: password check failed for user (backup)
+2026-10-17T10:47:25.287717+00:00 lab-target sshd-session[708]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=backup
+2026-10-17T10:47:26.765320+00:00 lab-target sshd-session[708]: Failed password for backup from 172.30.0.88 port 41152 ssh2
+2026-10-17T10:47:27.528018+00:00 lab-target sshd-session[708]: Connection closed by authenticating user backup 172.30.0.88 port 41152 [preauth]
+2026-10-17T10:47:27.595488+00:00 lab-target unix_chkpwd[725]: password check failed for user (www-data)
+2026-10-17T10:47:27.595666+00:00 lab-target sshd-session[723]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=www-data
+2026-10-17T10:47:29.951417+00:00 lab-target sshd-session[723]: Failed password for www-data from 172.30.0.88 port 41154 ssh2
+2026-10-17T10:47:31.889467+00:00 lab-target sshd-session[723]: Connection closed by authenticating user www-data 172.30.0.88 port 41154 [preauth]
+2026-10-17T10:47:31.959587+00:00 lab-target unix_chkpwd[752]: password check failed for user (mail)
+2026-10-17T10:47:31.959787+00:00 lab-target sshd-session[750]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=mail
+2026-10-17T10:47:34.456963+00:00 lab-target sshd-session[750]: Failed password for mail from 172.30.0.88 port 41168 ssh2
+2026-10-17T10:47:35.549649+00:00 lab-target sshd-session[750]: Connection closed by authenticating user mail 172.30.0.88 port 41168 [preauth]
+2026-10-17T10:47:35.619605+00:00 lab-target unix_chkpwd[779]: password check failed for user (news)
+2026-10-17T10:47:35.619800+00:00 lab-target sshd-session[777]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=news
+2026-10-17T10:47:37.533594+00:00 lab-target sshd-session[777]: Failed password for news from 172.30.0.88 port 54404 ssh2
+2026-10-17T10:47:37.702570+00:00 lab-target sshd-session[777]: Connection closed by authenticating user news 172.30.0.88 port 54404 [preauth]
+2026-10-17T10:47:37.771562+00:00 lab-target unix_chkpwd[794]: password check failed for user (proxy)
+2026-10-17T10:47:37.771743+00:00 lab-target sshd-session[792]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=proxy
+2026-10-17T10:47:39.575406+00:00 lab-target sshd-session[792]: Failed password for proxy from 172.30.0.88 port 54416 ssh2
+2026-10-17T10:47:41.137945+00:00 lab-target sshd-session[792]: Connection closed by authenticating user proxy 172.30.0.88 port 54416 [preauth]
+2026-10-17T10:47:41.211597+00:00 lab-target unix_chkpwd[815]: password check failed for user (list)
+2026-10-17T10:47:41.211777+00:00 lab-target sshd-session[813]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.88  user=list
+2026-10-17T10:47:42.660940+00:00 lab-target sshd-session[813]: Failed password for list from 172.30.0.88 port 54430 ssh2
+2026-10-17T10:47:44.103094+00:00 lab-target sshd-session[813]: Connection closed by authenticating user list 172.30.0.88 port 54430 [preauth]
+2026-10-17T10:47:45.739636+00:00 lab-target unix_chkpwd[847]: password check failed for user (dave)
+2026-10-17T10:47:45.740069+00:00 lab-target sshd-session[845]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.101  user=dave
+2026-10-17T10:47:48.225435+00:00 lab-target sshd-session[845]: Failed password for dave from 172.30.0.101 port 39274 ssh2
+2026-10-17T10:47:49.378963+00:00 lab-target sshd-session[845]: Connection closed by authenticating user dave 172.30.0.101 port 39274 [preauth]
+2026-10-17T10:47:49.476719+00:00 lab-target unix_chkpwd[868]: password check failed for user (dave)
+2026-10-17T10:47:49.477009+00:00 lab-target sshd-session[866]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.101  user=dave
+2026-10-17T10:47:51.214955+00:00 lab-target sshd-session[866]: Failed password for dave from 172.30.0.101 port 39280 ssh2
+2026-10-17T10:47:51.285500+00:00 lab-target sshd-session[866]: Connection closed by authenticating user dave 172.30.0.101 port 39280 [preauth]
+2026-10-17T10:47:52.850622+00:00 lab-target unix_chkpwd[889]: password check failed for user (dave)
+2026-10-17T10:47:52.850939+00:00 lab-target sshd-session[887]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.102  user=dave
+2026-10-17T10:47:54.000496+00:00 lab-target sshd-session[887]: Failed password for dave from 172.30.0.102 port 60374 ssh2
+2026-10-17T10:47:54.653544+00:00 lab-target sshd-session[887]: Connection closed by authenticating user dave 172.30.0.102 port 60374 [preauth]
+2026-10-17T10:47:54.750526+00:00 lab-target unix_chkpwd[904]: password check failed for user (dave)
+2026-10-17T10:47:54.750809+00:00 lab-target sshd-session[902]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.102  user=dave
+2026-10-17T10:47:56.897964+00:00 lab-target sshd-session[902]: Failed password for dave from 172.30.0.102 port 50226 ssh2
+2026-10-17T10:47:58.394425+00:00 lab-target sshd-session[902]: Connection closed by authenticating user dave 172.30.0.102 port 50226 [preauth]
+2026-10-17T10:48:00.011827+00:00 lab-target unix_chkpwd[937]: password check failed for user (dave)
+2026-10-17T10:48:00.012359+00:00 lab-target sshd-session[935]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.103  user=dave
+2026-10-17T10:48:02.297048+00:00 lab-target sshd-session[935]: Failed password for dave from 172.30.0.103 port 55694 ssh2
+2026-10-17T10:48:03.650649+00:00 lab-target sshd-session[935]: Connection closed by authenticating user dave 172.30.0.103 port 55694 [preauth]
+2026-10-17T10:48:03.746068+00:00 lab-target unix_chkpwd[964]: password check failed for user (dave)
+2026-10-17T10:48:03.746314+00:00 lab-target sshd-session[962]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.103  user=dave
+2026-10-17T10:48:05.820711+00:00 lab-target sshd-session[962]: Failed password for dave from 172.30.0.103 port 47884 ssh2
+2026-10-17T10:48:07.391086+00:00 lab-target sshd-session[962]: Connection closed by authenticating user dave 172.30.0.103 port 47884 [preauth]
+2026-10-17T10:48:08.983875+00:00 lab-target unix_chkpwd[997]: password check failed for user (dave)
+2026-10-17T10:48:08.984153+00:00 lab-target sshd-session[995]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.104  user=dave
+2026-10-17T10:48:10.736432+00:00 lab-target sshd-session[995]: Failed password for dave from 172.30.0.104 port 45920 ssh2
+2026-10-17T10:48:10.781566+00:00 lab-target sshd-session[995]: Connection closed by authenticating user dave 172.30.0.104 port 45920 [preauth]
+2026-10-17T10:48:10.878214+00:00 lab-target unix_chkpwd[1012]: password check failed for user (dave)
+2026-10-17T10:48:10.878500+00:00 lab-target sshd-session[1010]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.104  user=dave
+2026-10-17T10:48:12.998065+00:00 lab-target sshd-session[1010]: Failed password for dave from 172.30.0.104 port 45932 ssh2
+2026-10-17T10:48:14.522482+00:00 lab-target sshd-session[1010]: Connection closed by authenticating user dave 172.30.0.104 port 45932 [preauth]
+2026-10-17T10:48:16.111523+00:00 lab-target unix_chkpwd[1045]: password check failed for user (dave)
+2026-10-17T10:48:16.111894+00:00 lab-target sshd-session[1043]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.105  user=dave
+2026-10-17T10:48:17.951021+00:00 lab-target sshd-session[1043]: Failed password for dave from 172.30.0.105 port 42812 ssh2
+2026-10-17T10:48:19.748677+00:00 lab-target sshd-session[1043]: Connection closed by authenticating user dave 172.30.0.105 port 42812 [preauth]
+2026-10-17T10:48:19.846501+00:00 lab-target unix_chkpwd[1072]: password check failed for user (dave)
+2026-10-17T10:48:19.846839+00:00 lab-target sshd-session[1070]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.30.0.105  user=dave
+2026-10-17T10:48:21.136589+00:00 lab-target sshd-session[1070]: Failed password for dave from 172.30.0.105 port 42828 ssh2
+2026-10-17T10:48:21.655702+00:00 lab-target sshd-session[1070]: Connection closed by authenticating user dave 172.30.0.105 port 42828 [preauth]

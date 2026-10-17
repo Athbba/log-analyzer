@@ -114,6 +114,7 @@ const SPEC = {
     prefixV4: [int(1, 32), 'newSource.prefixV4'],
     prefixV6: [int(1, 128), 'newSource.prefixV6'],
     remember: [duration, 'newSource.rememberMs'],
+    sharedNetworkUsers: [int(0), 'newSource.sharedNetworkUsers'],
   },
   logTampering: {
     enabled: [bool, 'tampering.enabled'],
@@ -207,6 +208,7 @@ export function toConfig(o) {
     newSource: {
       enabled: o.newSource.enabled, learning: formatDuration(o.newSource.learningMs),
       prefixV4: o.newSource.prefixV4, prefixV6: o.newSource.prefixV6, remember: formatDuration(o.newSource.rememberMs),
+      sharedNetworkUsers: o.newSource.sharedNetworkUsers,
     },
     logTampering: {
       enabled: o.tampering.enabled, maxGap: formatDuration(o.tampering.maxGapMs),

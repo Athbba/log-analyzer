@@ -31,6 +31,8 @@ export const SCENARIOS = [
   { id: 'admin-work', service: 'office', script: '/scenarios/admin-work.sh' },
   { id: 'guessing', service: 'attacker-guess', script: '/scenarios/guessing.sh' },
   { id: 'break-in', service: 'attacker-breakin', script: '/scenarios/break-in.sh' },
+  { id: 'spray', service: 'attacker-spray', script: '/scenarios/spray.sh' },
+  ...[1, 2, 3, 4, 5].map((n) => ({ id: 'distributed', service: `attacker-dist-${n}`, script: '/scenarios/distributed.sh' })),
 ];
 
 /**

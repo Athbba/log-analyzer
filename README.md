@@ -1,13 +1,17 @@
 # SSH Log Analyzer
 
-A command-line tool that reads a Linux SSH `auth.log` and reports four kinds of suspicious activity:
+A command-line tool that reads a Linux SSH `auth.log` and reports suspicious activity:
 
 1. **Brute force**: many failed logins from one IP in a short time.
-2. **Possible breach**: a successful login from an IP that was failing just before.
-3. **Unusual hour**: a successful login in the middle of the night.
-4. **Account change**: a new user, or a user given admin rights, flagged high when it comes from an IP that broke in.
+2. **Password spray**: many real accounts tried a few times each from one source, slowly enough to dodge brute-force limits.
+3. **Distributed brute force**: one account guessed from many sources, each staying under the per-source limit.
+4. **Possible breach**: a successful login from an IP that was failing just before.
+5. **New source**: a login from a network the user has never logged in from, the way stolen credentials usually look.
+6. **Unusual hour**: a successful login in the middle of the night.
+7. **Account change**: a new user, or a user given admin rights, flagged high when it comes from an IP that broke in.
+8. **Log tampering**: hours of silence, timestamps jumping back, NUL-damaged lines: traces of lines deleted from or spliced into the log.
 
-Findings are grouped by source IP, so one attacker's activity reads as one incident: brute force, then break-in, then the backdoor account.
+Findings are grouped by source, so one attacker's activity reads as one incident: brute force, then break-in, then the backdoor account. Each rule's false positives are measured on labelled data and documented: see [docs/detections.md](docs/detections.md) and [docs/evaluation.md](docs/evaluation.md).
 
 It is plain Node.js with no dependencies and nothing to install.
 
@@ -26,6 +30,8 @@ npm run generate-sample                         # rebuild samples/auth.log
 ```text
 Options:
   --json              Print the results as JSON
+  --config <file>     Settings file (default log-analyzer.config.json, if it exists)
+  --print-config      Print the effective settings as a config file and exit
   --threshold <n>     Failed logins from one IP that count as brute force (default 5)
   --window <time>     ...within this window, e.g. 90s, 10m, 1h (default 10m)
   --lookback <time>   How far before a login to look for failures (default 30m)
@@ -35,7 +41,15 @@ Options:
   -h, --help          Show this help
 ```
 
-The exit status is 0 if nothing high-severity was found, 1 if something was, and 2 for bad arguments or an unreadable file, so the tool can gate a cron job or CI step.
+The exit status is 0 if nothing high-severity was found, 1 if something was, and 2 for bad arguments, a bad config file, or an unreadable log, so the tool can gate a cron job or CI step.
+
+### Configuration
+
+Every rule's settings can go in one JSON file. Copy [log-analyzer.config.example.json](log-analyzer.config.example.json), which lists every setting at its default, to `log-analyzer.config.json` and change what you need. Unknown keys and wrong types are errors, not silently ignored, and durations always carry a unit (`"90s"`, `"10m"`, `"1h"`, `"7d"`). Flags override the file. For example, to stop the new-source and distributed rules from reporting your own internal networks:
+
+```json
+{ "trustedNetworks": ["10.0.0.0/8"] }
+```
 
 ## Example: one attacker, start to finish
 
@@ -47,13 +61,15 @@ HIGH    198.51.100.23
                                         2 usernames: deploy (12), root (2)
                                         then logged in as deploy (password) at 2026-09-09 03:39:12
   2026-09-09 03:39:12  possible breach  deploy logged in (password) after 14 failed logins in the previous 17m 32s
+  2026-09-09 03:39:12  new source       deploy logged in (password) from 198.51.100.0/24, a network not seen for deploy before
+                                        previously from 1 other network
   2026-09-09 03:39:12  unusual hour     deploy logged in (password) at 03:39
   2026-09-09 03:40:56  account change   new user sysupdate, member of sudo
                                         by deploy via sudo, in a session from 198.51.100.23
                                         198.51.100.23 broke in as deploy at 2026-09-09 03:39:12 after 14 failed logins
 ```
 
-In words: B guessed the `deploy` account's password over about 17 minutes, logged in at 3:39 AM, and less than two minutes later created a new sudo user called `sysupdate` as a backdoor. All four rules fire, and they appear together under one IP.
+In words: B guessed the `deploy` account's password over about 17 minutes, logged in at 3:39 AM from a network `deploy` had never used, and less than two minutes later created a new sudo user called `sysupdate` as a backdoor. Five rules fire, and they appear together under one IP.
 
 <details>
 <summary>Full report for the sample log</summary>
@@ -68,12 +84,18 @@ Rules:
   possible breach  a login from an IP with failed logins in the previous 30m
   unusual hour     a login between 01:00 and 04:59
   account change   a new user, or a user added to sudo/wheel/admin; high if made from an IP that broke in
+  password spray   6+ real accounts from one source within 1h, at most 2 tries each
+  distributed      one account guessed from 4+ sources (8+ failures) within 1h
+  new source       a login from a network the user hasn't logged in from before (after 24h of learning)
+  log tampering    no lines for 2h, time going back 5m+, NUL bytes, or truncation
 
 HIGH    198.51.100.23
   2026-09-09 03:21:40  brute force      14 failed logins over 16m 1s
                                         2 usernames: deploy (12), root (2)
                                         then logged in as deploy (password) at 2026-09-09 03:39:12
   2026-09-09 03:39:12  possible breach  deploy logged in (password) after 14 failed logins in the previous 17m 32s
+  2026-09-09 03:39:12  new source       deploy logged in (password) from 198.51.100.0/24, a network not seen for deploy before
+                                        previously from 1 other network
   2026-09-09 03:39:12  unusual hour     deploy logged in (password) at 03:39
   2026-09-09 03:40:56  account change   new user sysupdate, member of sudo
                                         by deploy via sudo, in a session from 198.51.100.23
@@ -95,22 +117,48 @@ LOW     10.0.1.57
   2026-09-09 09:03:04  possible breach  bob logged in (password) 5s after 1 failed login
   2026-09-10 09:19:38  possible breach  bob logged in (password) 6s after 1 failed login
 
+LOW     2001:db8:4a2::/64
+  2026-09-09 10:27:32  new source       carol logged in (publickey) from 2001:db8:4a2::/64, a network not seen for carol before
+                                        previously from 1 other network
+
 LOW     10.8.0.22
+  2026-09-10 01:52:13  new source       dave logged in (publickey) from 10.8.0.0/24, a network not seen for dave before
+                                        previously from 1 other network
   2026-09-10 01:52:13  unusual hour     dave logged in (publickey) at 01:52
 
-5 incidents: 1 high, 2 medium, 2 low
+6 incidents: 1 high, 2 medium, 3 low
 ```
 
 </details>
 
-## The four detections
+## The detections
 
 | Rule | Fires when | Default | Severity |
 |---|---|---|---|
-| Brute force | failed logins from one IP within a sliding window | 5 in 10 minutes | medium; high if that IP later logs in |
-| Possible breach | a successful login, and the same IP failed in the time before it | 30-minute lookback | low for 1–4 failures; high for 5+ or during a brute force |
+| Brute force | failed logins from one source within a sliding window | 5 in 10 minutes | medium; high if that source later logs in |
+| Password spray | failures for many existing accounts from one source, few tries each | 6 accounts in 1 hour, ≤ 2 tries each | medium; high on a login as one of them |
+| Distributed brute force | failures for one account from many sources | 4 sources and 8 attempts in 1 hour | medium; high on a login from one of them |
+| Possible breach | a successful login, and the same source failed in the time before it | 30-minute lookback | low for 1–4 failures; high for 5+ or during a brute force |
+| New source | a login from a network (/24 or /64) the user never logged in from | after 24 hours of learning | low for keys, medium for passwords |
 | Unusual hour | a successful SSH login during the night window | 01:00–04:59 | low |
 | Account change | a new user, or a user added to an admin group | groups `sudo`, `wheel`, `admin` | low for a plain user; medium for admin rights or UID 0; high if made from an IP that broke in |
+| Log tampering | no lines for hours, time going back, NUL-damaged lines, a truncated file | gap 2 hours, step back 5 minutes | low, medium, high for truncation |
+
+The first four rules below are described in detail here. The rest, and the tuning options and known false positives of every rule, are in **[docs/detections.md](docs/detections.md)**.
+
+### Measured quality
+
+On a labelled corpus of 40 synthetic three-day logs (157 attacks, many deliberately below the thresholds, plus benign lookalikes) and on the Docker-lab recording, with default settings ([full results](docs/evaluation.md), regenerated and checked by CI):
+
+| Rule | Recall | Precision | Where it misses / what trips it |
+|---|---|---|---|
+| Brute force | 89% | 95% | misses 3–4 guesses; trips on several typos behind one NAT |
+| Password spray | 69% | 100% | misses sprays of 3–5 accounts (below the default of 6) |
+| Distributed brute force | 56% | 62% | misses 2–3 sources; trips on a misconfigured internal service (94% precision once internal networks are trusted) |
+| New source | 100% | 38% | trips on travel and on the first users through an office NAT; inherent, hence never high |
+| Log tampering | 96% | 76% | misses holes shorter than 2 hours; trips on maintenance downtime |
+
+On the lab recording every labelled attack is caught with no false positives. The corpus was written by the same person as the rules, so it can only contain cases that were thought of: these numbers show where the thresholds sit, not how the tool will do on real traffic.
 
 ### Brute force
 
@@ -202,12 +250,12 @@ The engine was checked against the original implementation, which is kept unchan
 
 `npm run bench` generates a deliberately hostile synthetic log in memory: 70% of lines are single guesses from ever-new random IPs, as from a large botnet, mixed with brute-force bursts, logins, logouts and sudo noise. It then analyzes it. Measured on my Windows laptop with Node 24.21:
 
-| 1M lines | time | live heap after GC at 25 / 50 / 75 / 100% |
+| 1M lines, all eight rules | time | live heap after GC at 25 / 50 / 75 / 100% |
 |---|---|---|
-| streaming (current) | 8.4 s, ~119,000 lines/s | 41 / 43 / 42 / 40 MB |
-| collect, then analyze (the v0.1.0 approach) | 8.8 s | 93 / 182 / 270 / 359 MB |
+| streaming (current) | 11.2 s, ~89,000 lines/s | 45 / 47 / 45 / 43 MB |
+| collect, then analyze (the v0.1.0 approach) | 8.3 s | 93 / 182 / 270 / 360 MB |
 
-At 4M lines the streaming run is still at 54 MB of live heap. Most of what remains is the report's own findings, which grow with the number of attacks rather than lines. Resident memory (RSS) is higher than the live heap in both cases, because V8 holds on to memory it has freed.
+Streaming trades some speed for flat memory. Part of the gap is that the collect path can't run the log-tampering rule, which needs every line rather than only authentication events. With the original four rules only, the streaming run took 8.4 s. At 4M lines the streaming run's live heap is 43 / 50 / 56 / 57 MB at each million. The slow rise fits the findings kept for the final report, which grow with the number of attacks rather than lines (not yet measured separately). Resident memory (RSS) is higher than the live heap in both cases, because V8 holds on to memory it has freed.
 
 ## Testing
 
@@ -232,15 +280,17 @@ External addresses come from the IP ranges reserved for documentation (RFC 5737)
 
 C through G are deliberate lookalikes. They check that the analyzer is right about what it *doesn't* flag, not only about what it does.
 
+The sample predates the newer rules, which find three more things in it. The new-source rule reports B's login as `deploy` from a network `deploy` had never used, a true positive. It also reports two benign lookalikes at low severity, which are honest examples of that rule's inherent false positives: carol logging in from home over IPv6, and dave's on-call login over the VPN (C). The newer rules are measured on a separate labelled corpus instead (see [Measured quality](#measured-quality)).
+
 ### Real logs from a Docker lab
 
-The synthetic sample only contains formats the generator knows about, so the analyzer is also tested on logs written by the real software. [`lab/`](lab/README.md) is a Docker Compose lab: a Debian 13 server running OpenSSH 10 and rsyslog, an office workstation, and two attackers, on an internal network with no route out. Its scenarios are normal admin work, a dictionary attack, and a break-in that ends with a backdoor sudo user.
+The synthetic sample only contains formats the generator knows about, so the analyzer is also tested on logs written by the real software. [`lab/`](lab/README.md) is a Docker Compose lab: a Debian 13 server running OpenSSH 10 and rsyslog, an office workstation, and attackers on nine addresses, on an internal network with no route out. Its scenarios are normal admin work, a dictionary attack, a break-in that ends with a backdoor sudo user, a password spray across ten accounts, and a distributed attack on one account from five addresses.
 
-`npm run lab` builds it, plays the scenarios, copies out `/var/log/auth.log` and checks it against [labels](test/fixtures/lab/labels.json). CI does this on every pull request, and one recorded run is committed as a test fixture. The lab confirmed that the parser handles current formats (`sshd-session`, sudo 1.9 lines with no `TTY=`, RFC 3339 timestamps). It also exposed a false positive: on a shared office IP, a colleague's login right after someone else's typo counts as a low-severity possible breach.
+`npm run lab` builds it, plays the scenarios, copies out `/var/log/auth.log` and checks it against [labels](test/fixtures/lab/labels.json). CI does this on every pull request, and one recorded run is committed as a test fixture. The lab confirmed that the parser handles current formats (`sshd-session`, sudo 1.9 lines with no `TTY=`, RFC 3339 timestamps). It also exposed a false positive, since fixed: on a shared office IP, a colleague's key login right after someone else's typo counted as a possible breach.
 
 ### Test suites
 
-55 tests using Node's built-in `node:test`. Run them with `npm test`.
+85 tests using Node's built-in `node:test`. Run them with `npm test`.
 
 - `test/parse.test.js`: each line type, `message repeated` counting, spoofed usernames, IPv6, RFC 3339, the December-to-January year change, unreadable lines.
 - `test/detectors.test.js`: each rule's thresholds and boundaries (4 vs 5 failures, a window exactly 10 minutes wide, 00:59 vs 01:00 vs 05:00), plus each way an account change can or can't be linked to a break-in.
@@ -248,6 +298,8 @@ The synthetic sample only contains formats the generator knows about, so the ana
 - `test/engine-equivalence.test.js`: fast-check generates thousands of random event streams (attacks, logins, sessions, sudo and account changes on a few IPs and users) and requires the engine and the frozen original rules to agree.
 - `test/engine.test.js`: incremental findings, state staying under its caps with 100,000 attacking IPs, eviction as the log clock moves, the 7-day memory, and the same-second logout case the random test can't reach.
 - `test/hostile-input.test.js`: lines split mid-character, the line-length cap (a 50 MB line never buffers more than 8 KiB), adversarial regex input under a time budget, escaped terminal output, and year inference.
+- `test/rules.test.js`: the newer rules, each with what it must catch and the lookalikes it must not: scanner noise and office-NAT typos for spraying; roaming users, nonexistent accounts and IPv6 address rotation for distributed attacks; learning, first logins, shared and trusted networks for new sources; NTP steps and DST for tampering.
+- `test/config.test.js`: the config file round trip, rejection of typos and wrong types, flags overriding the file, and the IP and network helpers.
 - `test/sample.test.js`: an end-to-end check that the sample log produces exactly the incidents in the table above, plus the command line (exit codes, `--json`, stdin, bad arguments).
 
 ### Planted-bug testing
@@ -280,6 +332,12 @@ The same was done for the streaming engine's new code paths, the ones with no co
 
 The random equivalence test caught six of the seven. The seventh survived because the generator never puts two actions in the same second. A targeted test now covers it, and catches it.
 
+For the four newer rules the tests were written alongside the rules rather than strictly first, so planted bugs were used to check them. Eleven were planted: off-by-one thresholds, counting nonexistent accounts, forgetting the typo exemption, alerting during learning, comparing exact addresses instead of networks, dropping the DST allowance, measuring gaps from the wrong line, never reporting a held-back login, and counting IPv6 per address. All eleven were caught. The labelled evaluation then found three bugs that no test had:
+
+- steps across the end of DST misread as tampering when the lines were minutes apart;
+- logins from trusted networks not building the new-source baseline;
+- a flood of new-source alerts for every first login through an office NAT, fixed by treating a network that several colleagues use as known.
+
 ## Development
 
 ```sh
@@ -308,6 +366,10 @@ samples/auth.log                the generated sample
 scripts/lab.js                  runs the Docker lab and checks its log against labels
 lab/                            Docker lab: SSH target, clients, attack scenarios
 scripts/bench.js                speed and memory benchmark
+scripts/eval.js                 precision and recall on labelled data, written to docs/evaluation.md
+scripts/lib/corpus.js           the seeded, labelled synthetic corpus
+docs/detections.md              every rule: what it reads, tuning, false positives
+log-analyzer.config.example.json  every setting at its default
 test/                           parser, detector, engine, hostile-input, end-to-end and lab tests
 test/reference/                 the original batch rules, frozen, as a test oracle
 test/fixtures/lab/              a recorded lab auth.log and its labels

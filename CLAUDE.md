@@ -11,6 +11,7 @@ npm run lint         # ESLint
 npm run typecheck    # tsc --checkJs on JSDoc types, strict
 npm run check        # all three, as CI runs them
 npm run bench        # speed and memory benchmark (--lines N, --collect, --json)
+npm run eval         # precision/recall on labelled data -> docs/evaluation.md (--check in CI)
 npm run lab          # Docker lab: play the scenarios, collect and check auth.log
 npm run lab:fixture  # same, but refresh test/fixtures/lab/auth.log
 ```

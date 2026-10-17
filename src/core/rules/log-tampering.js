@@ -8,9 +8,10 @@
 // - backwards: a line more than `maxBackwardsMs` earlier than the one before
 //   it, as when lines are spliced in from elsewhere. Small steps back (clock
 //   sync, lines from several processes) are normal. When DST ends the clock
-//   goes back an hour: with RFC 3339 timestamps the offset change shows it;
-//   with classic syslog timestamps a one-hour step is let through when
-//   `allowDstJumps` is on.
+//   goes back an hour. With RFC 3339 timestamps the offsets turn every line
+//   into a real instant, so gaps and steps are measured in real time and DST
+//   never shows. With classic syslog timestamps there is no offset, so a
+//   one-hour step back is let through when `allowDstJumps` is on.
 // - nul-bytes: lines containing NUL characters, which appear when a file is
 //   truncated or zero-filled while a process still writes to it.
 // - truncated: in live mode, the file got shorter without being rotated.
@@ -41,7 +42,9 @@ export function createLogTampering(ctx) {
   const { maxGapMs, maxBackwardsMs, allowDstJumps } = ctx.options.tampering;
   /** @type {LineInfo | null} */
   let previous = null;
+  /** Latest wall-clock time, and latest real instant (for lines with offsets). */
   let latest = -Infinity;
+  let latestInstant = -Infinity;
   /** The finding for the current run of lines with NUL bytes, if any. */
   /** @type {LogTamperingFinding | null} */
   let nulRun = null;
@@ -79,15 +82,19 @@ export function createLogTampering(ctx) {
         nulLines = 0;
       }
 
+      const instant = instantOf(info);
       if (previous) {
-        if (info.time > latest + maxGapMs) {
+        const prevInstant = instantOf(previous);
+        const real = instant !== null && prevInstant !== null && latestInstant > -Infinity;
+        const silence = real ? /** @type {number} */ (instant) - latestInstant : info.time - latest;
+        if (silence > maxGapMs) {
           report({
             kind: 'gap', severity: 'low', time: latest, until: info.time, line: info.line,
-            detail: `no log lines for ${span(info.time - latest)}`,
+            detail: `no log lines for ${span(silence)}`,
           });
         }
-        const back = previous.time - info.time;
-        if (back > maxBackwardsMs && !isDst(previous, info, back)) {
+        const back = real ? /** @type {number} */ (prevInstant) - /** @type {number} */ (instant) : previous.time - info.time;
+        if (back > maxBackwardsMs && (real || !isDst(back))) {
           report({
             kind: 'backwards', severity: 'medium', time: previous.time, until: info.time, line: info.line,
             detail: `timestamps went back ${span(back)} at line ${info.line}`,
@@ -96,6 +103,7 @@ export function createLogTampering(ctx) {
       }
       previous = info;
       latest = Math.max(latest, info.time);
+      if (instant !== null) latestInstant = Math.max(latestInstant, instant);
     },
 
     onSignal(signal) {
@@ -110,16 +118,18 @@ export function createLogTampering(ctx) {
   };
 
   /**
-   * Whether a step back is the end of daylight saving time.
-   * @param {LineInfo} before
-   * @param {LineInfo} after
+   * The real instant of a line, when its timestamp has an offset.
+   * @param {LineInfo} info
+   */
+  function instantOf(info) {
+    return info.offsetMinutes === null ? null : info.time - info.offsetMinutes * MINUTE;
+  }
+
+  /**
+   * Whether a wall-clock step back (no offsets to go by) may be the end of DST.
    * @param {number} back
    */
-  function isDst(before, after, back) {
-    if (before.offsetMinutes !== null && after.offsetMinutes !== null) {
-      const shift = (before.offsetMinutes - after.offsetMinutes) * MINUTE;
-      return shift > 0 && Math.abs(back - shift) <= maxBackwardsMs;
-    }
+  function isDst(back) {
     return allowDstJumps && Math.abs(back - HOUR) <= maxBackwardsMs;
   }
 }

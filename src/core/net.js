@@ -134,6 +134,8 @@ export function prefixOf(text, bitsV4, bitsV6) {
  * @param {number} bitsV6
  */
 export function sourceOf(ip, bitsV6) {
+  // Hot path (every failure, in several rules): plain IPv4 is its own source.
+  if (!ip.includes(':')) return ip;
   return prefixOf(ip, 32, bitsV6);
 }
 

@@ -19,6 +19,7 @@
     "check": "npm run lint && npm run typecheck && npm test",
     "generate-sample": "node scripts/generate-sample-log.js",
     "bench": "node --expose-gc scripts/bench.js",
+    "eval": "node scripts/eval.js",
     "lab": "node scripts/lab.js run",
     "lab:fixture": "node scripts/lab.js run --out test/fixtures/lab/auth.log"
   },

@@ -8,7 +8,9 @@
 // The first `learningMs` of the log only build the baseline. A user's very
 // first login is never reported (there's no baseline to compare with; new
 // accounts are the account-change rule's job). Logins from trusted networks
-// are never reported. Password logins are medium, key logins low: a key
+// are never reported, and nor are networks that `sharedNetworkUsers` other
+// users already log in from: that is the organisation's own (an office NAT, a
+// VPN exit), not an attacker's. Password logins are medium, key logins low: a key
 // can't be guessed, so a key login from somewhere new is more likely the
 // user travelling.
 //
@@ -31,11 +33,14 @@ const MAX_NETWORKS_PER_USER = 100;
  */
 export function createNewSource(ctx) {
   const { newSource, trustedNetworks, limits } = ctx.options;
-  const { learningMs, prefixV4, prefixV6, rememberMs } = newSource;
+  const { learningMs, prefixV4, prefixV6, rememberMs, sharedNetworkUsers } = newSource;
   const trusted = networkMatcher(trustedNetworks.flatMap((c) => parseCidr(c) ?? []));
   /** Per user: network → last login time, least recent first. */
   /** @type {BoundedMap<string, Map<string, number>>} */
   const users = new BoundedMap('new-source: users', limits.maxKeys, ctx.health);
+  /** Per network: up to sharedNetworkUsers users seen there, and when. */
+  /** @type {BoundedMap<string, Map<string, number>>} */
+  const networks = new BoundedMap('new-source: networks', limits.maxKeys, ctx.health);
   let start = -Infinity;
   let nextSweep = -Infinity;
 
@@ -44,16 +49,20 @@ export function createNewSource(ctx) {
 
     onEvent(event) {
       if (start === -Infinity) start = event.time;
-      if (!newSource.enabled || event.type !== 'success' || trusted(event.ip)) return;
+      if (!newSource.enabled || event.type !== 'success') return;
       const network = prefixOf(event.ip, prefixV4, prefixV6);
       const isFirstLogin = !users.has(event.user);
+      const others = networks.touch(network, () => new Map());
+      const shared = sharedNetworkUsers > 0 && [...others.keys()].filter((u) => u !== event.user).length >= sharedNetworkUsers;
+      if (others.has(event.user) || others.size < sharedNetworkUsers + 1) others.set(event.user, event.time);
       const known = users.touch(event.user, () => new Map());
       const seenBefore = known.has(network);
       known.delete(network);
       known.set(network, event.time);
       if (known.size > MAX_NETWORKS_PER_USER) known.delete(/** @type {string} */ (known.keys().next().value));
 
-      if (seenBefore || isFirstLogin || event.time < start + learningMs) return;
+      // Trusted networks build the baseline but are never reported.
+      if (seenBefore || isFirstLogin || shared || trusted(event.ip) || event.time < start + learningMs) return;
       ctx.emit({
         rule: 'new-source',
         severity: event.method === 'password' ? 'medium' : 'low',
@@ -69,16 +78,20 @@ export function createNewSource(ctx) {
     onAdvance(time) {
       if (time < nextSweep) return;
       nextSweep = time + 60 * 60_000;
-      users.sweep((known) => {
-        for (const [network, last] of known) if (last < time - rememberMs) known.delete(network);
-        return known.size === 0;
-      });
+      /** @param {Map<string, number>} seen */
+      const forget = (seen) => {
+        for (const [key, last] of seen) if (last < time - rememberMs) seen.delete(key);
+        return seen.size === 0;
+      };
+      users.sweep(forget);
+      networks.sweep(forget);
     },
 
     size() {
       let entries = 0;
       for (const known of users.values()) entries += known.size;
-      return { keys: users.size, entries };
+      for (const seen of networks.values()) entries += seen.size;
+      return { keys: users.size + networks.size, entries };
     },
   };
 }

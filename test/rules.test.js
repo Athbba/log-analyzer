@@ -122,10 +122,25 @@ test('new source: after the learning day, a login from a network the user never 
   assert.deepEqual(run(password), ['new-source medium 198.51.100.23'], 'a password login is medium');
 });
 
+test('new source lookalike: an office network that several colleagues already use is known for everyone', () => {
+  const people = ['alice', 'bob', 'carol', 'dave', 'erin', 'frank'];
+  const baseline = people.map((u, i) => ok(`10.0.${10 + i}.5`, u, i, 'publickey'));
+  const office = people.map((u, i) => ok('10.0.2.1', u, DAY + 60 + i * 5, 'password'));
+  assert.deepEqual(run([...baseline, ...office], {}, 'new-source'), ['new-source medium 10.0.2.1', 'new-source medium 10.0.2.1'],
+    'the first two get reported; after that two other users have used it');
+  assert.equal(run([...baseline, ...office], { newSource: { sharedNetworkUsers: 0 } }, 'new-source').length, 6, '0 turns this off');
+});
+
 test('new source lookalikes: the learning period, a first-ever login, a trusted network', () => {
   assert.deepEqual(run([ok('10.0.1.23', 'alice', 0), ok('198.51.100.23', 'alice', 60)]), [], 'still learning');
   assert.deepEqual(run([ok('10.0.1.23', 'alice', 0), ok('198.51.100.23', 'erin', DAY + 60)]), [], 'erin has no baseline');
   assert.deepEqual(run([ok('10.0.1.23', 'dave', 0), ok('10.8.0.22', 'dave', DAY + 60)], { trustedNetworks: ['10.0.0.0/8'] }), []);
+});
+
+test('new source: logins from trusted networks still form the baseline', () => {
+  // dave only ever logs in from the trusted office, then from an attacker's network.
+  const events = [ok('10.0.1.81', 'dave', 0, 'publickey'), ok('198.51.100.66', 'dave', DAY + 60)];
+  assert.deepEqual(run(events, { trustedNetworks: ['10.0.0.0/8'] }, 'new-source'), ['new-source medium 198.51.100.66']);
 });
 
 // --- Log tampering ---
@@ -144,6 +159,11 @@ function timeline(lines, options = {}) {
   return engine.findings().map((f) => (f.rule === 'log-tampering' ? `${f.kind} ${f.severity}` : f.rule));
 }
 
+test('tampering: with RFC 3339 offsets, gaps are measured in real time, so DST adds no hour', () => {
+  // 01:30 (+01:00) to 03:20 (+02:00) when DST starts is 50 real minutes, not 110.
+  assert.deepEqual(timeline([[90, 60], [200, 120], [201, 120]], { tampering: { maxGapMs: 60 * MIN } }), []);
+});
+
 test('tampering: hours of silence, and time going backwards', () => {
   assert.deepEqual(timeline([0, 60, 120, 400, 460]), ['gap low'], 'nearly 5 hours with no lines');
   assert.deepEqual(timeline([0, 60, 120, 180]), [], 'hourly cron lines are normal');
@@ -154,6 +174,7 @@ test('tampering lookalikes: a clock step of seconds, and the end of daylight sav
   assert.deepEqual(timeline([10, 10.05, 10.01, 11]), [], 'NTP stepping the clock back 3 s');
   // RFC 3339: 02:59 at +02:00, then 02:00 at +01:00. The offset shows it is DST.
   assert.deepEqual(timeline([[179, 120], [120, 60], [121, 60]]), []);
+  assert.deepEqual(timeline([[179, 120], [130, 60], [131, 60]]), [], 'lines 11 real minutes apart across the change');
   assert.deepEqual(timeline([[179, 120], [120, 120]]), ['backwards medium'], 'the same step without the offset change');
   // Classic syslog has no offset; a one-hour step is let through unless disabled.
   assert.deepEqual(timeline([179, 120]), []);

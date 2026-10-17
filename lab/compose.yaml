@@ -50,6 +50,44 @@ services:
       lab:
         ipv4_address: 172.30.0.77
 
+  # Attacker spraying one password across many accounts.
+  attacker-spray:
+    <<: *client
+    networks:
+      lab:
+        ipv4_address: 172.30.0.88
+
+  # Five nodes of a botnet, each guessing dave's password twice.
+  attacker-dist-1:
+    <<: *client
+    networks:
+      lab:
+        ipv4_address: 172.30.0.101
+
+  attacker-dist-2:
+    <<: *client
+    networks:
+      lab:
+        ipv4_address: 172.30.0.102
+
+  attacker-dist-3:
+    <<: *client
+    networks:
+      lab:
+        ipv4_address: 172.30.0.103
+
+  attacker-dist-4:
+    <<: *client
+    networks:
+      lab:
+        ipv4_address: 172.30.0.104
+
+  attacker-dist-5:
+    <<: *client
+    networks:
+      lab:
+        ipv4_address: 172.30.0.105
+
 networks:
   lab:
     # No gateway to the host's network: the containers can only reach each other.

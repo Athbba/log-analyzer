@@ -43,7 +43,7 @@ export const EXTENDED_DEFAULTS = {
   ignoreKeyLoginsAfterOthersFailures: true,
   spray: { enabled: true, minUsers: 6, windowMs: HOUR, maxAttemptsPerUser: 2, countInvalidUsers: false },
   distributed: { enabled: true, minSources: 4, minAttempts: 8, windowMs: HOUR, countInvalidUsers: false, ignoreUsers: [] },
-  newSource: { enabled: true, learningMs: DAY, prefixV4: 24, prefixV6: 64, rememberMs: 90 * DAY },
+  newSource: { enabled: true, learningMs: DAY, prefixV4: 24, prefixV6: 64, rememberMs: 90 * DAY, sharedNetworkUsers: 2 },
   tampering: { enabled: true, maxGapMs: 2 * HOUR, maxBackwardsMs: 5 * MINUTE, allowDstJumps: true },
 };
 
