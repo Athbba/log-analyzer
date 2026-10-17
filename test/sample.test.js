@@ -102,3 +102,12 @@ test('CLI exits 0 on a clean log and 2 on bad input', () => {
   const badArgs = [['--threshold', '0'], ['--night', '5-5'], ['--window', 'soon'], ['--admin-groups', 'sudo,'], ['--bogus']];
   for (const args of badArgs) assert.equal(cli([...args, SAMPLE]).status, 2, args.join(' '));
 });
+
+test('CLI: valid --window and --lookback values are accepted and used', () => {
+  const tuned = cli([SAMPLE, '--year', '2026', '--json', '--window', '1h', '--lookback', '90s', '--threshold', '3']);
+  assert.equal(tuned.stderr, '');
+  const report = JSON.parse(tuned.stdout);
+  assert.deepEqual(report.rules.bruteForce, { threshold: 3, windowSeconds: 3600 });
+  assert.deepEqual(report.rules.possibleBreach, { lookbackSeconds: 90 });
+  assert.equal(JSON.parse(cli([SAMPLE, '--json', '--window', '15']).stdout).rules.bruteForce.windowSeconds, 900, 'minutes by default');
+});
