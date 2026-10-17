@@ -68,6 +68,17 @@
  * @property {string[]} adminGroups  Groups that grant admin rights.
  */
 
+/**
+ * Ceilings on detector state (see core/options.js).
+ * @typedef {object} Limits
+ * @property {number} maxKeys  IPs, users, sessions or changes tracked by each rule.
+ * @property {number} maxEntriesPerKey  Recent failures kept per IP.
+ * @property {number} maxUsersPerFinding  Distinct usernames tallied per attack.
+ * @property {number} memoryMs  How long attacker IPs, breaches and unclosed sessions are remembered.
+ */
+
+/** @typedef {Options & { limits: Limits }} ResolvedOptions */
+
 /** @typedef {{ user: string, attempts: number }} UserTally */
 
 /**

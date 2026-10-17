@@ -178,16 +178,36 @@ Only the sudo user's sessions are considered. That way, if an admin makes a legi
 - If one user has sessions open from two IPs at once, the log doesn't say which terminal ran the command. Both IPs are reported, and the change is high if either IP broke in.
 - Only a high-severity breach escalates a change. A login right after a single mistyped password doesn't.
 
+## How it works inside
+
+The code is a functional core with an imperative shell. Parsing and detection (`src/core/`) are pure and deterministic, with no I/O, no clock and no randomness, and a lint rule enforces that. Reading files, printing and exit codes live at the edges (`bin/`, `src/io/`).
+
+The four rules run on a **streaming engine**. Lines are read one at a time, parsed, and pushed into the engine; events are never collected into a list. Each rule keeps only the state it needs, such as one window of recent failures per IP or the SSH sessions currently open. That state is dropped as the log's own clock moves on, so memory doesn't grow with the length of the log. Findings appear as soon as a rule sees them and are updated when more evidence arrives. For example, a brute force is reported as medium and becomes high when the attacker logs in. This is what will let the same rules watch a live log.
+
+Every kind of state also has a hard ceiling: 100,000 tracked IPs per rule, 5,000 recent failures per IP, 1,000 usernames per attack. Attacker IPs, breaches, and sessions with no logout are remembered for 7 days. If a ceiling is ever reached, for example by a botnet using more addresses than that, the oldest state is dropped and the report warns that activity may have been missed.
+
+The engine was checked against the original implementation, which is kept unchanged in `test/reference/` for this purpose. A property-based test generates thousands of random event streams and requires both to report exactly the same incidents. The two differ in only three documented ways ([ADR-0007](docs/adr/0007-streaming-engine-with-bounded-state.md)): the 7-day memory; ties within the same second, where the engine uses only lines it has already read; and incidents at the same time and severity, which are ordered by IP.
+
 ## Log formats
 
-- Classic syslog timestamps (`Sep  7 03:39:12`). These have no year: pass `--year`, or the tool uses the current year (last year if the log starts in a later month than now). Moving from December to January inside a log starts the next year.
+- Classic syslog timestamps (`Sep  7 03:39:12`). These have no year. The first line takes `--year`, or else the most recent year that doesn't put it in the future. Each later line takes whichever year puts it closest to the line before, so New Year works in both directions: Dec 31 → Jan 1 moves to the next year, and a late Dec 31 line arriving after Jan 1 stays in the old one.
 - RFC 3339 timestamps (`2026-09-07T03:39:12.123456+00:00`), used by newer Debian and Ubuntu. The offset is ignored so times stay on the server clock.
 - `sshd`, and the `sshd-session` and `sshd-auth` processes used by OpenSSH 9.8 and later.
 - IPv6 addresses, Windows (CRLF) line endings, and input from stdin.
 - **Spoofed usernames.** Usernames come from the attacker and can contain text like `from 10.0.0.1 port 22`. The parser always takes the *last* `from … port …` on the line, which sshd itself writes.
 - Lines in no recognized format are counted and reported, not treated as errors.
+- **Hostile input.** Lines over 8 KiB are skipped and counted rather than buffered; sshd's own lines are far shorter. Every log-derived field in the terminal report is escaped, so a forged line can't send terminal escape sequences, fake extra report lines with newlines, or reorder text with Unicode bidi overrides. Adversarial lines of 7–8 KB parse in well under 5 ms each, and a test enforces that.
 
-Speed: a 1-million-line (about 110 MB) log takes about 3.5 seconds on my laptop. The file is read as a stream, and only the parsed events are kept in memory.
+### Speed and memory
+
+`npm run bench` generates a deliberately hostile synthetic log in memory: 70% of lines are single guesses from ever-new random IPs, as from a large botnet, mixed with brute-force bursts, logins, logouts and sudo noise. It then analyzes it. Measured on my Windows laptop with Node 24.21:
+
+| 1M lines | time | live heap after GC at 25 / 50 / 75 / 100% |
+|---|---|---|
+| streaming (current) | 8.4 s, ~119,000 lines/s | 41 / 43 / 42 / 40 MB |
+| collect, then analyze (the v0.1.0 approach) | 8.8 s | 93 / 182 / 270 / 359 MB |
+
+At 4M lines the streaming run is still at 54 MB of live heap. Most of what remains is the report's own findings, which grow with the number of attacks rather than lines. Resident memory (RSS) is higher than the live heap in both cases, because V8 holds on to memory it has freed.
 
 ## Testing
 
@@ -220,11 +240,14 @@ The synthetic sample only contains formats the generator knows about, so the ana
 
 ### Test suites
 
-40 tests using Node's built-in `node:test`. Run them with `npm test`.
+55 tests using Node's built-in `node:test`. Run them with `npm test`.
 
 - `test/parse.test.js`: each line type, `message repeated` counting, spoofed usernames, IPv6, RFC 3339, the December-to-January year change, unreadable lines.
 - `test/detectors.test.js`: each rule's thresholds and boundaries (4 vs 5 failures, a window exactly 10 minutes wide, 00:59 vs 01:00 vs 05:00), plus each way an account change can or can't be linked to a break-in.
 - `test/lab-fixture.test.js`: the recorded lab log produces exactly its labelled incidents, the label check fails when an attack step is removed or an unlabelled attack is added, and current OpenSSH/sudo formats parse.
+- `test/engine-equivalence.test.js`: fast-check generates thousands of random event streams (attacks, logins, sessions, sudo and account changes on a few IPs and users) and requires the engine and the frozen original rules to agree.
+- `test/engine.test.js`: incremental findings, state staying under its caps with 100,000 attacking IPs, eviction as the log clock moves, the 7-day memory, and the same-second logout case the random test can't reach.
+- `test/hostile-input.test.js`: lines split mid-character, the line-length cap (a 50 MB line never buffers more than 8 KiB), adversarial regex input under a time budget, escaped terminal output, and year inference.
 - `test/sample.test.js`: an end-to-end check that the sample log produces exactly the incidents in the table above, plus the command line (exit codes, `--json`, stdin, bad arguments).
 
 ### Planted-bug testing
@@ -245,6 +268,18 @@ Of 11 planted bugs, two survived at first. Both were real gaps in the tests:
 
 One lesson from the process: a planted bug that doesn't actually apply gives the same "0 tests failed" as a real gap. The script therefore checks that the source file really changed before trusting the result. That check caught one planted bug that hadn't applied.
 
+The same was done for the streaming engine's new code paths, the ones with no counterpart in the original:
+
+- never escalating a low possible breach when a brute force turns up later;
+- ignoring a breach that became high after an account change;
+- forgetting logins that came before an attack became visible;
+- an exclusive window edge;
+- forgetting low findings too soon;
+- dropping a session whose PID is reused;
+- not counting a session that logged out in the same second as the change.
+
+The random equivalence test caught six of the seven. The seventh survived because the generator never puts two actions in the same second. A targeted test now covers it, and catches it.
+
 ## Development
 
 ```sh
@@ -262,15 +297,19 @@ The plan and the reasoning behind it live in [SPEC.md](SPEC.md) (goals, non-goal
 
 ```text
 bin/analyze.js                  command line: options, reading the file or stdin, exit codes
-src/parse.js                    log lines to events (logins, logouts, sudo commands, account changes)
-src/detectors.js                the four rules and the grouping into incidents
+src/core/                       the pure core: parser, year inference, engine, rules, incidents
+src/core/rules/                 brute force, possible breach, unusual hour, account change
+src/io/                         reading lines from files and stdin; the streaming analysis
+src/parse.js, src/detectors.js  stable entry points: parseLines(), analyze()
 src/report.js                   terminal and JSON output
 src/types.js                    shared JSDoc types (events, findings, options)
 scripts/generate-sample-log.js  synthetic auth.log with a known answer key
 samples/auth.log                the generated sample
 scripts/lab.js                  runs the Docker lab and checks its log against labels
 lab/                            Docker lab: SSH target, clients, attack scenarios
-test/                           parser, detector, end-to-end and lab-fixture tests
+scripts/bench.js                speed and memory benchmark
+test/                           parser, detector, engine, hostile-input, end-to-end and lab tests
+test/reference/                 the original batch rules, frozen, as a test oracle
 test/fixtures/lab/              a recorded lab auth.log and its labels
 docs/adr/                       architecture decision records
 ```
@@ -285,7 +324,7 @@ I built this to learn the fundamentals of SOC log analysis:
 
 Development is AI-assisted: I set the direction, the requirements and the standards, and review the results; much of the code is written with Claude Code, an AI coding assistant, working under that direction.
 
-It is a learning project, not a production security tool. It has only been tested against the synthetic logs described above, not real-world traffic. It analyzes a file after the fact rather than watching live. Its account attribution is a best guess, as described in the limits above. On a real system, this job belongs to tools like fail2ban, auditd and a SIEM. This project is about understanding what those tools are doing underneath.
+It is a learning project, not a production security tool. It has been tested against the synthetic logs and the Docker-lab logs described above, not real-world traffic. It analyzes a file after the fact; watching a live log is the next milestone. Lines in `auth.log` are not authenticated, so any local user can forge one with `logger -t sshd`, and the analyzer is only as trustworthy as the system logger. Its account attribution is a best guess, as described in the limits above. On a real system, this job belongs to tools like fail2ban, auditd and a SIEM. This project is about understanding what those tools are doing underneath.
 
 ## License
 

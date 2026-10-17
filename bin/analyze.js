@@ -6,10 +6,9 @@
 // 2 bad arguments or unreadable input.
 
 import { open } from 'node:fs/promises';
-import { createInterface } from 'node:readline';
 import { parseArgs } from 'node:util';
-import { DEFAULTS, analyze } from '../src/detectors.js';
-import { parseLines } from '../src/parse.js';
+import { DEFAULTS } from '../src/detectors.js';
+import { analyzeStream } from '../src/io/analyze-stream.js';
 import { duration, formatJson, formatText } from '../src/report.js';
 
 /** @typedef {import('../src/types.js').Options} Options */
@@ -59,16 +58,16 @@ if (values.year !== undefined && !/^\d{4}$/.test(values.year)) usageError('--yea
 const year = values.year === undefined ? undefined : Number(values.year);
 
 const source = positionals[0];
-let parsed;
+let analysis;
 try {
-  parsed = await parseLines(await openLines(source), { year });
+  analysis = await analyzeStream(await openInput(source), { options, year });
 } catch (err) {
   console.error(`error: can't read ${source}: ${errorMessage(err)}`);
   process.exit(2);
 }
 
-const incidents = analyze(parsed.events, options);
-const result = { source: source === '-' ? 'stdin' : source, stats: parsed.stats, options, incidents };
+const { stats, incidents, health } = analysis;
+const result = { source: source === '-' ? 'stdin' : source, stats, options, incidents, health };
 
 // Exit quietly if the reader goes away early, e.g. when piped into `head`.
 process.stdout.on('error', (err) => {
@@ -106,11 +105,11 @@ function errorMessage(err) {
 }
 
 /** @param {string} path */
-async function openLines(path) {
-  if (path === '-') return createInterface({ input: process.stdin, crlfDelay: Infinity });
+async function openInput(path) {
+  if (path === '-') return process.stdin;
   // Opening first makes a missing file fail here, with a clear message.
   const file = await open(path);
-  return createInterface({ input: file.createReadStream(), crlfDelay: Infinity });
+  return file.createReadStream();
 }
 
 /**

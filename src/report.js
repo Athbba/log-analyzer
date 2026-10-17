@@ -2,6 +2,7 @@
 // server's wall clock (see parse.js), so they are printed without a timezone.
 
 import { styleText } from 'node:util';
+import { safeText } from './core/text.js';
 import { SEVERITIES } from './detectors.js';
 
 /** @typedef {import('./types.js').Finding} Finding */
@@ -9,7 +10,12 @@ import { SEVERITIES } from './detectors.js';
 /** @typedef {import('./types.js').Options} Options */
 /** @typedef {import('./types.js').ParseStats} ParseStats */
 /** @typedef {import('./types.js').Severity} Severity */
-/** @typedef {{ source: string, stats: ParseStats, options: Options, incidents: Incident[] }} Result */
+/**
+ * Problems with the run itself: lines too long to read, and detector state
+ * dropped because a limit was reached (core/bounded.js).
+ * @typedef {{ oversizedLines: number, maxLineLength: number, evicted: Record<string, number> }} RunHealth
+ */
+/** @typedef {{ source: string, stats: ParseStats, options: Options, incidents: Incident[], health?: RunHealth }} Result */
 
 /** @type {Record<Finding['rule'], string>} */
 const LABELS = {
@@ -62,18 +68,27 @@ export function countBySeverity(incidents) {
  * @param {Result} result
  * @param {{ color?: boolean }} [options]
  */
-export function formatText({ source, stats, options, incidents }, { color = false } = {}) {
+export function formatText({ source, stats, options, incidents, health }, { color = false } = {}) {
   /** @param {Parameters<typeof styleText>[0]} style @param {string} text */
   const paint = (style, text) => (color ? styleText(style, text) : text);
   const [from, to] = options.night;
   const out = [
-    paint('bold', `SSH auth log analysis: ${source}`),
+    paint('bold', `SSH auth log analysis: ${safeText(source)}`),
     `${plural(stats.lines, 'line')}` +
       (stats.first === null || stats.last === null ? '' : `, ${stamp(stats.first)} to ${stamp(stats.last)}`),
     `${plural(stats.failures, 'failed login')}, ${plural(stats.successes, 'successful login')}`,
   ];
   if (stats.unrecognized > 0) {
     out.push(paint('yellow', `Warning: skipped ${plural(stats.unrecognized, 'line')} not in a recognized syslog format.`));
+  }
+  if (health && health.oversizedLines > 0) {
+    out.push(paint('yellow', `Warning: skipped ${plural(health.oversizedLines, 'line')} longer than ${num(health.maxLineLength)} bytes.`));
+  }
+  const dropped = health ? Object.entries(health.evicted) : [];
+  if (dropped.length > 0) {
+    const total = dropped.reduce((sum, [, n]) => sum + n, 0);
+    out.push(paint('yellow', `Warning: detector state limits were reached (${num(total)} items dropped); some activity may be missed.`));
+    for (const [what, n] of dropped) out.push(paint('yellow', `  ${what}: ${num(n)}`));
   }
   out.push(
     '',
@@ -85,10 +100,12 @@ export function formatText({ source, stats, options, incidents }, { color = fals
   );
 
   for (const incident of incidents) {
-    const source = incident.ip ?? 'no single source IP';
+    const source = incident.ip === null ? 'no single source IP' : safeText(incident.ip);
     out.push('', paint(['bold', COLORS[incident.severity]], incident.severity.toUpperCase().padEnd(8)) + paint('bold', source));
     for (const finding of incident.findings) {
-      const [first, ...more] = describe(finding);
+      // Every line of a description mixes fixed text with log fields, so the
+      // whole line is escaped.
+      const [first, ...more] = describe(finding).map(safeText);
       out.push(`  ${paint('dim', stamp(finding.time))}  ${paint(COLORS[finding.severity], LABELS[finding.rule].padEnd(17))}${first}`);
       for (const line of more) out.push(INDENT + line);
     }
@@ -156,7 +173,7 @@ function describe(f) {
  * The JSON report. Times are printed as wall-clock ISO strings without a zone.
  * @param {Result} result
  */
-export function formatJson({ source, stats, options, incidents }) {
+export function formatJson({ source, stats, options, incidents, health }) {
   const timeKeys = new Set(['time', 'until', 'firstFailure', 'first', 'last']);
   const report = {
     source,
@@ -168,6 +185,7 @@ export function formatJson({ source, stats, options, incidents }) {
       accountChange: { adminGroups: options.adminGroups },
     },
     summary: countBySeverity(incidents),
+    ...(health && { health }),
     incidents,
   };
   /** @param {string} key @param {unknown} value */
