@@ -1,6 +1,6 @@
 {
   "name": "log-analyzer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Detects brute force, likely break-ins, off-hours logins and backdoor accounts in Linux SSH auth.log files",
   "license": "MIT",
   "private": true,
