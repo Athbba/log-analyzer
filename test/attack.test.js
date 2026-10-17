@@ -3,7 +3,7 @@
 
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -14,6 +14,7 @@ import { createJsonLinesSink } from '../src/io/sinks/terminal.js';
 
 const BIN = fileURLToPath(new URL('../bin/analyze.js', import.meta.url));
 const SAMPLE = fileURLToPath(new URL('../samples/auth.log', import.meta.url));
+const DOCS = new URL('../docs/detections.md', import.meta.url);
 
 /** Minimal findings: the mapping reads only `rule` and, for account changes, what changed. */
 const base = { severity: 'medium', ip: '192.0.2.1', time: 0 };
@@ -96,4 +97,15 @@ test('SQLite stores the techniques with each finding', async (t) => {
   assert.ok(rows.length > 0);
   for (const row of rows) assert.ok(row.ids, `${row.rule} stored with techniques`);
   assert.ok(rows.some((r) => r.rule === 'brute-force' && r.ids === 'T1110.001'));
+});
+
+test('docs/detections.md explains every rule and links every technique, and its local links resolve', () => {
+  const docs = readFileSync(DOCS, 'utf8');
+  for (const id of Object.keys(TECHNIQUES)) {
+    assert.ok(docs.includes(`(https://attack.mitre.org/techniques/${id.replace('.', '/')}/)`), `${id} is linked`);
+  }
+  for (const rule of Object.keys(LABELS)) assert.ok(docs.includes(`| \`${rule}\` |`), `${rule} is in the mapping table`);
+  for (const [, target] of docs.matchAll(/\]\((?!https?:|#)([^)#]+)/g)) {
+    assert.ok(existsSync(new URL(target, DOCS)), `${target} exists`);
+  }
 });

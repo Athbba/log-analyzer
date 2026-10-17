@@ -6,6 +6,13 @@ it is wrong. Settings are shown as they appear in the config file
 full list with current values). Measured precision and recall are in
 [evaluation.md](evaluation.md).
 
+Every finding is labelled with the [MITRE ATT&CK](https://attack.mitre.org/)
+techniques it is evidence of (Enterprise, ATT&CK v20): in the terminal report
+(`ATT&CK T1110.001 Brute Force: Password Guessing`), as an `attack` array of
+`{ id, name }` on each finding in the JSON output and in the SQLite `data`
+column, and as links on the dashboard's incident page. The labels are worked
+out from the finding itself ([ADR-0017](adr/0017-attack-labels.md)).
+
 | Rule | Finds | Severity |
 |---|---|---|
 | [Brute force](#brute-force) | many failed logins from one source in a short time | medium; high if that source logs in |
@@ -16,6 +23,17 @@ full list with current values). Measured precision and recall are in
 | [Unusual hour](#unusual-hour) | a login in the night window | low |
 | [Account change](#account-change) | a new user, or a user given admin rights | low, medium, or high if made from a breached session |
 | [Log tampering](#log-tampering) | lines removed from or spliced into the log, truncation | low (gaps, NULs), medium (time going back), high (truncation) |
+
+| Rule (`rule` in JSON) | ATT&CK techniques |
+|---|---|
+| `brute-force` | T1110.001 |
+| `password-spray` | T1110.003 |
+| `distributed-brute-force` | T1110.001 |
+| `possible-breach` | T1110.001, T1078.003 |
+| `new-source` | T1078.003, T1021.004 |
+| `unusual-hour` | T1078.003 |
+| `account-change` | T1136.001 for a new account, T1098.007 for admin rights (both when a new account gets them) |
+| `log-tampering` | T1685.006 |
 
 **Sources.** Rules that count attempts count them per *source*: an IPv4
 address, or an IPv6 /64 (`bruteForce.ipv6Prefix`; 128 means exact addresses).
@@ -49,6 +67,8 @@ password.
 **Misses:** attacks slower than the threshold allows (3–4 guesses per 10
 minutes); the password-spray and distributed rules cover the slow variants.
 
+**ATT&CK:** [T1110.001 Brute Force: Password Guessing](https://attack.mitre.org/techniques/T1110/001/). Many guesses at one account from one source.
+
 ## Password spray
 
 **Looks for** one source failing against at least `minUsers` (6) **existing**
@@ -75,6 +95,8 @@ password against many service accounts.
 **Misses:** sprays of 3–5 accounts (0 of 14 caught in the corpus); lowering
 `minUsers` catches them at the risk of the office-NAT pattern.
 
+**ATT&CK:** [T1110.003 Brute Force: Password Spraying](https://attack.mitre.org/techniques/T1110/003/). One or two guesses each at many accounts, to stay under lockouts.
+
 ## Distributed brute force
 
 **Looks for** failed logins for one existing account from at least
@@ -96,6 +118,8 @@ fail2ban. The finding has no single source IP; its incident is "user <name>".
 
 **Misses:** attacks from 2–3 sources, or with fewer than 8 attempts in all.
 
+**ATT&CK:** [T1110.001 Brute Force: Password Guessing](https://attack.mitre.org/techniques/T1110/001/): the same guessing, spread over many sources. ATT&CK has no separate technique for where the guesses come from.
+
 ## Possible breach
 
 **Looks for** a successful login from a source that failed within `lookback`
@@ -114,6 +138,8 @@ reported, at high.
 **Tuning:** `possibleBreach.lookback` (`--lookback`).
 
 **False positives:** typos, by design reported at low: they are context.
+
+**ATT&CK:** [T1110.001 Brute Force: Password Guessing](https://attack.mitre.org/techniques/T1110/001/) for the failures, and [T1078.003 Valid Accounts: Local Accounts](https://attack.mitre.org/techniques/T1078/003/) for the login that follows: guessing that ends in a working account.
 
 ## New source
 
@@ -144,6 +170,8 @@ office NAT, against 24 real stolen-credential logins, all caught. This is why
 the rule is low or medium and never high on its own; it adds weight to an
 incident rather than being one.
 
+**ATT&CK:** [T1078.003 Valid Accounts: Local Accounts](https://attack.mitre.org/techniques/T1078/003/), an account used from somewhere it never was, and [T1021.004 Remote Services: SSH](https://attack.mitre.org/techniques/T1021/004/), the way in.
+
 ## Unusual hour
 
 **Looks for** a successful SSH login during `night` (01:00–04:59), by the
@@ -154,6 +182,8 @@ flagged; windows can wrap midnight (`22-6`).
 **Tuning:** `unusualHour.night` (`--night`).
 
 **False positives:** on-call admins and night jobs, by design at low: context.
+
+**ATT&CK:** [T1078.003 Valid Accounts: Local Accounts](https://attack.mitre.org/techniques/T1078/003/). An unusual time is weak evidence of an account in the wrong hands.
 
 ## Account change
 
@@ -171,6 +201,8 @@ session is a candidate. sudo's `PWD=` is user-controlled and precedes
 `COMMAND=`, so a directory named `x ; COMMAND=…` can disguise the command; the
 effect is the same weaker attribution. sudo's JSON log format would remove the
 ambiguity.
+
+**ATT&CK:** [T1136.001 Create Account: Local Account](https://attack.mitre.org/techniques/T1136/001/) when the account is new, [T1098.007 Account Manipulation: Additional Local or Domain Groups](https://attack.mitre.org/techniques/T1098/007/) when it gets admin rights (`adminGroups`), both for a backdoor account created straight into `sudo`.
 
 ## Log tampering
 
@@ -201,6 +233,8 @@ through the `analyze(events)` API, which only sees authentication events.
 **False positives:** maintenance downtime and reboots (8 in the corpus, against
 26 real tamperings). **Misses:** wiping less than `maxGap` of lines leaves no
 gap long enough (1 of 26 missed).
+
+**ATT&CK:** [T1685.006 Disable or Modify Tools: Clear Linux or Mac System Logs](https://attack.mitre.org/techniques/T1685/006/). ATT&CK v20 moved this from T1070.002 (Indicator Removal) to the new Defense Impairment tactic; older tools may still show the old ID.
 
 ## What no rule can see
 
