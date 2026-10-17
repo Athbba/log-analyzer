@@ -9,6 +9,7 @@
 // storing a large log costs little more than reading it.
 
 import { DatabaseSync } from 'node:sqlite';
+import { withAttack } from '../core/attack.js';
 import { sourceOf } from '../core/net.js';
 
 /** @typedef {import('../types.js').AuthEvent} AuthEvent */
@@ -258,7 +259,7 @@ export function openStore(path, { readOnly = false } = {}) {
    */
   function insertFinding(incident, run, f) {
     return Number(db.prepare('INSERT INTO findings (incident, run, rule, severity, ip, user, time, until, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-      .run(incident, run, f.rule, f.severity, f.ip, 'user' in f ? f.user : null, f.time, 'until' in f ? f.until : null, JSON.stringify(f)).lastInsertRowid);
+      .run(incident, run, f.rule, f.severity, f.ip, 'user' in f ? f.user : null, f.time, 'until' in f ? f.until : null, JSON.stringify(withAttack(f))).lastInsertRowid);
   }
 
   /**
@@ -267,7 +268,7 @@ export function openStore(path, { readOnly = false } = {}) {
    */
   function updateFinding(id, f) {
     db.prepare('UPDATE findings SET severity = ?, ip = ?, time = ?, until = ?, data = ? WHERE id = ?')
-      .run(f.severity, f.ip, f.time, 'until' in f ? f.until : null, JSON.stringify(f), id);
+      .run(f.severity, f.ip, f.time, 'until' in f ? f.until : null, JSON.stringify(withAttack(f)), id);
   }
 }
 
