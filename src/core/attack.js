@@ -47,7 +47,9 @@ export function techniquesFor(finding) {
     if (finding.created) ids.push('T1136.001');
     if (finding.privilegedGroups.length > 0) ids.push('T1098.007');
   } else {
-    ids = BY_RULE[finding.rule] ?? [];
+    // `rule` comes back from stored JSON too: own keys only, so `constructor`
+    // or `toString` can't pull in an inherited property.
+    ids = Object.hasOwn(BY_RULE, finding.rule) ? BY_RULE[finding.rule] : [];
   }
   return ids.map((id) => ({ id, name: TECHNIQUES[id].name }));
 }

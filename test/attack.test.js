@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { TECHNIQUES, techniquesFor, withAttack } from '../src/core/attack.js';
-import { LABELS } from '../src/report.js';
+import { LABELS, attackLine } from '../src/report.js';
 import { createJsonLinesSink } from '../src/io/sinks/terminal.js';
 
 const BIN = fileURLToPath(new URL('../bin/analyze.js', import.meta.url));
@@ -108,4 +108,11 @@ test('docs/detections.md explains every rule and links every technique, and its 
   for (const [, target] of docs.matchAll(/\]\((?!https?:|#)([^)#]+)/g)) {
     assert.ok(existsSync(new URL(target, DOCS)), `${target} exists`);
   }
+});
+
+test('a stored finding with an unknown or inherited rule name gets no techniques, and no empty label', () => {
+  for (const rule of ['constructor', 'toString', '__proto__', 'no-such-rule']) {
+    assert.deepEqual(techniquesFor(/** @type {any} */ ({ ...base, rule })), [], rule);
+  }
+  assert.equal(attackLine(change(false, [])), '');
 });

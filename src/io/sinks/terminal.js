@@ -33,7 +33,8 @@ export function createTerminalSink({ write, color = false, minSeverity = 'low' }
       write(`${paint('dim', stamp(finding.time))}  ${paint(['bold', COLORS[incident.severity]], `${incident.severity.toUpperCase()} (${what})`.padEnd(14))}`
         + `${paint('bold', where)}  ${LABELS[finding.rule]}: ${first}\n`);
       for (const line of more) write(`${' '.repeat(35)}${line}\n`);
-      write(`${' '.repeat(35)}${paint('dim', attackLine(finding))}\n`);
+      const attack = attackLine(finding);
+      if (attack) write(`${' '.repeat(35)}${paint('dim', attack)}\n`);
     },
     onNotice(message) {
       write(`${paint('dim', `note: ${safeText(message)}`)}\n`);
