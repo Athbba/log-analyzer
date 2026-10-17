@@ -185,7 +185,7 @@ ${SEVERITIES.map((s) => html`<label class="check"><input type="checkbox" name="s
 <div class="actions"><button type="submit">Filter</button>${filtered ? html` <a href="${href('/', { run: run.id })}">Clear</a>` : ''}</div>
 </form>
 <section class="incidents" aria-labelledby="incidents-heading">
-<h2 id="incidents-heading">${filtered ? `${plural(incidents.length, 'incident')} of ${num(total)}` : plural(incidents.length, 'incident')}${counts.length ? html` <span class="breakdown">${counts.map(([s, n]) => `${n} ${s}`).join(', ')}</span>` : ''}</h2>
+<h2 id="incidents-heading">${filtered || incidents.length < total ? `${plural(incidents.length, 'incident')} of ${num(total)}` : plural(incidents.length, 'incident')}${counts.length ? html` <span class="breakdown">${counts.map(([s, n]) => `${n} ${s}`).join(', ')}</span>` : ''}</h2>
 ${list}
 </section>
 </div>
@@ -199,15 +199,16 @@ ${list}
  * @param {RunSummary} data.run
  * @param {{ id: number, ip: string | null, subject: string | null, severity: string, time: number, last: number, closed: number }} data.incident
  * @param {{ id: number, finding: Finding, lines: { line: number, text: string }[], more: boolean }[]} data.findings
+ * @param {number} data.total  Findings in the incident; more than are shown when capped.
  */
-export function incidentPage({ run, incident, findings }) {
+export function incidentPage({ run, incident, findings, total }) {
   const where = incident.ip ?? incident.subject ?? 'no single source IP';
   const body = html`<main class="incident">
 <p class="back"><a href="${href('/', { run: run.id })}">All incidents in ${run.source}</a></p>
 <header class="incident-head">
 <span class="sev sev-${incident.severity}">${capital(incident.severity)}</span>
 <h1>${where}</h1>
-<p>${span(incident.time, incident.last)}, ${plural(findings.length, 'finding')}${incident.closed ? '' : ', still open'}</p>
+<p>${span(incident.time, incident.last)}, ${findings.length < total ? `first ${num(findings.length)} of ${plural(total, 'finding')}` : plural(findings.length, 'finding')}${incident.closed ? '' : ', still open'}</p>
 </header>
 <ol class="findings">${findings.map(({ id, finding, lines, more }) => {
     const [first, ...rest] = describe(finding);

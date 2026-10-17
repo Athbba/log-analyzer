@@ -73,23 +73,34 @@ export function incidentsFor(db, run, { severities, rule, q }) {
 }
 
 /**
+ * How many incidents a run has, unfiltered and uncapped.
+ * @param {DatabaseSync} db
+ * @param {number} run
+ */
+export function countIncidents(db, run) {
+  return Number(/** @type {{ n: number }} */ (db.prepare('SELECT COUNT(*) AS n FROM incidents WHERE run = ?').get(run)).n);
+}
+
+/**
  * An incident with its findings and, for each, the raw lines behind it.
  * @param {DatabaseSync} db
  * @param {number} id
  * @param {number} [linesPerFinding]
+ * @param {number} [maxFindings]  An incident from one file can hold any number of findings.
  */
-export function incidentDetail(db, id, linesPerFinding = 60) {
+export function incidentDetail(db, id, linesPerFinding = 60, maxFindings = 200) {
   const incident = /** @type {any} */ (db.prepare('SELECT * FROM incidents WHERE id = ?').get(id));
   if (!incident) return null;
   const rows = /** @type {{ id: number, data: string }[]} */ (
-    db.prepare('SELECT id, data FROM findings WHERE incident = ? ORDER BY time, id').all(id));
+    db.prepare('SELECT id, data FROM findings WHERE incident = ? ORDER BY time, id LIMIT ?').all(id, maxFindings));
+  const total = Number(/** @type {{ n: number }} */ (db.prepare('SELECT COUNT(*) AS n FROM findings WHERE incident = ?').get(id)).n);
   const findings = rows.map((row) => {
     /** @type {Finding} */
     const finding = JSON.parse(row.data);
     const lines = evidence(db, incident.run, finding, linesPerFinding + 1);
     return { id: row.id, finding, lines: lines.slice(0, linesPerFinding), more: lines.length > linesPerFinding };
   });
-  return { incident, findings };
+  return { incident, findings, total };
 }
 
 /**
