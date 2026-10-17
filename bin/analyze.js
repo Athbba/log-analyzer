@@ -36,6 +36,7 @@ Options:
   --follow            Keep watching the log, through rotation, and report incidents as they happen
   --from-start        With --follow, read what is already in the file first
   --discord           Send alerts to the Discord webhook in DISCORD_WEBHOOK_URL (or .env)
+  --db <file>         Also store the lines, events, incidents and findings in this SQLite file
   --config <file>     Settings file (default ${DEFAULT_CONFIG_PATH}, if it exists)
   --print-config      Print the effective settings as a config file and exit
   --threshold <n>     Failed logins from one IP that count as brute force (default ${DEFAULTS.threshold})
@@ -127,11 +128,36 @@ process.stdout.on('error', (err) => {
   throw err;
 });
 
+// The store is loaded only when asked for: node:sqlite still prints an
+// experimental warning on Node 22.
+/** @type {import('../src/io/store.js').Store | null} */
+let store = null;
+if (values.db !== undefined) {
+  const { openStore } = await import('../src/io/store.js');
+  try {
+    store = openStore(values.db);
+  } catch (err) {
+    fail(`can't open ${values.db}: ${errorMessage(err)}`);
+  }
+}
+
 if (values.follow) {
   if (source === '-') usageError('--follow needs a file, not stdin');
   await follow(source, discord);
 } else {
   await analyzeOnce(source, discord);
+}
+
+/**
+ * Starts a stored run, if --db was given.
+ * @param {'file' | 'follow'} mode
+ * @param {string} name
+ */
+function beginStoredRun(mode, name) {
+  if (!store) return null;
+  const resolved = resolveOptions(options);
+  const run = store.beginRun({ source: name, mode, options: toConfig(resolved, config.settings) });
+  return { run, tap: store.tap(run, resolved.ipv6Prefix) };
 }
 
 /**
@@ -144,9 +170,14 @@ async function follow(path, alerts) {
   /** @type {Sink[]} */
   const sinks = [values.json ? createJsonLinesSink({ write }) : createTerminalSink({ write, color: process.stdout.isTTY && !process.env.NO_COLOR })];
   if (alerts) sinks.push(alerts);
+  const stored = beginStoredRun('follow', path);
+  if (store && stored) {
+    const db = store;
+    sinks.push({ name: 'sqlite', onIncident: (event) => db.saveLiveEvent(stored.run, event), close: async () => db.flush() });
+  }
   const live = startLive({
     path, sinks, options, year, fromStart: values['from-start'] ?? false,
-    pollMs: config.settings.live.pollMs, idleMs: config.settings.live.idleMs,
+    pollMs: config.settings.live.pollMs, idleMs: config.settings.live.idleMs, tap: stored?.tap,
   });
   let stopping = false;
   for (const signal of /** @type {const} */ (['SIGINT', 'SIGTERM'])) {
@@ -164,7 +195,12 @@ async function follow(path, alerts) {
   } catch (err) {
     fail(`can't follow ${path}: ${errorMessage(err)}`);
   }
-  const report = alerts ? result.sinks.at(-1) : null;
+  const report = alerts ? result.sinks[1] : null;
+  if (store && stored) {
+    store.finishRun(stored.run, { stats: result.stats, health: result.health });
+    store.close();
+    console.error(`stored as run ${stored.run} in ${values.db}`);
+  }
   console.error(`stopped after ${result.lines.toLocaleString('en-US')} lines${report ? `; Discord: ${JSON.stringify(report)}` : ''}`);
   process.exit(0);
 }
@@ -175,12 +211,19 @@ async function follow(path, alerts) {
  */
 async function analyzeOnce(path, alerts) {
   let analysis;
+  const stored = beginStoredRun('file', path === '-' ? 'stdin' : path);
   try {
-    analysis = await analyzeStream(await openInput(path), { options, year });
+    analysis = await analyzeStream(await openInput(path), { options, year, tap: stored?.tap });
   } catch (err) {
     fail(`can't read ${path}: ${errorMessage(err)}`);
   }
   const { stats, incidents, health } = analysis;
+  if (store && stored) {
+    store.saveIncidents(stored.run, incidents);
+    store.finishRun(stored.run, { stats, health });
+    store.close();
+    console.error(`stored as run ${stored.run} in ${values.db}`);
+  }
   const result = { source: path === '-' ? 'stdin' : path, stats, options: analysis.options, incidents, health };
   process.stdout.write(values.json
     ? formatJson(result)
@@ -218,6 +261,7 @@ function readArgs() {
         follow: { type: 'boolean' },
         'from-start': { type: 'boolean' },
         discord: { type: 'boolean' },
+        db: { type: 'string' },
         config: { type: 'string' },
         'print-config': { type: 'boolean' },
         threshold: { type: 'string' },

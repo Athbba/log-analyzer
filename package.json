@@ -9,7 +9,7 @@
     "ssh-log-analyzer": "bin/analyze.js"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13"
   },
   "scripts": {
     "analyze": "node bin/analyze.js",

@@ -17,7 +17,7 @@ It is plain Node.js with no dependencies and nothing to install.
 
 ## Running it
 
-Requires Node.js 22 or later.
+Requires Node.js 22.13 or later (24 recommended).
 
 ```sh
 node bin/analyze.js samples/auth.log            # terminal report
@@ -88,6 +88,16 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/<id>/<token>
 
 The tool reads it with Node's own `.env` support and never prints it. Thresholds live in the config file under `discord` (`minSeverity`, `burst`, `perMinute`). `--discord` also works without `--follow`, sending one alert per incident in the report, which suits a nightly cron job.
 
+
+### Storing results (SQLite)
+
+`--db runs.db` also stores the run in a SQLite file: every line, the events parsed from them, and the incidents and findings. It works for a one-off analysis and with `--follow`, where each incident is updated as it changes. It uses Node's built-in `node:sqlite`, so nothing extra is installed, and is loaded only when asked for (on Node 22, `node:sqlite` still prints an experimental warning). All SQL is parameterized: log content is always data.
+
+```sh
+node bin/analyze.js samples/auth.log --db runs.db
+```
+
+Two rules, brute force and unusual hour, are also written in SQL (`src/io/sql-rules.js`). They are a second, independent implementation. Tests require them to produce exactly the findings of the JavaScript rules on the sample, the lab recording, 29 corpus logs, and 300 random event streams. The one exception is logs with spliced lines, which the tampering rule reports: there the streaming engine follows file order while SQL orders by time ([ADR-0015](docs/adr/0015-sqlite-storage.md)).
 ## Example: one attacker, start to finish
 
 `samples/auth.log` is four days of synthetic activity on a small web server, with attacks hidden among normal traffic. This is how the analyzer reports attacker B:
@@ -327,7 +337,7 @@ The synthetic sample only contains formats the generator knows about, so the ana
 
 ### Test suites
 
-112 tests using Node's built-in `node:test`. Run them with `npm test`.
+120 tests using Node's built-in `node:test`. Run them with `npm test`.
 
 - `test/parse.test.js`: each line type, `message repeated` counting, spoofed usernames, IPv6, RFC 3339, the December-to-January year change, unreadable lines.
 - `test/detectors.test.js`: each rule's thresholds and boundaries (4 vs 5 failures, a window exactly 10 minutes wide, 00:59 vs 01:00 vs 05:00), plus each way an account change can or can't be linked to a break-in.
@@ -340,6 +350,7 @@ The synthetic sample only contains formats the generator knows about, so the ana
 - `test/follow.test.js`: the follower on real files: partial lines, rotation by rename, copytruncate, truncation, a file that disappears.
 - `test/live-incidents.test.js`, `test/live.test.js`: incident events (one opened, one escalated), shutdown, truncation as tampering, the CLI with `--follow --json` and SIGTERM, `--discord` with the URL from `.env`, and a 100,000-line soak run with state bounded.
 - `test/discord.test.js`: the Discord sink against a local mock webhook: dedup, hostile content kept inert, 429 with `retry_after`, 5xx retries, 4xx not retried, a slow server not blocking the caller, the rate limit, a full queue, and a hanging server at shutdown.
+- `test/store.test.js`, `test/sql-rules.test.js`: what `--db` stores, drill-down from a finding to its raw lines, hostile strings stored as data, the schema version, read-only access, live mode storage, and the SQL rules matching the JavaScript ones.
 - `test/sample.test.js`: an end-to-end check that the sample log produces exactly the incidents in the table above, plus the command line (exit codes, `--json`, stdin, bad arguments).
 
 ### Planted-bug testing
@@ -400,6 +411,7 @@ src/core/rules/                 brute force, possible breach, unusual hour, acco
 src/io/                         reading lines from files and stdin; the streaming analysis
 src/io/follow.js, src/io/live.js  following a log through rotation; live mode
 src/io/sinks/                   live outputs: terminal, JSON lines, Discord
+src/io/store.js, sql-rules.js   SQLite storage, drill-down, and two rules in SQL
 src/parse.js, src/detectors.js  stable entry points: parseLines(), analyze()
 src/report.js                   terminal and JSON output
 src/types.js                    shared JSDoc types (events, findings, options)
