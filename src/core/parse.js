@@ -12,9 +12,12 @@
 
 import { createSyslogClock } from './time.js';
 
+const NUL = String.fromCharCode(0);
+
 /** @typedef {import('../types.js').AuthEvent} AuthEvent */
 /** @typedef {import('../types.js').EventBase} EventBase */
 /** @typedef {import('../types.js').ParseStats} ParseStats */
+/** @typedef {import('../types.js').LineInfo} LineInfo */
 
 /** @type {Record<string, number>} */
 const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
@@ -22,7 +25,7 @@ const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7,
 // "Sep  7 03:39:12 web01 …": classic syslog, which has no year.
 const SYSLOG_RE = /^([A-Z][a-z]{2}) {1,2}(\d{1,2}) (\d{2}):(\d{2}):(\d{2}) (\S+) (.*)$/;
 // "2026-09-07T03:39:12.123456+00:00 web01 …": RFC 3339, used by newer Debian/Ubuntu.
-const ISO_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})? (\S+) (.*)$/;
+const ISO_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:?\d{2})? (\S+) (.*)$/;
 // "sshd[5452]: message" or "sudo: message".
 const PROGRAM_RE = /^([^\s[:]+)(?:\[(\d+)\])?: (.*)$/;
 
@@ -59,20 +62,35 @@ export function createParser({ year, now }) {
   const syslogTime = createSyslogClock({ year, now });
   /** @type {ParseStats} */
   const stats = { lines: 0, unrecognized: 0, failures: 0, successes: 0, first: null, last: null };
+  /** Time of the last line with a timestamp, for NUL-damaged lines without one. */
+  /** @type {number | null} */
+  let lastTime = null;
 
   /**
-   * @param {string} line  One line, without its newline.
+   * Parses one line. `info` is set for every line with a timestamp, and for
+   * damaged lines containing NUL bytes, which are removed first so that a real
+   * line written right after a zero-filled hole is still read.
+   * @param {string} raw  One line, without its newline.
    * @param {number} lineNo  Its 1-based position in the input.
-   * @returns {AuthEvent | null}
+   * @returns {{ event: AuthEvent | null, info: LineInfo | null }}
    */
-  function parse(line, lineNo) {
-    if (line === '') return null;
+  function read(raw, lineNo) {
+    const hasNul = raw.includes(NUL);
+    const line = hasNul ? raw.replaceAll(NUL, '') : raw;
+    /** @returns {{ event: null, info: LineInfo | null }} */
+    const damagedOnly = () => ({
+      event: null,
+      info: hasNul && lastTime !== null ? { time: lastTime, line: lineNo, offsetMinutes: null, hasNul } : null,
+    });
+    if (line === '') return damagedOnly();
     stats.lines++;
 
     /** @type {RegExpExecArray | null} */
     let m;
     /** @type {number} */
     let time;
+    /** @type {number | null} */
+    let offsetMinutes = null;
     /** @type {string} */
     let host;
     /** @type {string} */
@@ -82,16 +100,20 @@ export function createParser({ year, now }) {
       [host, rest] = [m[6], m[7]];
     } else if ((m = ISO_RE.exec(line))) {
       time = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
-      [host, rest] = [m[7], m[8]];
+      offsetMinutes = isoOffset(m[7]);
+      [host, rest] = [m[8], m[9]];
     } else {
       stats.unrecognized++;
-      return null;
+      return damagedOnly();
     }
+    lastTime = time;
     if (stats.first === null || time < stats.first) stats.first = time;
     if (stats.last === null || time > stats.last) stats.last = time;
+    /** @type {LineInfo} */
+    const info = { time, line: lineNo, offsetMinutes, hasNul };
 
     const program = PROGRAM_RE.exec(rest);
-    if (!program) return null;
+    if (!program) return { event: null, info };
     const [, name, pid, msg] = program;
     /** @type {EventBase} */
     const base = { time, host, pid: pid === undefined ? null : Number(pid), line: lineNo };
@@ -99,13 +121,31 @@ export function createParser({ year, now }) {
       : name === 'sudo' ? sudoEvent(msg, base)
       : ACCOUNT_PROGRAMS.has(name) ? accountEvent(msg, { ...base, program: name })
       : null;
-    if (!event) return null;
-    if (event.type === 'failure') stats.failures += event.count;
-    if (event.type === 'success') stats.successes++;
-    return event;
+    if (event?.type === 'failure') stats.failures += event.count;
+    if (event?.type === 'success') stats.successes++;
+    return { event, info };
   }
 
-  return { parse, stats };
+  /**
+   * @param {string} line
+   * @param {number} lineNo
+   * @returns {AuthEvent | null}
+   */
+  const parse = (line, lineNo) => read(line, lineNo).event;
+
+  return { parse, read, stats };
+}
+
+/**
+ * Minutes east of UTC from an RFC 3339 offset ("Z", "+02:00", "-0500").
+ * @param {string | undefined} text
+ */
+function isoOffset(text) {
+  if (text === undefined) return null;
+  if (text === 'Z') return 0;
+  const digits = text.slice(1).replace(':', '');
+  const minutes = Number(digits.slice(0, 2)) * 60 + Number(digits.slice(2));
+  return text[0] === '-' ? -minutes : minutes;
 }
 
 /**

@@ -17,8 +17,8 @@
     {
       "scenario": "admin-work",
       "ip": "172.30.0.20",
-      "findings": ["possible-breach:low", "possible-breach:low", "account-change:low", "account-change:medium"],
-      "notes": "bob mistypes once, then logs in (low). dave's key login 2 s later from the same workstation also counts, because the rule looks at failures from the IP for any username: a known false positive for shared source IPs, kept at low severity. dave creates erin (low) and adds her to sudo (medium); bob joining docker is ignored."
+      "findings": ["possible-breach:low", "account-change:low", "account-change:medium"],
+      "notes": "bob mistypes once, then logs in (low). dave's key login 2 s later from the same workstation is not reported: a key login after other users' failures from a shared IP is not a guessed password (this false positive was found by the lab in M1 and fixed in M2b). dave creates erin (low) and adds her to sudo (medium); bob joining docker is ignored."
     }
   ]
 }

@@ -7,8 +7,7 @@ import { toIncidents } from '../core/incidents.js';
 import { createParser } from '../core/parse.js';
 import { readLines } from './read-lines.js';
 
-/** @typedef {import('../types.js').Options} Options */
-/** @typedef {import('../types.js').Limits} Limits */
+/** @typedef {import('../types.js').AnalyzerOptions} AnalyzerOptions */
 /** @typedef {import('../report.js').RunHealth} RunHealth */
 
 export const MAX_LINE_LENGTH = 8192;
@@ -16,7 +15,7 @@ export const MAX_LINE_LENGTH = 8192;
 /**
  * @param {AsyncIterable<Buffer | string>} stream
  * @param {object} [settings]
- * @param {Partial<Options> & { limits?: Partial<Limits> }} [settings.options]
+ * @param {AnalyzerOptions} [settings.options]
  * @param {number} [settings.year]  Year of the first syslog line.
  * @param {number} [settings.now]  For the year guess; defaults to the current time.
  * @param {number} [settings.maxLineLength]
@@ -27,10 +26,12 @@ export async function analyzeStream(stream, { options = {}, year, now = Date.now
   const engine = createEngine(options);
   let lineNo = 0;
   for await (const line of lines) {
-    const event = parser.parse(line, ++lineNo);
+    const { event, info } = parser.read(line, ++lineNo);
+    if (info) engine.line(info);
     if (event) engine.push(event);
   }
   /** @type {RunHealth} */
   const health = { oversizedLines: splitter.oversized, maxLineLength, evicted: { ...engine.health.evicted } };
-  return { stats: parser.stats, incidents: toIncidents(engine.findings()), health, options: engine.options };
+  const incidents = toIncidents(engine.findings(), { ipv6Prefix: engine.options.ipv6Prefix });
+  return { stats: parser.stats, incidents, health, options: engine.options };
 }

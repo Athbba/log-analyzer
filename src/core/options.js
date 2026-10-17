@@ -3,9 +3,12 @@
 /** @typedef {import('../types.js').Options} Options */
 /** @typedef {import('../types.js').Limits} Limits */
 /** @typedef {import('../types.js').ResolvedOptions} ResolvedOptions */
+/** @typedef {import('../types.js').AnalyzerOptions} AnalyzerOptions */
+/** @typedef {import('../types.js').ExtendedOptions} ExtendedOptions */
 
 const MINUTE = 60_000;
-const DAY = 24 * 60 * MINUTE;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
 
 /** @type {Options} */
 export const DEFAULTS = {
@@ -29,20 +32,41 @@ export const DEFAULT_LIMITS = {
   memoryMs: 7 * DAY, // how long an attacker IP, a breach, or a session without logout is remembered
 };
 
+/**
+ * Settings for the rules added after v0.1.0. The defaults are argued for in
+ * docs/detections.md and measured in docs/evaluation.md.
+ * @type {ExtendedOptions}
+ */
+export const EXTENDED_DEFAULTS = {
+  trustedNetworks: [],
+  ipv6Prefix: 64,
+  ignoreKeyLoginsAfterOthersFailures: true,
+  spray: { enabled: true, minUsers: 6, windowMs: HOUR, maxAttemptsPerUser: 2, countInvalidUsers: false },
+  distributed: { enabled: true, minSources: 4, minAttempts: 8, windowMs: HOUR, countInvalidUsers: false, ignoreUsers: [] },
+  newSource: { enabled: true, learningMs: DAY, prefixV4: 24, prefixV6: 64, rememberMs: 90 * DAY },
+  tampering: { enabled: true, maxGapMs: 2 * HOUR, maxBackwardsMs: 5 * MINUTE, allowDstJumps: true },
+};
+
 /** @type {Severity[]} */
 export const SEVERITIES = ['high', 'medium', 'low'];
 /** @typedef {import('../types.js').Severity} Severity */
 
 /**
- * Fills in defaults. Explicit `undefined` values fall back to the default too.
- * @param {Partial<Options> & { limits?: Partial<Limits> }} [options]
+ * Fills in defaults, merging nested rule settings key by key. Explicit
+ * `undefined` values fall back to the default too.
+ * @param {AnalyzerOptions} [options]
  * @returns {ResolvedOptions}
  */
 export function resolveOptions(options = {}) {
-  const { limits = {}, ...rest } = options;
+  const { limits = {}, spray = {}, distributed = {}, newSource = {}, tampering = {}, ...rest } = options;
   return {
     ...DEFAULTS,
+    ...EXTENDED_DEFAULTS,
     ...definedOnly(rest),
+    spray: { ...EXTENDED_DEFAULTS.spray, ...definedOnly(spray) },
+    distributed: { ...EXTENDED_DEFAULTS.distributed, ...definedOnly(distributed) },
+    newSource: { ...EXTENDED_DEFAULTS.newSource, ...definedOnly(newSource) },
+    tampering: { ...EXTENDED_DEFAULTS.tampering, ...definedOnly(tampering) },
     limits: { ...DEFAULT_LIMITS, ...definedOnly(limits) },
   };
 }

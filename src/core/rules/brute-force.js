@@ -6,8 +6,13 @@
 // Streaming version of the original batch rule, with the same results on
 // in-order input. Per IP it keeps only the failures of the last window, the
 // logins of the last window, and attacks still waiting for a login.
+//
+// IPv6 is counted per /64 (`ipv6Prefix`): an attacker holding a /64 could
+// otherwise use a new address for every guess. The finding's `ip` is then the
+// prefix, e.g. 2001:db8:1:2::/64.
 
 import { BoundedMap, TimeWindow } from '../bounded.js';
+import { sourceOf } from '../net.js';
 
 /** @typedef {import('../../types.js').AuthEvent} AuthEvent */
 /** @typedef {import('../../types.js').SuccessEvent} SuccessEvent */
@@ -40,7 +45,7 @@ import { BoundedMap, TimeWindow } from '../bounded.js';
  * @returns {Rule}
  */
 export function createBruteForce(ctx) {
-  const { threshold, windowMs, limits } = ctx.options;
+  const { threshold, windowMs, limits, ipv6Prefix } = ctx.options;
   /** @type {BoundedMap<string, IpState>} */
   // An IP with an attack, or more than one recent failure, outlives one-off IPs.
   const ips = new BoundedMap('brute-force: IPs', limits.maxKeys, ctx.health, {
@@ -130,8 +135,10 @@ export function createBruteForce(ctx) {
     name: 'brute-force',
 
     onEvent(event) {
+      if (event.type !== 'failure' && event.type !== 'success') return;
+      const source = sourceOf(event.ip, ipv6Prefix);
       if (event.type === 'failure') {
-        const state = ips.touch(event.ip, newState);
+        const state = ips.touch(source, newState);
         state.last = event.time;
         /** @param {Failure} f */
         const evicted = (f) => {
@@ -146,10 +153,10 @@ export function createBruteForce(ctx) {
           // ones are already hot, so only the newest `unmarked` need adding.
           const newlyHot = [...state.window.tail(state.unmarked)];
           state.unmarked = 0;
-          for (const failure of newlyHot) addHot(event.ip, state, failure);
+          for (const failure of newlyHot) addHot(source, state, failure);
         }
-      } else if (event.type === 'success') {
-        const state = ips.touch(event.ip, newState);
+      } else {
+        const state = ips.touch(source, newState);
         state.last = event.time;
         state.logins.dropBefore(event.time - windowMs);
         state.logins.push(event);

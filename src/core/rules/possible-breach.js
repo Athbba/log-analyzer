@@ -7,8 +7,16 @@
 // login, then a fifth failure within the window makes all five hot). The
 // original batch rule saw the whole file at once; here a low finding is kept
 // for one window and escalated if such a brute force turns up.
+//
+// A key login after a few password failures for *other* usernames from the
+// same IP is not reported (`ignoreKeyLoginsAfterOthersFailures`). That is a
+// colleague behind the same office NAT, not a guessed password: a key can't
+// be the payoff of guessing someone else's password. The Docker lab found
+// this false positive. If a brute force from the IP covers the login after
+// all, it is reported, at high.
 
 import { BoundedMap, TimeWindow } from '../bounded.js';
+import { sourceOf } from '../net.js';
 
 /** @typedef {import('../../types.js').BruteForceFinding} BruteForceFinding */
 /** @typedef {import('../../types.js').PossibleBreachFinding} PossibleBreachFinding */
@@ -31,11 +39,14 @@ import { BoundedMap, TimeWindow } from '../bounded.js';
  * @returns {Rule}
  */
 export function createPossibleBreach(ctx) {
-  const { threshold, windowMs, lookbackMs, limits } = ctx.options;
+  const { threshold, windowMs, lookbackMs, limits, ipv6Prefix, ignoreKeyLoginsAfterOthersFailures } = ctx.options;
   /** @type {BoundedMap<string, IpState>} */
   const ips = new BoundedMap('possible-breach: IPs', limits.maxKeys, ctx.health, {
     keep: (s) => s.failures.length > 1 || s.attacks.length > 0 || s.low.length > 0,
   });
+  /** Low findings not reported (yet): key logins after other users' failures. */
+  /** @type {WeakSet<PossibleBreachFinding>} */
+  const held = new WeakSet();
   let nextSweep = -Infinity;
 
   /** @returns {IpState} */
@@ -58,15 +69,17 @@ export function createPossibleBreach(ctx) {
     name: 'possible-breach',
 
     onEvent(event) {
+      if (event.type !== 'failure' && event.type !== 'success') return;
+      // Counted per source, like brute force: an IPv6 /64 by default.
+      const source = sourceOf(event.ip, ipv6Prefix);
       if (event.type === 'failure') {
-        const state = ips.touch(event.ip, newState);
+        const state = ips.touch(source, newState);
         state.last = event.time;
         state.failures.dropBefore(event.time - lookbackMs);
         state.failures.push({ time: event.time, count: event.count, user: event.user });
         return;
       }
-      if (event.type !== 'success') return;
-      const state = ips.get(event.ip);
+      const state = ips.get(source);
       if (!state) return;
       state.failures.dropBefore(event.time - lookbackMs);
       const before = [...state.failures];
@@ -88,7 +101,13 @@ export function createPossibleBreach(ctx) {
         sameUser: users.some((u) => u.user === event.user),
       };
       state.last = event.time;
-      if (finding.severity === 'low') state.low.push(finding);
+      if (finding.severity === 'low') {
+        state.low.push(finding);
+        if (ignoreKeyLoginsAfterOthersFailures && event.method === 'publickey' && !finding.sameUser) {
+          held.add(finding);
+          return;
+        }
+      }
       ctx.emit(finding);
     },
 
@@ -100,7 +119,8 @@ export function createPossibleBreach(ctx) {
       state.low = state.low.filter((low) => {
         if (!covers(finding, low.time)) return true;
         low.severity = 'high';
-        ctx.update(low);
+        if (held.delete(low)) ctx.emit(low);
+        else ctx.update(low);
         return false;
       });
     },

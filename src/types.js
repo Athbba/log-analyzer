@@ -77,7 +77,68 @@
  * @property {number} memoryMs  How long attacker IPs, breaches and unclosed sessions are remembered.
  */
 
-/** @typedef {Options & { limits: Limits }} ResolvedOptions */
+/**
+ * Password spraying: many accounts, few guesses each, from one source.
+ * @typedef {object} SprayOptions
+ * @property {boolean} enabled
+ * @property {number} minUsers  Distinct accounts that make a spray…
+ * @property {number} windowMs  …within this window…
+ * @property {number} maxAttemptsPerUser  …each guessed at most this many times.
+ * @property {boolean} countInvalidUsers  Count usernames that don't exist (default: only real accounts).
+ */
+
+/**
+ * Distributed brute force: one account, many sources.
+ * @typedef {object} DistributedOptions
+ * @property {boolean} enabled
+ * @property {number} minSources  Distinct sources that make an attack…
+ * @property {number} minAttempts  …with at least this many failures in total…
+ * @property {number} windowMs  …within this window.
+ * @property {boolean} countInvalidUsers  Also watch usernames that don't exist.
+ * @property {string[]} ignoreUsers  Accounts not to watch (e.g. root, if it is under constant attack).
+ */
+
+/**
+ * First login from a new source network for a user.
+ * @typedef {object} NewSourceOptions
+ * @property {boolean} enabled
+ * @property {number} learningMs  From the first line, logins only build the baseline.
+ * @property {number} prefixV4  Network size that counts as "the same place" for IPv4…
+ * @property {number} prefixV6  …and for IPv6.
+ * @property {number} rememberMs  How long a known network stays known without logins.
+ */
+
+/**
+ * Log tampering: gaps, time going backwards, truncation, NUL bytes.
+ * @typedef {object} TamperingOptions
+ * @property {boolean} enabled
+ * @property {number} maxGapMs  A longer silence is reported.
+ * @property {number} maxBackwardsMs  Time going back further than this is reported…
+ * @property {boolean} allowDstJumps  …except a jump of one hour, as at the end of DST.
+ */
+
+/**
+ * Settings beyond the original five.
+ * @typedef {object} ExtendedOptions
+ * @property {string[]} trustedNetworks  CIDRs never counted by spray, distributed and new-source rules.
+ * @property {number} ipv6Prefix  IPv6 attempts are counted per prefix of this length (128 = exact address).
+ * @property {boolean} ignoreKeyLoginsAfterOthersFailures  A key login after a few failures for
+ *   other usernames from the same IP (a shared office IP) is not a possible breach.
+ * @property {SprayOptions} spray
+ * @property {DistributedOptions} distributed
+ * @property {NewSourceOptions} newSource
+ * @property {TamperingOptions} tampering
+ */
+
+/** @typedef {Options & ExtendedOptions & { limits: Limits }} ResolvedOptions */
+
+/**
+ * What callers may pass: any subset, nested settings included.
+ * @typedef {Partial<Options> & Partial<Omit<ExtendedOptions, 'spray' | 'distributed' | 'newSource' | 'tampering'>> & {
+ *   limits?: Partial<Limits>, spray?: Partial<SprayOptions>, distributed?: Partial<DistributedOptions>,
+ *   newSource?: Partial<NewSourceOptions>, tampering?: Partial<TamperingOptions>,
+ * }} AnalyzerOptions
+ */
 
 /** @typedef {{ user: string, attempts: number }} UserTally */
 
@@ -134,12 +195,77 @@
  * @property {{ time: number, user: string, attempts: number } | null} afterBreach
  */
 
-/** @typedef {BruteForceFinding | PossibleBreachFinding | UnusualHourFinding | AccountChangeFinding} Finding */
+/**
+ * @typedef {object} PasswordSprayFinding
+ * @property {'password-spray'} rule
+ * @property {Severity} severity
+ * @property {string} ip  The source (an IPv6 /64 when ipv6Prefix is 64).
+ * @property {number} time
+ * @property {number} until
+ * @property {number} attempts
+ * @property {number} userCount  Accounts tried no more than maxAttemptsPerUser times.
+ * @property {UserTally[]} users
+ * @property {{ time: number, user: string, method: string } | null} loggedIn
+ */
 
 /**
- * Findings grouped by source IP.
+ * @typedef {object} DistributedBruteForceFinding
+ * @property {'distributed-brute-force'} rule
+ * @property {Severity} severity
+ * @property {null} ip  No single source.
+ * @property {string} user  The account under attack.
+ * @property {number} time
+ * @property {number} until
+ * @property {number} attempts
+ * @property {number} sourceCount
+ * @property {{ ip: string, attempts: number }[]} sources  Most active first.
+ * @property {{ time: number, ip: string, method: string } | null} loggedIn
+ */
+
+/**
+ * @typedef {object} NewSourceFinding
+ * @property {'new-source'} rule
+ * @property {Severity} severity
+ * @property {string} ip
+ * @property {number} time
+ * @property {string} user
+ * @property {string} method
+ * @property {string} network  The new network, e.g. 198.51.100.0/24.
+ * @property {number} knownNetworks  How many networks this user had logged in from before.
+ */
+
+/**
+ * @typedef {object} LogTamperingFinding
+ * @property {'log-tampering'} rule
+ * @property {Severity} severity
+ * @property {null} ip
+ * @property {'gap' | 'backwards' | 'truncated' | 'nul-bytes'} kind
+ * @property {number} time  When it starts (the last line before a gap or jump).
+ * @property {number} until  When it ends.
+ * @property {number} line  The input line where it was noticed.
+ * @property {string} detail  Plain-language description.
+ */
+
+/** @typedef {BruteForceFinding | PossibleBreachFinding | UnusualHourFinding | AccountChangeFinding
+ *   | PasswordSprayFinding | DistributedBruteForceFinding | NewSourceFinding | LogTamperingFinding} Finding */
+
+/**
+ * Metadata for every recognized line, for rules that look at the log itself
+ * rather than at authentication events (log tampering).
+ * @typedef {{ time: number, line: number, offsetMinutes: number | null, hasNul: boolean }} LineInfo
+ */
+
+/**
+ * Something the shell observed about the input itself (live mode).
+ * @typedef {{ type: 'truncated', time: number, line: number, fromBytes: number, toBytes: number }} SourceSignal
+ */
+
+/**
+ * Findings grouped by where they come from: one source IP (or IPv6 /64), or,
+ * for findings with no single source, a subject such as "user deploy".
  * @typedef {object} Incident
  * @property {string | null} ip
+ * @property {string | null} subject  Set when ip is null and the findings share a subject.
  * @property {Severity} severity  The most severe of its findings.
  * @property {number} time  Its earliest finding.
  * @property {Finding[]} findings  In time order.
