@@ -87,3 +87,7 @@ for one final visual check only; `AGENTS.md` stays out of commits.
 - [ ] fast-check property tests for the parser. *Check: invariants hold for 10k+ cases.*
 - [ ] Stryker mutation testing with a break threshold. *Check: score recorded in docs.*
 - [ ] Benchmark (speed + memory) in CI. *Check: numbers in README match the CI output.*
+
+## Deferred
+
+- [ ] Dashboard time filter (SPEC M5: "filters by … time"). For now the SVG timeline stands in for it: it shows each run's span, and finer time filtering is left for later ([ADR-0016](docs/adr/0016-local-read-only-dashboard.md)). *Check: a from/to filter on the incident list, with tests for bounds and bad input.*
