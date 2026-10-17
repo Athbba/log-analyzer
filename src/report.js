@@ -77,46 +77,16 @@ export function countBySeverity(incidents) {
 export function formatText({ source, stats, options, incidents, health }, { color = false } = {}) {
   /** @param {Parameters<typeof styleText>[0]} style @param {string} text */
   const paint = (style, text) => (color ? styleText(style, text) : text);
-  const [from, to] = options.night;
   const out = [
     paint('bold', `SSH auth log analysis: ${safeText(source)}`),
     `${plural(stats.lines, 'line')}` +
       (stats.first === null || stats.last === null ? '' : `, ${stamp(stats.first)} to ${stamp(stats.last)}`),
     `${plural(stats.failures, 'failed login')}, ${plural(stats.successes, 'successful login')}`,
-  ];
-  if (stats.unrecognized > 0) {
-    out.push(paint('yellow', `Warning: skipped ${plural(stats.unrecognized, 'line')} not in a recognized syslog format.`));
-  }
-  if (health && health.oversizedLines > 0) {
-    out.push(paint('yellow', `Warning: skipped ${plural(health.oversizedLines, 'line')} longer than ${num(health.maxLineLength)} bytes.`));
-  }
-  const dropped = health ? Object.entries(health.evicted) : [];
-  if (dropped.length > 0) {
-    const total = dropped.reduce((sum, [, n]) => sum + n, 0);
-    out.push(paint('yellow', `Warning: detector state limits were reached (${num(total)} items dropped); some activity may be missed.`));
-    for (const [what, n] of dropped) out.push(paint('yellow', `  ${what}: ${num(n)}`));
-  }
-  out.push(
+    ...warnings(stats, health).map((line) => paint('yellow', line)),
     '',
     'Rules:',
-    `  brute force      ${options.threshold}+ failed logins from one IP within ${duration(options.windowMs)}`,
-    `  possible breach  a login from an IP with failed logins in the previous ${duration(options.lookbackMs)}`,
-    `  unusual hour     a login between ${pad2(from)}:00 and ${pad2((to + 23) % 24)}:59`,
-    `  account change   a new user, or a user added to ${options.adminGroups.join('/')}; high if made from an IP that broke in`,
-  );
-  const { spray, distributed, newSource, tampering } = options;
-  if (spray.enabled) {
-    out.push(`  password spray   ${spray.minUsers}+ real accounts from one source within ${duration(spray.windowMs)}, at most ${spray.maxAttemptsPerUser} tries each`);
-  }
-  if (distributed.enabled) {
-    out.push(`  distributed      one account guessed from ${distributed.minSources}+ sources (${distributed.minAttempts}+ failures) within ${duration(distributed.windowMs)}`);
-  }
-  if (newSource.enabled) {
-    out.push(`  new source       a login from a network the user hasn't logged in from before (after ${duration(newSource.learningMs)} of learning)`);
-  }
-  if (tampering.enabled) {
-    out.push(`  log tampering    no lines for ${duration(tampering.maxGapMs)}, time going back ${duration(tampering.maxBackwardsMs)}+, NUL bytes, or truncation`);
-  }
+    ...ruleSummary(options),
+  ];
 
   for (const incident of incidents) {
     const source = safeText(incident.ip ?? incident.subject ?? 'no single source IP');
@@ -141,6 +111,59 @@ export function formatText({ source, stats, options, incidents, health }, { colo
     out.push(paint('bold', `${plural(incidents.length, 'incident')}: ${breakdown}`));
   }
   return out.join('\n') + '\n';
+}
+
+/**
+ * Warnings about the run itself: unreadable or oversized lines, and detector
+ * state dropped at a limit.
+ * @param {ParseStats} stats
+ * @param {RunHealth} [health]
+ * @returns {string[]}
+ */
+function warnings(stats, health) {
+  const lines = [];
+  if (stats.unrecognized > 0) {
+    lines.push(`Warning: skipped ${plural(stats.unrecognized, 'line')} not in a recognized syslog format.`);
+  }
+  if (health && health.oversizedLines > 0) {
+    lines.push(`Warning: skipped ${plural(health.oversizedLines, 'line')} longer than ${num(health.maxLineLength)} bytes.`);
+  }
+  const dropped = health ? Object.entries(health.evicted) : [];
+  if (dropped.length > 0) {
+    const total = dropped.reduce((sum, [, n]) => sum + n, 0);
+    lines.push(`Warning: detector state limits were reached (${num(total)} items dropped); some activity may be missed.`);
+    for (const [what, n] of dropped) lines.push(`  ${what}: ${num(n)}`);
+  }
+  return lines;
+}
+
+/**
+ * One line per enabled rule, with its current settings.
+ * @param {Options} options
+ * @returns {string[]}
+ */
+function ruleSummary(options) {
+  const [from, to] = options.night;
+  const lines = [
+    `  brute force      ${options.threshold}+ failed logins from one IP within ${duration(options.windowMs)}`,
+    `  possible breach  a login from an IP with failed logins in the previous ${duration(options.lookbackMs)}`,
+    `  unusual hour     a login between ${pad2(from)}:00 and ${pad2((to + 23) % 24)}:59`,
+    `  account change   a new user, or a user added to ${options.adminGroups.join('/')}; high if made from an IP that broke in`,
+  ];
+  const { spray, distributed, newSource, tampering } = options;
+  if (spray.enabled) {
+    lines.push(`  password spray   ${spray.minUsers}+ real accounts from one source within ${duration(spray.windowMs)}, at most ${spray.maxAttemptsPerUser} tries each`);
+  }
+  if (distributed.enabled) {
+    lines.push(`  distributed      one account guessed from ${distributed.minSources}+ sources (${distributed.minAttempts}+ failures) within ${duration(distributed.windowMs)}`);
+  }
+  if (newSource.enabled) {
+    lines.push(`  new source       a login from a network the user hasn't logged in from before (after ${duration(newSource.learningMs)} of learning)`);
+  }
+  if (tampering.enabled) {
+    lines.push(`  log tampering    no lines for ${duration(tampering.maxGapMs)}, time going back ${duration(tampering.maxBackwardsMs)}+, NUL bytes, or truncation`);
+  }
+  return lines;
 }
 
 /**
