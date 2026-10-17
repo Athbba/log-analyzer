@@ -212,12 +212,19 @@ External addresses come from the IP ranges reserved for documentation (RFC 5737)
 
 C through G are deliberate lookalikes. They check that the analyzer is right about what it *doesn't* flag, not only about what it does.
 
+### Real logs from a Docker lab
+
+The synthetic sample only contains formats the generator knows about, so the analyzer is also tested on logs written by the real software. [`lab/`](lab/README.md) is a Docker Compose lab: a Debian 13 server running OpenSSH 10 and rsyslog, an office workstation, and two attackers, on an internal network with no route out. Its scenarios are normal admin work, a dictionary attack, and a break-in that ends with a backdoor sudo user.
+
+`npm run lab` builds it, plays the scenarios, copies out `/var/log/auth.log` and checks it against [labels](test/fixtures/lab/labels.json). CI does this on every pull request, and one recorded run is committed as a test fixture. The lab confirmed that the parser handles current formats (`sshd-session`, sudo 1.9 lines with no `TTY=`, RFC 3339 timestamps). It also exposed a false positive: on a shared office IP, a colleague's login right after someone else's typo counts as a low-severity possible breach.
+
 ### Test suites
 
-35 tests using Node's built-in `node:test`. Run them with `npm test`.
+40 tests using Node's built-in `node:test`. Run them with `npm test`.
 
 - `test/parse.test.js`: each line type, `message repeated` counting, spoofed usernames, IPv6, RFC 3339, the December-to-January year change, unreadable lines.
 - `test/detectors.test.js`: each rule's thresholds and boundaries (4 vs 5 failures, a window exactly 10 minutes wide, 00:59 vs 01:00 vs 05:00), plus each way an account change can or can't be linked to a break-in.
+- `test/lab-fixture.test.js`: the recorded lab log produces exactly its labelled incidents, the label check fails when an attack step is removed or an unlabelled attack is added, and current OpenSSH/sudo formats parse.
 - `test/sample.test.js`: an end-to-end check that the sample log produces exactly the incidents in the table above, plus the command line (exit codes, `--json`, stdin, bad arguments).
 
 ### Planted-bug testing
@@ -261,7 +268,10 @@ src/report.js                   terminal and JSON output
 src/types.js                    shared JSDoc types (events, findings, options)
 scripts/generate-sample-log.js  synthetic auth.log with a known answer key
 samples/auth.log                the generated sample
-test/                           parser, detector and end-to-end tests
+scripts/lab.js                  runs the Docker lab and checks its log against labels
+lab/                            Docker lab: SSH target, clients, attack scenarios
+test/                           parser, detector, end-to-end and lab-fixture tests
+test/fixtures/lab/              a recorded lab auth.log and its labels
 docs/adr/                       architecture decision records
 ```
 

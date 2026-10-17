@@ -13,16 +13,16 @@ Status: `[x]` done, `[ ]` to do.
 - [x] JSDoc types for parse, detectors, report, CLI; `tsc --checkJs --strict`. *Check: `npm run typecheck` exits 0; a planted type error makes it fail.*
 - [x] GitHub Actions: lint, typecheck, test on Node 22 and 24; SHA-pinned actions; `permissions: contents: read`. *Check: green run on the PR.*
 - [x] Dependabot for npm and Actions. *Check: config validates (GitHub shows no error on the PR).*
-- [ ] Protect `main`: PRs only, required checks, up to date, admins included, no force push. *Check: `gh api …/branches/main/protection` shows the settings; a direct `git push origin main` is rejected.*
+- [x] Protect `main`: PRs only, required checks, up to date, admins included, no force push. *Check: `gh api …/branches/main/protection` reads back all four required checks, strict, admins enforced, no force push or deletion; PR #1 merged through it. (A direct push was not attempted, since if protection were off it would land on `main`.)*
 
 ## M1: Docker lab (`feat/m1-docker-lab`)
 
-- [ ] Target image: Debian + OpenSSH + rsyslog, lab users and keys generated at build time. *Check: `docker compose up target` then `ssh` with the lab key works.*
-- [ ] Attacker image + scenario runner that only targets `target`. *Check: running it with another host name exits non-zero without connecting.*
-- [ ] Scenarios: guessing, break-in + backdoor, admin work. *Check: the target's `auth.log` contains the expected sshd/sudo/useradd lines.*
-- [ ] `npm run lab` collects the log into `test/fixtures/lab/`, with `labels.json`. *Check: rerun produces a log with the same labelled findings.*
-- [ ] Fixture tests assert the labelled findings. *Check: `npm test` passes; removing one labelled line makes it fail.*
-- [ ] CI job `lab-e2e`: build, run, analyze the fresh log. *Check: green run, log uploaded as an artifact.*
+- [x] Target image: Debian + OpenSSH + rsyslog, lab users and keys generated at build time. *Check: `docker compose up target` then `ssh` with the lab key works.*
+- [x] Attacker image + scenario runner that only targets `target`. *Check: running it with another host name exits non-zero without connecting.*
+- [x] Scenarios: guessing, break-in + backdoor, admin work. *Check: the target's `auth.log` contains the expected sshd/sudo/useradd lines.*
+- [x] `npm run lab` collects the log into `test/fixtures/lab/`, with `labels.json`. *Check: rerun produces a log with the same labelled findings.*
+- [x] Fixture tests assert the labelled findings. *Check: `npm test` passes; removing one labelled line makes it fail.*
+- [x] CI job `lab-e2e`: build, run, analyze the fresh log. *Check: green run, log uploaded as an artifact.*
 
 ## M2a: Streaming engine (`refactor/m2a-streaming-engine`)
 

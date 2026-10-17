@@ -7,6 +7,7 @@ node_modules/
 *.log
 *.log.*
 !samples/auth.log
+!test/fixtures/**/*.log
 
 # Test coverage
 coverage/
