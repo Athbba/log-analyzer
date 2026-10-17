@@ -63,12 +63,12 @@ async function hostileDashboard(t) {
 /**
  * @param {URL} base
  * @param {string} path
- * @param {{ method?: string, host?: string }} [options]
+ * @param {{ method?: string, host?: string, headers?: Record<string, string> }} [options]
  * @returns {Promise<{ status: number, headers: import('node:http').IncomingHttpHeaders, body: string }>}
  */
-function get(base, path, { method = 'GET', host } = {}) {
+function get(base, path, { method = 'GET', host, headers = {} } = {}) {
   return new Promise((resolve, reject) => {
-    const req = request({ hostname: base.hostname, port: base.port, path, method, headers: host ? { host } : {} }, (res) => {
+    const req = request({ hostname: base.hostname, port: base.port, path, method, headers: host ? { ...headers, host } : headers }, (res) => {
       let body = '';
       res.setEncoding('utf8');
       res.on('data', (c) => { body += c; });
@@ -161,6 +161,64 @@ test('only GET and HEAD, only its own Host, only known paths', async (t) => {
   assert.equal((await get(url, '/incidents/1abc')).status, 404);
   assert.equal((await get(url, '/?run=999')).status, 404);
   assert.equal((await get(url, '/', { method: 'HEAD' })).body, '');
+});
+
+test('requests from other sites are refused, so a web page can neither probe nor load it', async (t) => {
+  const { url } = await hostileDashboard(t);
+  for (const site of ['cross-site', 'same-site']) {
+    const res = await get(url, '/?q=192.0.2', { headers: { 'sec-fetch-site': site } });
+    assert.equal(res.status, 403, site);
+    assert.doesNotMatch(res.body, /incident/i);
+    assert.equal(res.headers['content-security-policy'], SECURITY_HEADERS['content-security-policy']);
+  }
+  // Typing the URL, following a link on the dashboard itself, or curl.
+  for (const site of ['none', 'same-origin']) assert.equal((await get(url, '/', { headers: { 'sec-fetch-site': site } })).status, 200, site);
+  assert.equal((await get(url, '/')).status, 200, 'no Sec-Fetch-Site header');
+});
+
+test('large runs stay bounded: findings per incident page are capped, totals counted in full', async (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'dash-'));
+  const file = join(dir, 'runs.db');
+  const store = openStore(file);
+  const run = store.beginRun({ source: 'big.log', mode: 'file', options: {} });
+  const lines = [];
+  const stamp = (/** @type {number} */ ms) => {
+    const d = new Date(Date.UTC(2026, 0, 1) + ms);
+    return `${d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })} ${String(d.getUTCDate()).padStart(2, ' ')} ${d.toISOString().slice(11, 19)}`;
+  };
+  // One IP, a burst of 6 guesses every 30 minutes: 250 brute-force findings in one incident.
+  for (let b = 0; b < 250; b++) {
+    for (let g = 0; g < 6; g++) lines.push(`${stamp(b * 30 * 60_000 + g * 1000)} web01 sshd[1]: Failed password for root from 198.51.100.7 port 1 ssh2`);
+  }
+  // 520 other IPs, one burst each: more incidents than the list shows.
+  for (let n = 0; n < 520; n++) {
+    for (let g = 0; g < 6; g++) lines.push(`${stamp(n * 60_000 + g * 1000)} web01 sshd[1]: Failed password for root from 10.${n >> 8}.${n & 255}.9 port 1 ssh2`);
+  }
+  lines.sort();
+  const { incidents } = await analyzeStream(Readable.from([`${lines.join('\n')}\n`]), { year: 2026, tap: store.tap(run, 5000) });
+  store.saveIncidents(run, incidents);
+  store.finishRun(run, {});
+  store.close();
+  const dashboard = createDashboard({ dbPath: file, port: 0 });
+  const url = new URL(await dashboard.listen());
+  t.after(async () => {
+    await dashboard.close();
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  const overview = await get(url, '/');
+  assert.equal(overview.status, 200);
+  assert.equal((overview.body.match(/<li><a href="\/incidents\//g) ?? []).length, 500, 'the list is capped');
+  const heading = /<h2 id="incidents-heading">([^<]*)/.exec(overview.body)?.[1];
+  assert.ok(incidents.length > 500);
+  assert.equal(heading?.trim(), `500 incidents of ${incidents.length}`, 'the total is the real count, not the capped list');
+
+  const big = /<li><a href="\/incidents\/(\d+)[^"]*">\s*<span[^>]*>[^<]*<\/span>\s*<span class="where">198\.51\.100\.7</.exec(overview.body);
+  assert.ok(big, 'the busy IP is listed');
+  const page = await get(url, `/incidents/${big[1]}`);
+  assert.equal(page.status, 200);
+  assert.equal((page.body.match(/<li class="finding"/g) ?? []).length, 200, 'findings on one page are capped');
+  assert.match(page.body, /first 200 of 250 findings/);
 });
 
 test('the dashboard refuses to listen anywhere but loopback', () => {

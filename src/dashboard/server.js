@@ -8,12 +8,13 @@
 // - Sends no JavaScript. The Content-Security-Policy forbids scripts, inline
 //   styles, frames, plugins, forms to other origins, and loading anything
 //   from elsewhere.
+// - Refuses requests the browser marks as coming from another site.
 // - Every log field is escaped (html.js); errors never echo request data.
 
 import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { openStore } from '../io/store.js';
-import { failureTrace, incidentDetail, incidentsFor, listRuns, RULES, runSummary, SEVERITIES } from './queries.js';
+import { countIncidents, failureTrace, incidentDetail, incidentsFor, listRuns, RULES, runSummary, SEVERITIES } from './queries.js';
 import { errorPage, incidentPage, overviewPage } from './views.js';
 
 /** @typedef {import('node:http').IncomingMessage} IncomingMessage */
@@ -80,6 +81,12 @@ export function createDashboard({ dbPath, host = '127.0.0.1', port = 4797 }) {
     if (!allowedHosts().has(req.headers.host ?? '')) {
       return send(res, 421, 'text/plain; charset=utf-8', 'This dashboard only answers on its own loopback address.\n', head);
     }
+    // A page on another site can still make the browser send requests here
+    // (images, no-cors fetches) and time them; browsers mark those.
+    const site = req.headers['sec-fetch-site'];
+    if (site === 'cross-site' || site === 'same-site') {
+      return send(res, 403, 'text/plain; charset=utf-8', 'This dashboard only answers to itself, not to other sites.\n', head);
+    }
     const url = new URL(req.url ?? '/', 'http://localhost');
     if (url.pathname === '/static/dashboard.css') {
       return send(res, 200, 'text/css; charset=utf-8', CSS, head, { 'cache-control': 'no-cache' });
@@ -100,7 +107,7 @@ export function createDashboard({ dbPath, host = '127.0.0.1', port = 4797 }) {
         q: (url.searchParams.get('q') ?? '').trim().slice(0, 100),
       };
       const incidents = incidentsFor(db, run.id, filters);
-      const total = incidentsFor(db, run.id, { severities: [], rule: null, q: '' }).length;
+      const total = countIncidents(db, run.id);
       const hasSpan = run.first !== null && run.last !== null;
       const trace = hasSpan ? failureTrace(db, run.id, run.first, run.last, 160) : [];
       /** @type {Map<number, number[]>} */
