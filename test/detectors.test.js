@@ -9,6 +9,7 @@ const login = (hms, ip, user = 'alice', pid = 100) => `${at(hms, pid)} Accepted 
 const logout = (hms, user, pid) => `${at(hms, pid)} pam_unix(sshd:session): session closed for user ${user}`;
 const sudo = (hms, user, command) =>
   `Sep  7 ${hms} web01 sudo: ${user.padStart(8)} : TTY=pts/0 ; PWD=/home/${user} ; USER=root ; COMMAND=${command}`;
+/** @param {string} hms @param {string} user @param {{ uid?: number, groups?: string[], pid?: number }} [options] */
 const useradd = (hms, user, { uid = 1200, groups = [], pid = 900 } = {}) => [
   `Sep  7 ${hms} web01 useradd[${pid}]: new user: name=${user}, UID=${uid}, GID=${uid}, home=/home/${user}, shell=/bin/bash`,
   ...groups.flatMap((g) => [
@@ -29,7 +30,9 @@ const breakIn = [
   login('03:01:00', ATTACKER, 'deploy', 200),
 ];
 
-async function findings(lines, options) {
+// Typed loosely on purpose: tests read fields specific to each rule.
+/** @returns {Promise<any[]>} */
+async function findings(lines, options = {}) {
   const { events } = await parseLines(lines, { year: 2026 });
   return analyze(events, options).flatMap((incident) => incident.findings);
 }

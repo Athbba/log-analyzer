@@ -12,6 +12,8 @@ import { DEFAULTS, analyze } from '../src/detectors.js';
 import { parseLines } from '../src/parse.js';
 import { duration, formatJson, formatText } from '../src/report.js';
 
+/** @typedef {import('../src/types.js').Options} Options */
+
 const USAGE = `Usage: node bin/analyze.js [options] <auth.log | ->
 
 Finds SSH brute-force attempts, logins that follow failed attempts, logins at
@@ -29,35 +31,23 @@ Options:
 
 Exit status: 0 if nothing high-severity was found, 1 if something was, 2 on error.`;
 
+/**
+ * @param {string} message
+ * @returns {never}
+ */
 function usageError(message) {
   console.error(`error: ${message}\n\n${USAGE}`);
   process.exit(2);
 }
 
-let values, positionals;
-try {
-  ({ values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      json: { type: 'boolean' },
-      threshold: { type: 'string' },
-      window: { type: 'string' },
-      lookback: { type: 'string' },
-      night: { type: 'string' },
-      'admin-groups': { type: 'string' },
-      year: { type: 'string' },
-      help: { type: 'boolean', short: 'h' },
-    },
-  }));
-} catch (err) {
-  usageError(err.message);
-}
+const { values, positionals } = readArgs();
 if (values.help) {
   console.log(USAGE);
   process.exit(0);
 }
 if (positionals.length !== 1) usageError('give exactly one log file, or - for stdin');
 
+/** @type {Options} */
 const options = {
   threshold: values.threshold === undefined ? DEFAULTS.threshold : positiveInt(values.threshold, '--threshold'),
   windowMs: values.window === undefined ? DEFAULTS.windowMs : parseDuration(values.window, '--window'),
@@ -73,7 +63,7 @@ let parsed;
 try {
   parsed = await parseLines(await openLines(source), { year });
 } catch (err) {
-  console.error(`error: can't read ${source}: ${err.message}`);
+  console.error(`error: can't read ${source}: ${errorMessage(err)}`);
   process.exit(2);
 }
 
@@ -90,6 +80,32 @@ process.stdout.write(values.json
   : formatText(result, { color: process.stdout.isTTY && !process.env.NO_COLOR }));
 process.exitCode = incidents.some((i) => i.severity === 'high') ? 1 : 0;
 
+function readArgs() {
+  try {
+    return parseArgs({
+      allowPositionals: true,
+      options: {
+        json: { type: 'boolean' },
+        threshold: { type: 'string' },
+        window: { type: 'string' },
+        lookback: { type: 'string' },
+        night: { type: 'string' },
+        'admin-groups': { type: 'string' },
+        year: { type: 'string' },
+        help: { type: 'boolean', short: 'h' },
+      },
+    });
+  } catch (err) {
+    return usageError(errorMessage(err));
+  }
+}
+
+/** @param {unknown} err */
+function errorMessage(err) {
+  return err instanceof Error ? err.message : String(err);
+}
+
+/** @param {string} path */
 async function openLines(path) {
   if (path === '-') return createInterface({ input: process.stdin, crlfDelay: Infinity });
   // Opening first makes a missing file fail here, with a clear message.
@@ -97,27 +113,43 @@ async function openLines(path) {
   return createInterface({ input: file.createReadStream(), crlfDelay: Infinity });
 }
 
+/**
+ * @param {string} value
+ * @param {string} flag
+ */
 function positiveInt(value, flag) {
   if (!/^\d+$/.test(value) || Number(value) < 1) usageError(`${flag} must be a whole number of 1 or more`);
   return Number(value);
 }
 
+/** @type {Record<string, number>} */
+const UNIT_MS = { s: 1000, m: 60_000, h: 3_600_000 };
+
+/**
+ * @param {string} value
+ * @param {string} flag
+ */
 function parseDuration(value, flag) {
   const m = /^(\d+)(s|m|h)?$/.exec(value);
-  if (!m || Number(m[1]) === 0) usageError(`${flag} must be a duration like 90s, 10m or 1h`);
-  return Number(m[1]) * { s: 1000, m: 60_000, h: 3_600_000 }[m[2] ?? 'm'];
+  if (!m || Number(m[1]) === 0) return usageError(`${flag} must be a duration like 90s, 10m or 1h`);
+  return Number(m[1]) * UNIT_MS[m[2] ?? 'm'];
 }
 
+/** @param {string} value */
 function parseGroups(value) {
   if (!/^[\w.-]+(,[\w.-]+)*$/.test(value)) usageError('--admin-groups must be group names separated by commas, e.g. sudo,wheel');
   return value.split(',');
 }
 
+/**
+ * @param {string} value
+ * @returns {[number, number]}
+ */
 function parseHours(value) {
   const m = /^(\d{1,2})-(\d{1,2})$/.exec(value);
-  const [from, to] = m ? [Number(m[1]), Number(m[2])] : [];
+  const [from, to] = m ? [Number(m[1]), Number(m[2])] : [NaN, NaN];
   if (!m || from > 23 || to > 24 || from === to) {
-    usageError('--night must be two different hours like 1-5 (01:00-04:59) or 22-6');
+    return usageError('--night must be two different hours like 1-5 (01:00-04:59) or 22-6');
   }
   return [from, to];
 }

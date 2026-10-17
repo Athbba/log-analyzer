@@ -8,6 +8,11 @@
 // is shifted by the timezone of the machine running the analyzer: 03:00 in the
 // log is 03:00 here, which is what the unusual-hours rule needs.
 
+/** @typedef {import('./types.js').AuthEvent} AuthEvent */
+/** @typedef {import('./types.js').EventBase} EventBase */
+/** @typedef {import('./types.js').ParseStats} ParseStats */
+
+/** @type {Record<string, number>} */
 const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
 
 // "Sep  7 03:39:12 web01 …": classic syslog, which has no year.
@@ -45,9 +50,14 @@ const GPASSWD_ADDED_RE = /^user (\S+) added by \S+ to group (\S+)$/;
  * interface, …) and returns the events in file order plus counters.
  * `year` is the year of the first syslog line; by default it's the current
  * year, or last year if the log starts in a month that hasn't come yet.
+ * @param {Iterable<string> | AsyncIterable<string>} lines
+ * @param {{ year?: number }} [options]
+ * @returns {Promise<{ events: AuthEvent[], stats: ParseStats }>}
  */
 export async function parseLines(lines, { year } = {}) {
+  /** @type {AuthEvent[]} */
   const events = [];
+  /** @type {ParseStats} */
   const stats = { lines: 0, unrecognized: 0, failures: 0, successes: 0, first: null, last: null };
   const syslogTime = yearTracker(year);
   let lineNo = 0;
@@ -58,12 +68,19 @@ export async function parseLines(lines, { year } = {}) {
     if (line === '') continue;
     stats.lines++;
 
-    let m, time, host, rest;
+    /** @type {RegExpExecArray | null} */
+    let m;
+    /** @type {number} */
+    let time;
+    /** @type {string} */
+    let host;
+    /** @type {string} */
+    let rest;
     if ((m = SYSLOG_RE.exec(line)) && m[1] in MONTHS) {
       time = syslogTime(MONTHS[m[1]], +m[2], +m[3], +m[4], +m[5]);
       [host, rest] = [m[6], m[7]];
     } else if ((m = ISO_RE.exec(line))) {
-      time = Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+      time = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
       [host, rest] = [m[7], m[8]];
     } else {
       stats.unrecognized++;
@@ -75,6 +92,7 @@ export async function parseLines(lines, { year } = {}) {
     const program = PROGRAM_RE.exec(rest);
     if (!program) continue;
     const [, name, pid, msg] = program;
+    /** @type {EventBase} */
     const base = { time, host, pid: pid === undefined ? null : Number(pid), line: lineNo };
     const event = SSHD_PROGRAMS.has(name) ? sshdEvent(msg, base)
       : name === 'sudo' ? sudoEvent(msg, base)
@@ -88,6 +106,11 @@ export async function parseLines(lines, { year } = {}) {
   return { events, stats };
 }
 
+/**
+ * @param {string} msg
+ * @param {EventBase} base
+ * @returns {AuthEvent | null}
+ */
 function sshdEvent(msg, base) {
   let count = 1;
   const repeated = REPEATED_RE.exec(msg);
@@ -103,11 +126,21 @@ function sshdEvent(msg, base) {
   return null;
 }
 
+/**
+ * @param {string} msg
+ * @param {EventBase} base
+ * @returns {AuthEvent | null}
+ */
 function sudoEvent(msg, base) {
   const m = SUDO_RE.exec(msg);
   return m ? { type: 'sudo', ...base, user: m[1], command: m[2] } : null;
 }
 
+/**
+ * @param {string} msg
+ * @param {EventBase & { program: string }} base
+ * @returns {AuthEvent | null}
+ */
 function accountEvent(msg, base) {
   let m;
   if ((m = NEW_USER_RE.exec(msg))) return { type: 'account', ...base, action: 'user-created', user: m[1], uid: Number(m[2]) };
@@ -118,7 +151,12 @@ function accountEvent(msg, base) {
 
 // Syslog timestamps have no year, so track it: start from `year` (or a guess)
 // and move to the next year whenever the month goes backwards (Dec → Jan).
+/**
+ * @param {number | undefined} year
+ * @returns {(month: number, day: number, h: number, m: number, s: number) => number}
+ */
 function yearTracker(year) {
+  /** @type {number | null} */
   let lastMonth = null;
   return (month, day, h, m, s) => {
     if (year === undefined) {

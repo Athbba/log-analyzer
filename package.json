@@ -14,6 +14,15 @@
   "scripts": {
     "analyze": "node bin/analyze.js",
     "test": "node --test",
+    "lint": "eslint .",
+    "typecheck": "tsc -p . && tsc -p test",
+    "check": "npm run lint && npm run typecheck && npm test",
     "generate-sample": "node scripts/generate-sample-log.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "eslint": "10.12.0",
+    "typescript": "6.0.3"
   }
 }

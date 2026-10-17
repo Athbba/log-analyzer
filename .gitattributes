@@ -1,0 +1,7 @@
+# Keep LF in the repository and the working tree on every OS.
+* text=auto eol=lf
+
+# Log fixtures are compared byte for byte (and may hold NUL bytes on purpose),
+# so Git must never convert them.
+*.log -text diff
+*.log.* -text diff

@@ -1,0 +1,7 @@
+{
+  // Tests are type-checked against the typed APIs they call, but their local
+  // helpers may stay unannotated.
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "noImplicitAny": false },
+  "include": ["**/*.js"]
+}

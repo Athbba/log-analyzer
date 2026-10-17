@@ -2,8 +2,24 @@
 // findings; `analyze` then groups them by IP into incidents, so one attacker's
 // brute force, break-in, night-time login and backdoor account read as one story.
 
+/** @typedef {import('./types.js').AuthEvent} AuthEvent */
+/** @typedef {import('./types.js').FailureEvent} FailureEvent */
+/** @typedef {import('./types.js').SuccessEvent} SuccessEvent */
+/** @typedef {import('./types.js').SudoEvent} SudoEvent */
+/** @typedef {import('./types.js').AccountEvent} AccountEvent */
+/** @typedef {import('./types.js').Options} Options */
+/** @typedef {import('./types.js').Severity} Severity */
+/** @typedef {import('./types.js').UserTally} UserTally */
+/** @typedef {import('./types.js').Finding} Finding */
+/** @typedef {import('./types.js').BruteForceFinding} BruteForceFinding */
+/** @typedef {import('./types.js').PossibleBreachFinding} PossibleBreachFinding */
+/** @typedef {import('./types.js').UnusualHourFinding} UnusualHourFinding */
+/** @typedef {import('./types.js').AccountChangeFinding} AccountChangeFinding */
+/** @typedef {import('./types.js').Incident} Incident */
+
 const MINUTE = 60_000;
 
+/** @type {Options} */
 export const DEFAULTS = {
   threshold: 5, // failed logins from one IP that count as brute force…
   windowMs: 10 * MINUTE, // …within this sliding window (fail2ban's defaults)
@@ -12,6 +28,7 @@ export const DEFAULTS = {
   adminGroups: ['sudo', 'wheel', 'admin'], // Debian/Ubuntu, RHEL/Fedora/Arch, old Ubuntu
 };
 
+/** @type {Severity[]} */
 export const SEVERITIES = ['high', 'medium', 'low'];
 const RULE_ORDER = ['brute-force', 'possible-breach', 'unusual-hour', 'account-change'];
 
@@ -20,8 +37,14 @@ const ACCOUNT_TOOLS = new Set(['useradd', 'adduser', 'usermod', 'gpasswd']);
 // adduser prompts for a password and details, so allow for a slow typist.
 const SUDO_MATCH_MS = MINUTE;
 
-/** Runs every rule and returns incidents (one per IP), most severe first. */
+/**
+ * Runs every rule and returns incidents (one per IP), most severe first.
+ * @param {AuthEvent[]} events
+ * @param {Partial<Options>} [options]
+ * @returns {Incident[]}
+ */
 export function analyze(events, options = {}) {
+  /** @type {Options} */
   const opts = { ...DEFAULTS, ...options };
   const sorted = [...events].sort((a, b) => a.time - b.time || a.line - b.line);
   const successes = sorted.filter((e) => e.type === 'success');
@@ -38,10 +61,18 @@ export function analyze(events, options = {}) {
   ]);
 }
 
-// Rule 1: `threshold` or more failures from one IP within `windowMs`. Every
-// failure that falls inside such a window is "hot"; runs of hot failures no
-// more than a window apart are merged into one finding per attack.
+/**
+ * Rule 1: `threshold` or more failures from one IP within `windowMs`. Every
+ * failure that falls inside such a window is "hot"; runs of hot failures no
+ * more than a window apart are merged into one finding per attack.
+ * @param {Map<string, FailureEvent[]>} failuresByIp
+ * @param {Map<string, SuccessEvent[]>} successesByIp
+ * @param {Options} options
+ * @returns {BruteForceFinding[]}
+ */
 function detectBruteForce(failuresByIp, successesByIp, { threshold, windowMs }) {
+  /** @typedef {{ rule: 'brute-force', ip: string, time: number, until: number, attempts: number, fails: FailureEvent[] }} Run */
+  /** @type {Run[]} */
   const findings = [];
   for (const [ip, fails] of failuresByIp) {
     const hot = new Array(fails.length).fill(false);
@@ -57,6 +88,7 @@ function detectBruteForce(failuresByIp, successesByIp, { threshold, windowMs }) 
       }
     }
 
+    /** @type {Run | null} */
     let current = null;
     fails.forEach((f, i) => {
       if (!hot[i]) return;
@@ -82,12 +114,20 @@ function detectBruteForce(failuresByIp, successesByIp, { threshold, windowMs }) 
   });
 }
 
-// Rule 2: a successful login from an IP that failed within the previous
-// `lookbackMs`. High when those failures amount to a brute force; low for the
-// odd mistyped password.
+/**
+ * Rule 2: a successful login from an IP that failed within the previous
+ * `lookbackMs`. High when those failures amount to a brute force; low for the
+ * odd mistyped password.
+ * @param {Map<string, FailureEvent[]>} failuresByIp
+ * @param {SuccessEvent[]} successes
+ * @param {Map<string, BruteForceFinding[]>} bruteForceByIp
+ * @param {Options} options
+ * @returns {PossibleBreachFinding[]}
+ */
 function detectPossibleBreaches(failuresByIp, successes, bruteForceByIp, { threshold, lookbackMs }) {
   return successes.flatMap((login) => {
     const fails = failuresByIp.get(login.ip) ?? [];
+    /** @type {FailureEvent[]} */
     const before = [];
     for (let i = firstAtOrAfter(fails, login.time - lookbackMs); i < fails.length; i++) {
       const f = fails[i];
@@ -100,7 +140,8 @@ function detectPossibleBreaches(failuresByIp, successes, bruteForceByIp, { thres
     const duringBruteForce = (bruteForceByIp.get(login.ip) ?? []).some((b) =>
       b.time <= login.time && b.until >= login.time - lookbackMs);
     const users = tallyUsers(before);
-    return [{
+    /** @type {PossibleBreachFinding} */
+    const finding = {
       rule: 'possible-breach',
       severity: attempts >= threshold || duringBruteForce ? 'high' : 'low',
       ip: login.ip,
@@ -111,19 +152,26 @@ function detectPossibleBreaches(failuresByIp, successes, bruteForceByIp, { thres
       firstFailure: before[0].time,
       users,
       sameUser: users.some((u) => u.user === login.user),
-    }];
+    };
+    return [finding];
   });
 }
 
-// Rule 3: a successful login during the night window. Hours come straight from
-// the log, i.e. the server's clock. A window like [22, 6] wraps past midnight.
+/**
+ * Rule 3: a successful login during the night window. Hours come straight from
+ * the log, i.e. the server's clock. A window like [22, 6] wraps past midnight.
+ * @param {SuccessEvent[]} successes
+ * @param {Options} options
+ * @returns {UnusualHourFinding[]}
+ */
 function detectUnusualHours(successes, { night: [from, to] }) {
+  /** @param {number} h */
   const atNight = (h) => (from < to ? h >= from && h < to : h >= from || h < to);
   return successes
     .filter((login) => atNight(new Date(login.time).getUTCHours()))
     .map((login) => ({
-      rule: 'unusual-hour',
-      severity: 'low',
+      rule: /** @type {const} */ ('unusual-hour'),
+      severity: /** @type {const} */ ('low'),
       ip: login.ip,
       time: login.time,
       user: login.user,
@@ -131,27 +179,36 @@ function detectUnusualHours(successes, { night: [from, to] }) {
     }));
 }
 
-// Rule 4: a new user, or a user added to an admin group. The account tools
-// don't log who ran them, so the IP is worked out: the sudo line that ran the
-// tool names the user, and that user's SSH sessions open at the time give the
-// IP. With no sudo line (a root shell), every open session is a candidate.
-// High when a candidate IP had already broken in (a high-severity possible
-// breach); otherwise medium for admin rights (or UID 0), low for a plain user.
+/**
+ * Rule 4: a new user, or a user added to an admin group. The account tools
+ * don't log who ran them, so the IP is worked out: the sudo line that ran the
+ * tool names the user, and that user's SSH sessions open at the time give the
+ * IP. With no sudo line (a root shell), every open session is a candidate.
+ * High when a candidate IP had already broken in (a high-severity possible
+ * breach); otherwise medium for admin rights (or UID 0), low for a plain user.
+ * @param {AuthEvent[]} events
+ * @param {PossibleBreachFinding[]} breaches
+ * @param {Options} options
+ * @returns {AccountChangeFinding[]}
+ */
 function detectAccountChanges(events, breaches, { adminGroups }) {
   const sessions = sshSessions(events);
-  const sudo = events.filter((e) => e.type === 'sudo');
+  const sudo = /** @type {SudoEvent[]} */ (events.filter((e) => e.type === 'sudo'));
   const breachesByIp = groupByIp(breaches.filter((b) => b.severity === 'high'));
 
   // One change per tool run: useradd -G logs the new user and each group separately.
+  /** @typedef {{ host: string, time: number, line: number, user: string, created: boolean, uid: number | null, groups: string[] }} Change */
+  /** @type {Map<string, Change>} */
   const changes = new Map();
-  for (const e of events.filter((e) => e.type === 'account')) {
+  for (const e of /** @type {AccountEvent[]} */ (events.filter((e) => e.type === 'account'))) {
     const key = `${e.host} ${e.program} ${e.pid ?? e.time} ${e.user}`;
-    if (!changes.has(key)) {
-      changes.set(key, { host: e.host, time: e.time, line: e.line, user: e.user, created: false, uid: null, groups: [] });
+    let change = changes.get(key);
+    if (!change) {
+      change = { host: e.host, time: e.time, line: e.line, user: e.user, created: false, uid: null, groups: [] };
+      changes.set(key, change);
     }
-    const change = changes.get(key);
-    if (e.action === 'user-created') [change.created, change.uid] = [true, e.uid];
-    else if (!change.groups.includes(e.group)) change.groups.push(e.group);
+    if (e.action === 'user-created') [change.created, change.uid] = [true, e.uid ?? null];
+    else if (e.group !== undefined && !change.groups.includes(e.group)) change.groups.push(e.group);
   }
 
   return [...changes.values()].flatMap((change) => {
@@ -170,7 +227,8 @@ function detectAccountChanges(events, breaches, { adminGroups }) {
       .filter((b) => b.time <= change.time)
       .sort((a, b) => b.time - a.time)[0];
 
-    return [{
+    /** @type {AccountChangeFinding} */
+    const finding = {
       rule: 'account-change',
       severity: breach ? 'high' : privileged ? 'medium' : 'low',
       ip: breach?.ip ?? (sessionIps.length === 1 ? sessionIps[0] : null),
@@ -183,35 +241,54 @@ function detectAccountChanges(events, breaches, { adminGroups }) {
       by,
       sessionIps,
       afterBreach: breach ? { time: breach.time, user: breach.user, attempts: breach.attempts } : null,
-    }];
+    };
+    return [finding];
   });
 }
 
+/**
+ * @param {string} command
+ * @param {string} user
+ */
 function runsAccountToolOn(command, user) {
   const [program, ...args] = command.trim().split(/\s+/);
-  return ACCOUNT_TOOLS.has(program.split('/').pop()) && args.includes(user);
+  return ACCOUNT_TOOLS.has(program.split('/').pop() ?? '') && args.includes(user);
 }
 
-// SSH sessions as login–logout intervals. A logout is matched to the login with
-// the same sshd PID and user; a session with no logout is open to the end.
+/**
+ * SSH sessions as login–logout intervals. A logout is matched to the login with
+ * the same sshd PID and user; a session with no logout is open to the end.
+ * @param {AuthEvent[]} events
+ */
 function sshSessions(events) {
+  /** @typedef {{ host: string, ip: string, user: string, start: number, end: number }} Session */
+  /** @type {Session[]} */
   const sessions = [];
+  /** @type {Map<string, Session>} */
   const open = new Map();
   for (const e of events) {
-    const key = `${e.host} ${e.pid} ${e.user}`;
+    const key = `${e.host} ${e.pid} ${'user' in e ? e.user : ''}`;
     if (e.type === 'success') {
       const session = { host: e.host, ip: e.ip, user: e.user, start: e.time, end: Infinity };
       sessions.push(session);
       if (e.pid !== null) open.set(key, session);
-    } else if (e.type === 'logout' && e.pid !== null && open.has(key)) {
-      open.get(key).end = e.time;
-      open.delete(key);
+    } else if (e.type === 'logout' && e.pid !== null) {
+      const session = open.get(key);
+      if (session) {
+        session.end = e.time;
+        open.delete(key);
+      }
     }
   }
   return sessions;
 }
 
+/**
+ * @param {Finding[]} findings
+ * @returns {Incident[]}
+ */
 function toIncidents(findings) {
+  /** @param {Severity} severity */
   const rank = (severity) => SEVERITIES.indexOf(severity);
   return [...groupByIp(findings)]
     .map(([ip, list]) => {
@@ -222,18 +299,30 @@ function toIncidents(findings) {
     .sort((a, b) => rank(a.severity) - rank(b.severity) || a.time - b.time);
 }
 
-// Keeps each IP's items in the order given.
+/**
+ * Keeps each IP's items in the order given.
+ * @template {{ ip: string | null }} T
+ * @param {T[]} items
+ * @returns {Map<T['ip'], T[]>}
+ */
 function groupByIp(items) {
+  /** @type {Map<T['ip'], T[]>} */
   const byIp = new Map();
   for (const item of items) {
-    if (!byIp.has(item.ip)) byIp.set(item.ip, []);
-    byIp.get(item.ip).push(item);
+    const list = byIp.get(item.ip);
+    if (list) list.push(item);
+    else byIp.set(item.ip, [item]);
   }
   return byIp;
 }
 
-// Attempts per username, most-tried first.
+/**
+ * Attempts per username, most-tried first.
+ * @param {FailureEvent[]} fails
+ * @returns {UserTally[]}
+ */
 function tallyUsers(fails) {
+  /** @type {Map<string, number>} */
   const counts = new Map();
   for (const f of fails) counts.set(f.user, (counts.get(f.user) ?? 0) + f.count);
   return [...counts]
@@ -241,7 +330,11 @@ function tallyUsers(fails) {
     .sort((a, b) => b.attempts - a.attempts || a.user.localeCompare(b.user));
 }
 
-// Binary search: index of the first event at or after `time` in a sorted list.
+/**
+ * Binary search: index of the first event at or after `time` in a sorted list.
+ * @param {{ time: number }[]} events
+ * @param {number} time
+ */
 function firstAtOrAfter(events, time) {
   let lo = 0;
   let hi = events.length;

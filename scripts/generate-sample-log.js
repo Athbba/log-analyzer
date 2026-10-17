@@ -26,6 +26,7 @@ const DECOY_IP = '192.0.2.77';
 
 // --- Seeded randomness ------------------------------------------------------
 
+/** @param {number} seed */
 function mulberry32(seed) {
   return () => {
     seed = (seed + 0x6d2b79f5) | 0;
@@ -35,9 +36,13 @@ function mulberry32(seed) {
   };
 }
 const rand = mulberry32(20260907);
+/** @param {number} min @param {number} max */
 const int = (min, max) => min + Math.floor(rand() * (max - min + 1));
+/** @template T @param {T[]} items @returns {T} */
 const pick = (items) => items[Math.floor(rand() * items.length)];
+/** @param {number} p */
 const chance = (p) => rand() < p;
+/** @template T @param {T[]} items @param {number} n @returns {T[]} */
 const sample = (items, n) => {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -52,9 +57,12 @@ const port = () => int(32768, 60999);
 
 // Times are Unix seconds holding server-local wall-clock time. All Date math is
 // done in UTC so the timezone of the machine running this script never leaks in.
+/** @param {number} day @param {number} h @param {number} [m] @param {number} [s] */
 const at = (day, h, m = 0, s = 0) => Date.UTC(YEAR, MONTH, day, h, m, s) / 1000;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+/** @param {number} n */
 const pad2 = (n) => String(n).padStart(2, '0');
+/** @param {number} t Unix seconds of server wall-clock time. */
 function syslogTime(t) {
   const d = new Date(t * 1000);
   return `${MONTHS[d.getUTCMonth()]} ${String(d.getUTCDate()).padStart(2, ' ')} ` +
@@ -67,7 +75,11 @@ function syslogTime(t) {
 // logind session numbers are assigned while rendering in time order, so they
 // climb through the file the way they do on a real host. `ctx` is shared by all
 // lines of one process or session; `msg` may be a function of it.
+/** @typedef {{ pid?: number, session?: number }} Ctx */
+/** @typedef {{ t: number, seq: number, proc: string, ctx: Ctx | null, msg: string | ((ctx: Ctx) => string) }} Entry */
+/** @type {Entry[]} */
 const entries = [];
+/** @param {number} t @param {string} proc @param {Ctx | null} ctx @param {Entry['msg']} msg */
 const emit = (t, proc, ctx, msg) => entries.push({ t, seq: entries.length, proc, ctx, msg });
 
 function render() {
@@ -76,20 +88,23 @@ function render() {
   let nextSession = 212;
   return entries.map(({ t, proc, ctx, msg }) => {
     let tag = proc;
+    const c = ctx ?? {};
     if (proc === 'systemd-logind') {
       tag += `[${LOGIND_PID}]`;
-      ctx.session ??= nextSession++;
+      c.session ??= nextSession++;
     } else if (proc !== 'sudo') {
-      tag += `[${(ctx.pid ??= (nextPid += int(3, 41)))}]`;
+      tag += `[${(c.pid ??= (nextPid += int(3, 41)))}]`;
     }
-    return `${syslogTime(t)} ${HOST} ${tag}: ${typeof msg === 'function' ? msg(ctx) : msg}`;
+    return `${syslogTime(t)} ${HOST} ${tag}: ${typeof msg === 'function' ? msg(c) : msg}`;
   });
 }
 
 // --- Actors -----------------------------------------------------------------
 
-const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+const B64 = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'];
 const fingerprint = () => Array.from({ length: 43 }, () => pick(B64)).join('');
+/** @typedef {{ uid: number, auth: string, key?: string, fp?: string }} LabUser */
+/** @type {Record<string, LabUser>} */
 const USERS = {
   alice: { uid: 1001, auth: 'publickey', key: 'ED25519', fp: fingerprint() },
   bob: { uid: 1002, auth: 'password' },
@@ -97,6 +112,7 @@ const USERS = {
   dave: { uid: 1004, auth: 'publickey', key: 'ED25519', fp: fingerprint() },
   deploy: { uid: 1100, auth: 'publickey', key: 'ED25519', fp: fingerprint() },
 };
+/** @type {Record<string, string[]>} */
 const SUDO = {
   alice: ['/usr/bin/systemctl reload nginx', '/usr/bin/tail -n 200 /var/log/nginx/error.log', '/usr/bin/journalctl -u webapp --since today'],
   bob: ['/usr/bin/apt update', '/usr/bin/docker ps', '/usr/bin/docker logs webapp --tail 50'],
@@ -105,8 +121,10 @@ const SUDO = {
 const PROBE_USERS = ['admin', 'test', 'user', 'ubuntu', 'oracle', 'postgres', 'git', 'ftpuser', 'pi', 'guest',
   'support', 'hadoop', 'jenkins', 'nagios', 'minecraft', 'steam', 'dev', 'www'];
 
+/** @type {{ name: string, ip: string, t: number }[]} */
 const typos = []; // normal logins preceded by a mistyped password, for the answer key
 
+/** @param {number} t @param {string} name @param {string} tty @param {string} cmd @param {number} [secs] */
 function sudoCmd(t, name, tty, cmd, secs = int(1, 20)) {
   emit(t, 'sudo', null, `${name.padStart(8)} : TTY=${tty} ; PWD=/home/${name} ; USER=root ; COMMAND=${cmd}`);
   emit(t, 'sudo', null, `pam_unix(sudo:session): session opened for user root(uid=0) by ${name}(uid=${USERS[name].uid})`);
@@ -115,8 +133,13 @@ function sudoCmd(t, name, tty, cmd, secs = int(1, 20)) {
 
 // A successful SSH login: an optional mistyped password on the same connection,
 // the session itself with any sudo commands, then a clean logout.
+/**
+ * @param {string} name @param {string} ip @param {number} start @param {number} minutes
+ * @param {{ method?: string, typo?: boolean, sudo?: string[] }} [options]
+ */
 function login(name, ip, start, minutes, { method = USERS[name].auth, typo = false, sudo = [] } = {}) {
   const u = USERS[name];
+  /** @type {Ctx} */
   const c = {};
   const p = port();
   const end = start + minutes * 60;
@@ -144,7 +167,9 @@ function login(name, ip, start, minutes, { method = USERS[name].auth, typo = fal
 // Repeated guesses collapse into rsyslog's "message repeated N times" line, and
 // PAM adds its own summary lines — both of which the analyzer must not
 // double-count. Returns the time the connection ended.
+/** @param {string} ip @param {string} user @param {number} t @param {number} [tries] */
 function failedConn(ip, user, t, tries = 1) {
+  /** @type {Ctx} */
   const c = {};
   const p = port();
   const valid = user === 'root' || user in USERS;
@@ -172,7 +197,9 @@ function failedConn(ip, user, t, tries = 1) {
 }
 
 // Internet background noise that never gets as far as a password guess.
+/** @param {string} ip @param {number} t */
 function scannerProbe(ip, t) {
+  /** @type {Ctx} */
   const c = {};
   const p = port();
   switch (int(1, 4)) {
@@ -194,7 +221,9 @@ function scannerProbe(ip, t) {
   }
 }
 
+/** @param {number} t */
 function cronJob(t) {
+  /** @type {Ctx} */
   const c = {};
   emit(t, 'CRON', c, 'pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)');
   emit(t + int(0, 1), 'CRON', c, 'pam_unix(cron:session): session closed for user root');
@@ -234,6 +263,7 @@ for (const day of DAYS) {
 
 // Internet background noise: a pool of scanner IPs, each of which makes at most
 // two password guesses across the whole log, so none of them should be flagged.
+/** @type {string[]} */
 const scanners = [];
 while (scanners.length < 60) {
   const ip = `${pick(['192.0.2', '198.51.100', '203.0.113'])}.${int(2, 254)}`;
@@ -244,9 +274,10 @@ for (const day of DAYS) {
   for (let n = int(30, 45); n > 0; n--) {
     const ip = pick(scanners);
     const t = at(day, 0) + int(0, 86399);
-    if (guessesLeft.get(ip) > 0 && chance(0.4)) {
+    const left = guessesLeft.get(ip) ?? 0;
+    if (left > 0 && chance(0.4)) {
       failedConn(ip, chance(0.5) ? 'root' : pick(PROBE_USERS), t);
-      guessesLeft.set(ip, guessesLeft.get(ip) - 1);
+      guessesLeft.set(ip, left - 1);
     } else {
       scannerProbe(ip, t);
     }
@@ -255,13 +286,17 @@ for (const day of DAYS) {
 
 // --- Injected scenarios -----------------------------------------------------
 
+/** @type {{ id: string, ip: string, when: string, text: string }[]} */
 const key = [];
+/** @param {string} id @param {string} ip @param {string} when @param {string} text */
 const note = (id, ip, when, text) => key.push({ id, ip, when, text });
+/** @param {number} t */
 const clock = (t) => syslogTime(t).slice(7);
 
 // A: loud dictionary attack against root and common service accounts, Tuesday
 // 02:14. Never gets in.
 {
+  /** @type {[string, number][]} */
   const plan = [['root', 3], ['admin', 1], ['root', 6], ['test', 1], ['ubuntu', 1], ['oracle', 1], ['postgres', 1],
     ['root', 3], ['user', 1], ['git', 1], ['ftpuser', 1], ['pi', 1], ['guest', 1], ['admin', 3], ['support', 1],
     ['root', 6], ['hadoop', 1], ['jenkins', 1], ['test1', 1], ['administrator', 1]];
@@ -331,7 +366,9 @@ const clock = (t) => syslogTime(t).slice(7);
   emit(start + 1, 'useradd', {}, 'new user: name=erin, UID=1005, GID=1005, home=/home/erin, shell=/bin/bash, from=/dev/pts/2');
   emit(start + 19, 'passwd', {}, 'pam_unix(passwd:chauthtok): password changed for erin');
   emit(start + 35, 'chfn', {}, "changed user 'erin' information");
-  for (const [offset, user, group] of [[97, 'erin', 'sudo'], [160, 'bob', 'docker']]) {
+  /** @type {[number, string, string][]} */
+  const changes = [[97, 'erin', 'sudo'], [160, 'bob', 'docker']];
+  for (const [offset, user, group] of changes) {
     sudoCmd(start + offset, 'dave', 'pts/2', `/usr/sbin/usermod -aG ${group} ${user}`, 1);
     const usermod = {};
     emit(start + offset, 'usermod', usermod, `add '${user}' to group '${group}'`);
@@ -351,7 +388,7 @@ mkdirSync(dirname(OUT_PATH), { recursive: true });
 writeFileSync(OUT_PATH, lines.join('\n') + '\n');
 
 console.log(`Wrote ${lines.length} lines to ${relative(process.cwd(), OUT_PATH)}`);
-console.log(`Span: ${syslogTime(entries[0].t)} to ${syslogTime(entries.at(-1).t)} (${YEAR}, server-local time)\n`);
+console.log(`Span: ${syslogTime(entries[0].t)} to ${syslogTime(entries[entries.length - 1].t)} (${YEAR}, server-local time)\n`);
 console.log('Answer key:');
 for (const { id, ip, when, text } of key) console.log(`  ${id}  ${ip.padEnd(14)} ${when}\n     ${text}`);
 console.log(`\n  Background: ${scanners.length} scanner IPs, each with at most 2 failed passwords in total.`);

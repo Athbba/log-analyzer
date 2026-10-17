@@ -238,6 +238,19 @@ Of 11 planted bugs, two survived at first. Both were real gaps in the tests:
 
 One lesson from the process: a planted bug that doesn't actually apply gives the same "0 tests failed" as a real gap. The script therefore checks that the source file really changed before trusting the result. That check caught one planted bug that hadn't applied.
 
+## Development
+
+```sh
+npm ci              # install the development tools (there are no runtime dependencies)
+npm run check       # lint, type check and tests, exactly as CI runs them
+```
+
+- **Lint:** ESLint with the recommended rules plus `no-eval`, `no-implied-eval` and `no-new-func`.
+- **Types:** JSDoc annotations checked by `tsc --checkJs` in strict mode. There is no build step; the `.js` files run as they are.
+- **CI:** every pull request runs lint, type check, and tests on Node 22 and 24. `main` only accepts pull requests whose checks pass.
+
+The plan and the reasoning behind it live in [SPEC.md](SPEC.md) (goals, non-goals, acceptance criteria), [PLAN.md](PLAN.md) (tasks and how each is verified) and [docs/adr/](docs/adr/) (architecture decision records).
+
 ## Project layout
 
 ```text
@@ -245,9 +258,11 @@ bin/analyze.js                  command line: options, reading the file or stdin
 src/parse.js                    log lines to events (logins, logouts, sudo commands, account changes)
 src/detectors.js                the four rules and the grouping into incidents
 src/report.js                   terminal and JSON output
+src/types.js                    shared JSDoc types (events, findings, options)
 scripts/generate-sample-log.js  synthetic auth.log with a known answer key
 samples/auth.log                the generated sample
 test/                           parser, detector and end-to-end tests
+docs/adr/                       architecture decision records
 ```
 
 ## About this project
@@ -257,6 +272,8 @@ I built this to learn the fundamentals of SOC log analysis:
 - why raw line counts mislead;
 - how to connect events across different processes when no single line tells the whole story;
 - how to set thresholds so that real attacks stand out from everyday noise like typos and on-call logins.
+
+Development is AI-assisted: I set the direction, the requirements and the standards, and review the results; much of the code is written with Claude Code, an AI coding assistant, working under that direction.
 
 It is a learning project, not a production security tool. It has only been tested against the synthetic logs described above, not real-world traffic. It analyzes a file after the fact rather than watching live. Its account attribution is a best guess, as described in the limits above. On a real system, this job belongs to tools like fail2ban, auditd and a SIEM. This project is about understanding what those tools are doing underneath.
 
