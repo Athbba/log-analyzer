@@ -35,11 +35,16 @@ export class BoundedMap {
    * @param {string} name  What the entries are, for the health counters.
    * @param {number} maxSize
    * @param {Health} health
+   * @param {{ keep?: (value: V) => boolean }} [options]
+   *   `keep` marks entries worth protecting (an attack in progress). When the
+   *   map is full, the oldest entry that isn't kept goes first, so flooding the
+   *   map with one-off addresses can't push out a real attacker's state.
    */
-  constructor(name, maxSize, health) {
+  constructor(name, maxSize, health, { keep } = {}) {
     this.name = name;
     this.maxSize = maxSize;
     this.health = health;
+    this.keep = keep;
   }
 
   /** @param {K} key */
@@ -66,11 +71,7 @@ export class BoundedMap {
       this.#map.delete(key);
     }
     this.#map.set(key, value);
-    if (this.#map.size > this.maxSize) {
-      const oldest = this.#map.keys().next().value;
-      this.#map.delete(/** @type {K} */ (oldest));
-      this.health.drop(this.name);
-    }
+    if (this.#map.size > this.maxSize) this.#evictOne();
     return value;
   }
 
@@ -82,6 +83,23 @@ export class BoundedMap {
   set(key, value) {
     this.#map.delete(key);
     this.touch(key, () => value);
+  }
+
+  // Evicts the least recently used entry that isn't protected, looking at no
+  // more than the 64 oldest (so eviction stays O(1)); if all of those are
+  // protected, the oldest goes anyway and is counted separately.
+  #evictOne() {
+    let scanned = 0;
+    for (const [key, value] of this.#map) {
+      if (++scanned > 64) break;
+      if (!this.keep?.(value)) {
+        this.#map.delete(key);
+        this.health.drop(this.name);
+        return;
+      }
+    }
+    this.#map.delete(/** @type {K} */ (this.#map.keys().next().value));
+    this.health.drop(`${this.name} (protected)`);
   }
 
   /** @param {K} key */

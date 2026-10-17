@@ -102,3 +102,28 @@ test('an attacker IP is remembered for limits.memoryMs, then forgotten', async (
   assert.equal(analyze([...attack, laterLogin(8 * day)], { limits: { memoryMs: 9 * day } })
     .find((i) => i.ip === '198.51.100.23')?.findings[0].severity, 'high', 'memoryMs is configurable');
 });
+
+// --- Evasion attempts found in security review ---
+
+/** @param {string} ip @param {number} time @returns {AuthEvent} */
+const failure = (ip, time) => ({ type: 'failure', time, host: 'web01', pid: 1, line: 0, ip, user: 'root', invalidUser: false, method: 'password', count: 1 });
+
+test('flooding the state with one-off IPs does not evict an attack in progress', () => {
+  const engine = createEngine({ limits: { maxKeys: 1_000 } });
+  const start = Date.UTC(2026, 8, 7, 12);
+  for (let i = 0; i < 4; i++) engine.push(failure('198.51.100.66', start + i * 1000));
+  for (let i = 0; i < 5_000; i++) engine.push(failure(`2001:db8::${i.toString(16)}`, start + 5_000));
+  engine.push(failure('198.51.100.66', start + 6_000));
+  assert.deepEqual(engine.findings().map((f) => `${f.rule} ${f.ip}`), ['brute-force 198.51.100.66']);
+  assert.ok(engine.health.evicted['brute-force: IPs'] > 0, 'the flood itself was evicted');
+});
+
+test('one line from the far future does not age out every rule\'s state', () => {
+  const engine = createEngine();
+  const start = Date.UTC(2026, 8, 7, 12);
+  for (let i = 0; i < 4; i++) engine.push(failure('198.51.100.66', start + i * 1000));
+  engine.push(failure('203.0.113.1', Date.UTC(2027, 0, 1)));
+  engine.push(failure('198.51.100.66', start + 5_000));
+  assert.deepEqual(engine.findings().map((f) => `${f.rule} ${f.ip}`), ['brute-force 198.51.100.66']);
+  assert.equal(engine.health.evicted['engine: unconfirmed forward time jumps'], 1);
+});

@@ -47,6 +47,13 @@ import { createUnusualHour } from './rules/unusual-hour.js';
 
 /** @typedef {(ctx: RuleContext) => Rule} RuleFactory */
 
+// Eviction follows the log's clock, so a single forged line from far in the
+// future must not be able to age out every rule's state at once. A forward
+// jump of more than an hour only moves the eviction clock once three events
+// in a row agree with it. Detection itself always uses each event's own time.
+const MAX_CLOCK_JUMP_MS = 60 * 60_000;
+const JUMP_CONFIRMATIONS = 3;
+
 /** The rules, in the order they see each event. */
 export const RULES = /** @type {RuleFactory[]} */ ([createBruteForce, createPossibleBreach, createUnusualHour, createAccountChange]);
 
@@ -74,6 +81,7 @@ export function createEngine(options = {}, { onFinding, keepFindings = true, rul
   /** @type {Set<Finding>} */
   const dirty = new Set();
   let clock = -Infinity;
+  let jumpVotes = 0;
   let depth = 0;
 
   /** @type {Rule[]} */
@@ -116,9 +124,16 @@ export function createEngine(options = {}, { onFinding, keepFindings = true, rul
 
     /** @param {AuthEvent} event */
     push(event) {
-      if (event.time > clock) {
-        clock = event.time;
-        for (const rule of rules) rule.onAdvance?.(clock);
+      const jump = clock !== -Infinity && event.time > clock + MAX_CLOCK_JUMP_MS;
+      if (jump && ++jumpVotes < JUMP_CONFIRMATIONS) {
+        // Not yet confirmed: don't evict on its account.
+      } else {
+        if (!jump && jumpVotes > 0) health.drop('engine: unconfirmed forward time jumps');
+        jumpVotes = 0;
+        if (event.time > clock) {
+          clock = event.time;
+          for (const rule of rules) rule.onAdvance?.(clock);
+        }
       }
       for (const rule of rules) rule.onEvent(event);
     },

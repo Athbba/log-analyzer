@@ -42,7 +42,10 @@ import { BoundedMap, TimeWindow } from '../bounded.js';
 export function createBruteForce(ctx) {
   const { threshold, windowMs, limits } = ctx.options;
   /** @type {BoundedMap<string, IpState>} */
-  const ips = new BoundedMap('brute-force: IPs', limits.maxKeys, ctx.health);
+  // An IP with an attack, or more than one recent failure, outlives one-off IPs.
+  const ips = new BoundedMap('brute-force: IPs', limits.maxKeys, ctx.health, {
+    keep: (s) => s.attack !== null || s.waiting.length > 0 || s.inWindow > 1,
+  });
   /** @type {WeakMap<BruteForceFinding, Attack>} */
   const attacks = new WeakMap();
   let nextSweep = -Infinity;
@@ -152,6 +155,9 @@ export function createBruteForce(ctx) {
         state.logins.push(event);
         const stillWaiting = [];
         for (const attack of state.waiting) {
+          // Checked here, not only in the sweep, so the memory limit holds
+          // even when the sweep is late (see the clock guard in engine.js).
+          if (attack.finding.time < event.time - limits.memoryMs) continue;
           if (attack.finding.time <= event.time) {
             loggedIn(attack.finding, event);
             ctx.update(attack.finding);

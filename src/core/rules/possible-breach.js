@@ -33,7 +33,9 @@ import { BoundedMap, TimeWindow } from '../bounded.js';
 export function createPossibleBreach(ctx) {
   const { threshold, windowMs, lookbackMs, limits } = ctx.options;
   /** @type {BoundedMap<string, IpState>} */
-  const ips = new BoundedMap('possible-breach: IPs', limits.maxKeys, ctx.health);
+  const ips = new BoundedMap('possible-breach: IPs', limits.maxKeys, ctx.health, {
+    keep: (s) => s.failures.length > 1 || s.attacks.length > 0 || s.low.length > 0,
+  });
   let nextSweep = -Infinity;
 
   /** @returns {IpState} */
