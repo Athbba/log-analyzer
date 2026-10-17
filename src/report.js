@@ -176,6 +176,16 @@ export function attackLine(finding) {
   return techniques.length > 0 ? `ATT&CK ${techniques.map((t) => `${t.id} ${t.name}`).join(', ')}` : '';
 }
 
+/** A username with its attempts, e.g. "root (12)". @param {{ user: string, attempts: number }} u */
+const tally = (u) => `${u.user} (${u.attempts})`;
+
+/**
+ * The first five items, and how many more of `total` there are.
+ * @param {string[]} items
+ * @param {number} total
+ */
+const firstFive = (items, total) => `${items.slice(0, 5).join(', ')}${total > 5 ? `, +${total - 5} more` : ''}`;
+
 /**
  * The text lines describing one finding. They contain log fields: escape them
  * for the medium they are shown in.
@@ -185,12 +195,10 @@ export function attackLine(finding) {
 export function describe(f) {
   switch (f.rule) {
     case 'brute-force': {
-      const shown = f.users.slice(0, 5).map((u) => `${u.user} (${u.attempts})`).join(', ');
-      const rest = f.users.length > 5 ? `, +${f.users.length - 5} more` : '';
       const invalid = f.invalidUsers > 0 ? `, ${num(f.invalidUsers)} nonexistent` : '';
       return [
         `${plural(f.attempts, 'failed login')} over ${duration(f.until - f.time)}`,
-        `${plural(f.users.length, 'username')}${invalid}: ${shown}${rest}`,
+        `${plural(f.users.length, 'username')}${invalid}: ${firstFive(f.users.map(tally), f.users.length)}`,
         f.loggedIn
           ? `then logged in as ${f.loggedIn.user} (${f.loggedIn.method}) at ${stamp(f.loggedIn.time)}`
           : 'never logged in',
@@ -207,22 +215,18 @@ export function describe(f) {
     case 'unusual-hour':
       return [`${f.user} logged in (${f.method}) at ${hhmm(f.time)}`];
     case 'password-spray': {
-      const shown = f.users.slice(0, 5).map((u) => `${u.user} (${u.attempts})`).join(', ');
-      const rest = f.users.length > 5 ? `, +${f.users.length - 5} more` : '';
       return [
         `${plural(f.userCount, 'account')} tried a few times each, ${plural(f.attempts, 'failed login')} over ${duration(f.until - f.time)}`,
-        `${shown}${rest}`,
+        firstFive(f.users.map(tally), f.users.length),
         f.loggedIn
           ? `then logged in as ${f.loggedIn.user} (${f.loggedIn.method}) at ${stamp(f.loggedIn.time)}`
           : 'never logged in as any of them',
       ];
     }
     case 'distributed-brute-force': {
-      const shown = f.sources.slice(0, 5).map((s) => `${s.ip} (${s.attempts})`).join(', ');
-      const rest = f.sourceCount > 5 ? `, +${f.sourceCount - 5} more` : '';
       return [
         `${f.user}: ${plural(f.attempts, 'failed login')} from ${plural(f.sourceCount, 'source')} over ${duration(f.until - f.time)}`,
-        `${shown}${rest}`,
+        firstFive(f.sources.map((s) => `${s.ip} (${s.attempts})`), f.sourceCount),
         f.loggedIn
           ? `then ${f.user} logged in from ${f.loggedIn.ip} (${f.loggedIn.method}) at ${stamp(f.loggedIn.time)}`
           : 'no login from any of them',
