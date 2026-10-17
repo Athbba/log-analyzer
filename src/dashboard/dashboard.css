@@ -213,3 +213,4 @@ button {
   .incident-list a { grid-template-columns: 5.5rem minmax(0, 1fr); grid-template-areas: "sev where" ". rules" ". when" ". count"; }
   .incident-list .when, .incident-list .count { text-align: left; }
 }
+.finding .attack { color: var(--muted); font-size: 0.875rem; margin-top: 0.25rem; }
