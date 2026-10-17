@@ -98,6 +98,21 @@ node bin/analyze.js samples/auth.log --db runs.db
 ```
 
 Two rules, brute force and unusual hour, are also written in SQL (`src/io/sql-rules.js`). They are a second, independent implementation. Tests require them to produce exactly the findings of the JavaScript rules on the sample, the lab recording, 29 corpus logs, and 300 random event streams. The one exception is logs with spliced lines, which the tampering rule reports: there the streaming engine follows file order while SQL orders by time ([ADR-0015](docs/adr/0015-sqlite-storage.md)).
+### Dashboard
+
+A local web view of a database written with `--db`: a timeline of failed logins with each incident marked on it, filters by severity, rule and IP or username, and every incident's findings down to the raw log lines behind them.
+
+```sh
+node bin/analyze.js samples/auth.log --db runs.db
+npm run dashboard -- --db runs.db      # http://127.0.0.1:4797/ (--port, --ipv6)
+```
+
+![Dashboard overview: timeline and incident list](docs/images/dashboard-overview.jpg)
+
+![An incident with its findings and raw log lines](docs/images/dashboard-incident.jpg)
+
+Log content is hostile, so the dashboard is deliberately narrow ([ADR-0016](docs/adr/0016-local-read-only-dashboard.md)): it listens on loopback only and answers only its own `Host` (against DNS rebinding), serves GET and HEAD only, opens the database read-only, and sends no JavaScript at all, under a Content-Security-Policy of `default-src 'none'`. Every log field is escaped, including control characters and bidi overrides; tests render hostile usernames into every page and check they come out as text.
+
 ## Example: one attacker, start to finish
 
 `samples/auth.log` is four days of synthetic activity on a small web server, with attacks hidden among normal traffic. This is how the analyzer reports attacker B:
@@ -412,6 +427,7 @@ src/io/                         reading lines from files and stdin; the streamin
 src/io/follow.js, src/io/live.js  following a log through rotation; live mode
 src/io/sinks/                   live outputs: terminal, JSON lines, Discord
 src/io/store.js, sql-rules.js   SQLite storage, drill-down, and two rules in SQL
+bin/dashboard.js, src/dashboard/  local read-only dashboard: server, queries, HTML views
 src/parse.js, src/detectors.js  stable entry points: parseLines(), analyze()
 src/report.js                   terminal and JSON output
 src/types.js                    shared JSDoc types (events, findings, options)
