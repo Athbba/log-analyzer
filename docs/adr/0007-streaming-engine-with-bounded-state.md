@@ -33,6 +33,16 @@ it). Live mode needs the same rules on an endless stream with flat memory.
   1,000 usernames per attack, and attacker IPs, breaches and sessions with no
   logout are remembered for 7 days (`limits.memoryMs`). Every drop caused by a
   cap is counted and printed as a warning; expiry by age is not a drop.
+- **Caps resist flooding.** When a map is full, the oldest entry that isn't
+  protected goes first (at most 64 are scanned). A rule protects the state
+  that matters, such as an IP with an attack or more than one recent failure,
+  so a flood of one-off addresses can't push out a real attacker's partial
+  attack. Forced evictions of protected entries are counted separately.
+- **The eviction clock resists forged timestamps.** A forward jump of more
+  than an hour moves the clock that drives eviction only after three events
+  in a row agree with it, so one forged far-future line can't age out every
+  rule's state. Detection always uses each event's own time, and abandoned
+  jumps are counted in health.
 - **Same results as before** on in-order input, with three deliberate,
   documented differences:
   1. memory is 7 days, not "the whole file";
