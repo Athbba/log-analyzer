@@ -2,6 +2,7 @@
 // server's wall clock (see parse.js), so they are printed without a timezone.
 
 import { styleText } from 'node:util';
+import { techniquesFor, withAttack } from './core/attack.js';
 import { safeText } from './core/text.js';
 import { SEVERITIES } from './detectors.js';
 
@@ -126,6 +127,7 @@ export function formatText({ source, stats, options, incidents, health }, { colo
       const [first, ...more] = describe(finding).map(safeText);
       out.push(`  ${paint('dim', stamp(finding.time))}  ${paint(COLORS[finding.severity], LABELS[finding.rule].padEnd(17))}${first}`);
       for (const line of more) out.push(INDENT + line);
+      out.push(INDENT + paint('dim', attackLine(finding)));
     }
   }
 
@@ -139,6 +141,14 @@ export function formatText({ source, stats, options, incidents, health }, { colo
   }
   return out.join('\n') + '\n';
 }
+
+/**
+ * A finding's ATT&CK techniques as one line, e.g. "ATT&CK T1110.001 Brute
+ * Force: Password Guessing". Fixed text only, no log fields.
+ * @param {Finding} finding
+ */
+export const attackLine = (finding) =>
+  `ATT&CK ${techniquesFor(finding).map((t) => `${t.id} ${t.name}`).join(', ')}`;
 
 /**
  * The text lines describing one finding. They contain log fields: escape them
@@ -234,7 +244,7 @@ export function formatJson({ source, stats, options, incidents, health }) {
     },
     summary: countBySeverity(incidents),
     ...(health && { health }),
-    incidents,
+    incidents: incidents.map((i) => ({ ...i, findings: i.findings.map(withAttack) })),
   };
   /** @param {string} key @param {unknown} value */
   const replacer = (key, value) =>

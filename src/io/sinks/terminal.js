@@ -3,8 +3,9 @@
 // escaped for the terminal (core/text.js).
 
 import { styleText } from 'node:util';
+import { withAttack } from '../../core/attack.js';
 import { safeText } from '../../core/text.js';
-import { LABELS, describe, stamp } from '../../report.js';
+import { LABELS, attackLine, describe, stamp } from '../../report.js';
 
 /** @typedef {import('../../core/live-incidents.js').IncidentEvent} IncidentEvent */
 /** @typedef {import('../live.js').Sink} Sink */
@@ -32,6 +33,7 @@ export function createTerminalSink({ write, color = false, minSeverity = 'low' }
       write(`${paint('dim', stamp(finding.time))}  ${paint(['bold', COLORS[incident.severity]], `${incident.severity.toUpperCase()} (${what})`.padEnd(14))}`
         + `${paint('bold', where)}  ${LABELS[finding.rule]}: ${first}\n`);
       for (const line of more) write(`${' '.repeat(35)}${line}\n`);
+      write(`${' '.repeat(35)}${paint('dim', attackLine(finding))}\n`);
     },
     onNotice(message) {
       write(`${paint('dim', `note: ${safeText(message)}`)}\n`);
@@ -54,7 +56,8 @@ export function createJsonLinesSink({ write }) {
     onIncident({ type, incident, finding }) {
       const { key, ...shown } = incident;
       void key;
-      write(`${JSON.stringify({ event: type, incident: shown, finding }, replacer)}\n`);
+      const labelled = { ...shown, findings: shown.findings.map(withAttack) };
+      write(`${JSON.stringify({ event: type, incident: labelled, finding: finding && withAttack(finding) }, replacer)}\n`);
     },
     onNotice(message) {
       write(`${JSON.stringify({ event: 'notice', message })}\n`);
