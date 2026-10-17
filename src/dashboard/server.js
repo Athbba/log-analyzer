@@ -13,6 +13,7 @@
 
 import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
+import { errorMessage } from '../io/cli.js';
 import { openStore } from '../io/store.js';
 import { countIncidents, failureTrace, incidentDetail, incidentsFor, listRuns, RULES, runSummary, SEVERITIES } from './queries.js';
 import { errorPage, incidentPage, overviewPage } from './views.js';
@@ -134,7 +135,7 @@ export function createDashboard({ dbPath, host = '127.0.0.1', port = 4797 }) {
     try {
       handle(req, res);
     } catch (err) {
-      console.error(`dashboard: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(`dashboard: ${errorMessage(err)}`);
       if (!res.headersSent) send(res, 500, 'text/plain; charset=utf-8', 'Something went wrong reading the database.\n', false);
       else res.destroy();
     }

@@ -3,6 +3,7 @@
 
 import { readFileSync } from 'node:fs';
 import { SHELL_DEFAULTS, parseConfig } from '../core/config.js';
+import { errorMessage } from './cli.js';
 
 /** @typedef {import('../types.js').AnalyzerOptions} AnalyzerOptions */
 /** @typedef {import('../core/config.js').ShellSettings} ShellSettings */
@@ -25,13 +26,13 @@ export function loadConfig(path) {
     if (path === undefined && /** @type {NodeJS.ErrnoException} */ (err).code === 'ENOENT') {
       return { options: {}, settings: SHELL_DEFAULTS, path: null };
     }
-    throw new ConfigError(`can't read config ${file}: ${err instanceof Error ? err.message : String(err)}`);
+    throw new ConfigError(`can't read config ${file}: ${errorMessage(err)}`);
   }
   let raw;
   try {
     raw = JSON.parse(text);
   } catch (err) {
-    throw new ConfigError(`config ${file} is not valid JSON: ${err instanceof Error ? err.message : String(err)}`);
+    throw new ConfigError(`config ${file} is not valid JSON: ${errorMessage(err)}`);
   }
   const { options, settings, errors } = parseConfig(raw);
   if (errors.length > 0) throw new ConfigError(`config ${file}:\n${errors.map((e) => `  - ${e}`).join('\n')}`);

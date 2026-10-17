@@ -13,6 +13,7 @@ import { toConfig } from '../src/core/config.js';
 import { resolveOptions } from '../src/core/options.js';
 import { DEFAULTS } from '../src/detectors.js';
 import { analyzeStream } from '../src/io/analyze-stream.js';
+import { errorMessage, fail } from '../src/io/cli.js';
 import { ConfigError, DEFAULT_CONFIG_PATH, loadConfig } from '../src/io/config.js';
 import { startLive } from '../src/io/live.js';
 import { createDiscordSink } from '../src/io/sinks/discord.js';
@@ -55,17 +56,7 @@ Exit status: 0 if nothing high-severity was found (or --follow was stopped),
  * @returns {never}
  */
 function usageError(message) {
-  console.error(`error: ${message}\n\n${USAGE}`);
-  process.exit(2);
-}
-
-/**
- * @param {string} message
- * @returns {never}
- */
-function fail(message) {
-  console.error(`error: ${message}`);
-  process.exit(2);
+  return fail(message, USAGE);
 }
 
 const { values, positionals } = readArgs();
@@ -276,11 +267,6 @@ function readArgs() {
   } catch (err) {
     return usageError(errorMessage(err));
   }
-}
-
-/** @param {unknown} err */
-function errorMessage(err) {
-  return err instanceof Error ? err.message : String(err);
 }
 
 /** @param {string} path */

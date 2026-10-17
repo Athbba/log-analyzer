@@ -10,6 +10,7 @@
 import { createEngine } from '../core/engine.js';
 import { createIncidentTracker } from '../core/live-incidents.js';
 import { createParser } from '../core/parse.js';
+import { errorMessage } from './cli.js';
 import { createFollower } from './follow.js';
 
 /** @typedef {import('../types.js').AnalyzerOptions} AnalyzerOptions */
@@ -45,7 +46,7 @@ export function startLive({ path, sinks, options = {}, year, fromStart = false, 
         try {
           sink.onIncident?.(event);
         } catch (err) {
-          console.error(`${sink.name}: ${err instanceof Error ? err.message : String(err)}`);
+          console.error(`${sink.name}: ${errorMessage(err)}`);
         }
       }
     }

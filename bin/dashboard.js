@@ -7,6 +7,7 @@
 import { existsSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { createDashboard } from '../src/dashboard/server.js';
+import { errorMessage, fail } from '../src/io/cli.js';
 
 const USAGE = `Usage: node bin/dashboard.js --db <file> [--port <n>] [--ipv6]
 
@@ -17,33 +18,22 @@ let values;
 try {
   ({ values } = parseArgs({ options: { db: { type: 'string' }, port: { type: 'string' }, ipv6: { type: 'boolean' }, help: { type: 'boolean', short: 'h' } } }));
 } catch (err) {
-  console.error(`error: ${err instanceof Error ? err.message : String(err)}\n\n${USAGE}`);
-  process.exit(2);
+  fail(errorMessage(err), USAGE);
 }
 if (values.help) {
   console.log(USAGE);
   process.exit(0);
 }
-if (!values.db) {
-  console.error(`error: give the database with --db\n\n${USAGE}`);
-  process.exit(2);
-}
-if (!existsSync(values.db)) {
-  console.error(`error: ${values.db} doesn't exist; create it with: node bin/analyze.js <log> --db ${values.db}`);
-  process.exit(2);
-}
+if (!values.db) fail('give the database with --db', USAGE);
+if (!existsSync(values.db)) fail(`${values.db} doesn't exist; create it with: node bin/analyze.js <log> --db ${values.db}`);
 const port = values.port === undefined ? 4797 : Number(values.port);
-if (!Number.isInteger(port) || port < 0 || port > 65535) {
-  console.error('error: --port must be a number from 0 to 65535');
-  process.exit(2);
-}
+if (!Number.isInteger(port) || port < 0 || port > 65535) fail('--port must be a number from 0 to 65535');
 
 let dashboard;
 try {
   dashboard = createDashboard({ dbPath: values.db, port, host: values.ipv6 ? '::1' : '127.0.0.1' });
 } catch (err) {
-  console.error(`error: can't open ${values.db}: ${err instanceof Error ? err.message : String(err)}`);
-  process.exit(2);
+  fail(`can't open ${values.db}: ${errorMessage(err)}`);
 }
 const url = await dashboard.listen();
 console.log(`Dashboard at ${url} (Ctrl+C to stop)`);
