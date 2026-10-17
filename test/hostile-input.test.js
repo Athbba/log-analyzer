@@ -28,6 +28,13 @@ test('lines split across chunks, including inside a multi-byte character, come o
   assert.equal(splitter.end(), null);
 });
 
+test('a partial line survives the caller reusing its buffer for the next read', () => {
+  const splitter = new LineSplitter();
+  const buffer = Buffer.alloc(8);
+  const read = (/** @type {string} */ text) => splitter.push(buffer.subarray(0, buffer.write(text)));
+  assert.deepEqual([...read('one\ntw'), ...read('o\nthree\n')], ['one', 'two', 'three']);
+});
+
 test('a line longer than the limit is skipped as one empty line, and counted', () => {
   const splitter = new LineSplitter(100);
   const lines = [

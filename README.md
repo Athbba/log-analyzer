@@ -23,13 +23,17 @@ Requires Node.js 22 or later.
 node bin/analyze.js samples/auth.log            # terminal report
 node bin/analyze.js samples/auth.log --json     # machine-readable output
 sudo cat /var/log/auth.log | node bin/analyze.js -   # read from stdin
+sudo node bin/analyze.js --follow /var/log/auth.log  # watch live, report incidents as they happen
 npm test                                        # run the tests
 npm run generate-sample                         # rebuild samples/auth.log
 ```
 
 ```text
 Options:
-  --json              Print the results as JSON
+  --json              Print the results as JSON (with --follow: one JSON object per line)
+  --follow            Keep watching the log, through rotation, and report incidents as they happen
+  --from-start        With --follow, read what is already in the file first
+  --discord           Send alerts to the Discord webhook in DISCORD_WEBHOOK_URL (or .env)
   --config <file>     Settings file (default log-analyzer.config.json, if it exists)
   --print-config      Print the effective settings as a config file and exit
   --threshold <n>     Failed logins from one IP that count as brute force (default 5)
@@ -50,6 +54,39 @@ Every rule's settings can go in one JSON file. Copy [log-analyzer.config.example
 ```json
 { "trustedNetworks": ["10.0.0.0/8"] }
 ```
+
+### Live mode
+
+`--follow` watches the log as it is written, like `tail -F`, and reports each incident as it opens, escalates (a brute force becoming a break-in), or gains a new kind of finding:
+
+```text
+2026-10-17 10:46:37  MEDIUM (new)  172.30.0.77  brute force: 5 failed logins over 13s
+                                   2 usernames: deploy (3), root (2)
+                                   never logged in
+2026-10-17 10:46:37  HIGH (now)    172.30.0.77  brute force: 10 failed logins over 28s
+                                   2 usernames: deploy (8), root (2)
+                                   then logged in as deploy (password) at 2026-10-17 10:47:07
+2026-10-17 10:47:07  HIGH (also)   172.30.0.77  possible breach: deploy logged in (password) after 10 failed logins in the previous 30s
+2026-10-17 10:47:09  HIGH (also)   172.30.0.77  account change: new user sysupdate, member of sudo
+                                   by deploy via sudo, in a session from 172.30.0.77
+                                   172.30.0.77 broke in as deploy at 2026-10-17 10:47:07 after 10 failed logins
+```
+
+That is the Docker-lab break-in, replayed into a file a few lines at a time: the attack is reported at its fifth guess, escalated when the attacker gets in, and the backdoor account joins the same incident. `(also)` lines are new findings in an incident that is already open; they don't send a second Discord alert.
+
+It survives logrotate in both modes (rename-and-create, and copytruncate) and the file briefly disappearing. It reports the file shrinking with no rotated copy beside it as log tampering, at high severity. Memory stays flat, because rule state is bounded and incidents close after 24 hours without news (`live.incidentIdle`). Ctrl+C or SIGTERM stops it cleanly: it reads what is left, closes the open incidents, and gives pending alerts up to 5 seconds. With `--json`, each incident event is one JSON object per line, for piping into other tools.
+
+### Discord alerts
+
+`--discord` sends one alert when an incident opens at medium or above, and one more when it escalates: one attack is one alert, however many lines it writes. Alerts are queued and rate-limited (5 at once, then 20 a minute), retried with backoff when Discord is busy, and never slow detection down. Log content in an alert sits inside a code block with mentions disabled, so a username like `@everyone` or a markdown link stays inert text.
+
+To set it up, create a webhook in Discord (Server Settings → Integrations → Webhooks → New Webhook → Copy Webhook URL). Then put it in a `.env` file next to where you run the tool. `.env` is git-ignored, and [.env.example](.env.example) shows the format:
+
+```sh
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/<id>/<token>
+```
+
+The tool reads it with Node's own `.env` support and never prints it. Thresholds live in the config file under `discord` (`minSeverity`, `burst`, `perMinute`). `--discord` also works without `--follow`, sending one alert per incident in the report, which suits a nightly cron job.
 
 ## Example: one attacker, start to finish
 
@@ -290,7 +327,7 @@ The synthetic sample only contains formats the generator knows about, so the ana
 
 ### Test suites
 
-85 tests using Node's built-in `node:test`. Run them with `npm test`.
+112 tests using Node's built-in `node:test`. Run them with `npm test`.
 
 - `test/parse.test.js`: each line type, `message repeated` counting, spoofed usernames, IPv6, RFC 3339, the December-to-January year change, unreadable lines.
 - `test/detectors.test.js`: each rule's thresholds and boundaries (4 vs 5 failures, a window exactly 10 minutes wide, 00:59 vs 01:00 vs 05:00), plus each way an account change can or can't be linked to a break-in.
@@ -300,6 +337,9 @@ The synthetic sample only contains formats the generator knows about, so the ana
 - `test/hostile-input.test.js`: lines split mid-character, the line-length cap (a 50 MB line never buffers more than 8 KiB), adversarial regex input under a time budget, escaped terminal output, and year inference.
 - `test/rules.test.js`: the newer rules, each with what it must catch and the lookalikes it must not: scanner noise and office-NAT typos for spraying; roaming users, nonexistent accounts and IPv6 address rotation for distributed attacks; learning, first logins, shared and trusted networks for new sources; NTP steps and DST for tampering.
 - `test/config.test.js`: the config file round trip, rejection of typos and wrong types, flags overriding the file, and the IP and network helpers.
+- `test/follow.test.js`: the follower on real files: partial lines, rotation by rename, copytruncate, truncation, a file that disappears.
+- `test/live-incidents.test.js`, `test/live.test.js`: incident events (one opened, one escalated), shutdown, truncation as tampering, the CLI with `--follow --json` and SIGTERM, `--discord` with the URL from `.env`, and a 100,000-line soak run with state bounded.
+- `test/discord.test.js`: the Discord sink against a local mock webhook: dedup, hostile content kept inert, 429 with `retry_after`, 5xx retries, 4xx not retried, a slow server not blocking the caller, the rate limit, a full queue, and a hanging server at shutdown.
 - `test/sample.test.js`: an end-to-end check that the sample log produces exactly the incidents in the table above, plus the command line (exit codes, `--json`, stdin, bad arguments).
 
 ### Planted-bug testing
@@ -358,6 +398,8 @@ bin/analyze.js                  command line: options, reading the file or stdin
 src/core/                       the pure core: parser, year inference, engine, rules, incidents
 src/core/rules/                 brute force, possible breach, unusual hour, account change
 src/io/                         reading lines from files and stdin; the streaming analysis
+src/io/follow.js, src/io/live.js  following a log through rotation; live mode
+src/io/sinks/                   live outputs: terminal, JSON lines, Discord
 src/parse.js, src/detectors.js  stable entry points: parseLines(), analyze()
 src/report.js                   terminal and JSON output
 src/types.js                    shared JSDoc types (events, findings, options)
@@ -386,7 +428,7 @@ I built this to learn the fundamentals of SOC log analysis:
 
 Development is AI-assisted: I set the direction, the requirements and the standards, and review the results; much of the code is written with Claude Code, an AI coding assistant, working under that direction.
 
-It is a learning project, not a production security tool. It has been tested against the synthetic logs and the Docker-lab logs described above, not real-world traffic. It analyzes a file after the fact; watching a live log is the next milestone. Lines in `auth.log` are not authenticated, so any local user can forge one with `logger -t sshd`, and the analyzer is only as trustworthy as the system logger. Its account attribution is a best guess, as described in the limits above. On a real system, this job belongs to tools like fail2ban, auditd and a SIEM. This project is about understanding what those tools are doing underneath.
+It is a learning project, not a production security tool. It has been tested against the synthetic logs and the Docker-lab logs described above, not real-world traffic. It can analyze a file after the fact or follow a live log. Lines in `auth.log` are not authenticated, so any local user can forge one with `logger -t sshd`, and the analyzer is only as trustworthy as the system logger. Its account attribution is a best guess, as described in the limits above. On a real system, this job belongs to tools like fail2ban, auditd and a SIEM. This project is about understanding what those tools are doing underneath.
 
 ## License
 
