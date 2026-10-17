@@ -152,6 +152,23 @@ function beginStoredRun(mode, name) {
 }
 
 /**
+ * Records a stored run's totals and closes the database, if --db was given.
+ * @param {{ run: number } | null} stored
+ * @param {Parameters<NonNullable<typeof store>['finishRun']>[1]} totals
+ */
+function finishStoredRun(stored, totals) {
+  if (!store || !stored) return;
+  store.finishRun(stored.run, totals);
+  store.close();
+  console.error(`stored as run ${stored.run} in ${values.db}`);
+}
+
+/** Whether to colour terminal output. */
+function useColor() {
+  return Boolean(process.stdout.isTTY && !process.env.NO_COLOR);
+}
+
+/**
  * @param {string} path
  * @param {ReturnType<typeof createDiscordSink> | null} alerts
  */
@@ -159,7 +176,7 @@ async function follow(path, alerts) {
   /** @param {string} text */
   const write = (text) => { process.stdout.write(text); };
   /** @type {Sink[]} */
-  const sinks = [values.json ? createJsonLinesSink({ write }) : createTerminalSink({ write, color: process.stdout.isTTY && !process.env.NO_COLOR })];
+  const sinks = [values.json ? createJsonLinesSink({ write }) : createTerminalSink({ write, color: useColor() })];
   if (alerts) sinks.push(alerts);
   const stored = beginStoredRun('follow', path);
   if (store && stored) {
@@ -187,11 +204,7 @@ async function follow(path, alerts) {
     fail(`can't follow ${path}: ${errorMessage(err)}`);
   }
   const report = alerts ? result.sinks[1] : null;
-  if (store && stored) {
-    store.finishRun(stored.run, { stats: result.stats, health: result.health });
-    store.close();
-    console.error(`stored as run ${stored.run} in ${values.db}`);
-  }
+  finishStoredRun(stored, { stats: result.stats, health: result.health });
   console.error(`stopped after ${result.lines.toLocaleString('en-US')} lines${report ? `; Discord: ${JSON.stringify(report)}` : ''}`);
   process.exit(0);
 }
@@ -209,16 +222,12 @@ async function analyzeOnce(path, alerts) {
     fail(`can't read ${path}: ${errorMessage(err)}`);
   }
   const { stats, incidents, health } = analysis;
-  if (store && stored) {
-    store.saveIncidents(stored.run, incidents);
-    store.finishRun(stored.run, { stats, health });
-    store.close();
-    console.error(`stored as run ${stored.run} in ${values.db}`);
-  }
+  if (store && stored) store.saveIncidents(stored.run, incidents);
+  finishStoredRun(stored, { stats, health });
   const result = { source: path === '-' ? 'stdin' : path, stats, options: analysis.options, incidents, health };
   process.stdout.write(values.json
     ? formatJson(result)
-    : formatText(result, { color: process.stdout.isTTY && !process.env.NO_COLOR }));
+    : formatText(result, { color: useColor() }));
   process.exitCode = incidents.some((i) => i.severity === 'high') ? 1 : 0;
   if (alerts) {
     // One alert per incident in the report, at or above the alert threshold.
