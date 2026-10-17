@@ -10,6 +10,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createDashboard, SECURITY_HEADERS } from '../src/dashboard/server.js';
 import { escapeHtml, href, html } from '../src/dashboard/html.js';
+import { incidentPage } from '../src/dashboard/views.js';
 import { analyzeStream } from '../src/io/analyze-stream.js';
 import { openStore } from '../src/io/store.js';
 
@@ -234,4 +235,12 @@ test('the template escapes by default and builds same-site links only', () => {
   // eslint-disable-next-line no-script-url -- the link builder must refuse it
   assert.throws(() => href('javascript:alert(1)'));
   assert.throws(() => href('//evil.example/'));
+});
+
+test('the dashboard shows each finding\'s techniques, linked to attack.mitre.org', () => {
+  const run = /** @type {any} */ ({ id: 1, source: 'auth.log' });
+  const incident = { id: 1, ip: '192.0.2.1', subject: null, severity: 'medium', time: 0, last: 0, closed: 1 };
+  const finding = /** @type {any} */ ({ rule: 'log-tampering', severity: 'medium', ip: null, time: 0, kind: 'gap', until: 0, line: 1, detail: 'no lines' });
+  const page = incidentPage({ run, incident, findings: [{ id: 7, finding, lines: [], more: false }], total: 1 });
+  assert.match(page, /<a href="https:\/\/attack\.mitre\.org\/techniques\/T1685\/006\/" rel="noreferrer">T1685\.006<\/a> Disable or Modify Tools: Clear Linux or Mac System Logs/);
 });
