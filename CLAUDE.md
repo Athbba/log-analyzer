@@ -29,6 +29,8 @@ npm run lab:fixture  # same, but refresh test/fixtures/lab/auth.log
   deterministic: no I/O, no clock, no randomness, no dependencies. All I/O
   (files, network, database, signals) lives in the CLI and the sinks.
 - **Tests first.** Write the failing test, then the code. Show real output.
+- **Keep command output short.** Use quiet flags and show only failing
+  tests, not full logs.
 - **Bounded state.** Any detector state that grows with input needs an
   eviction rule and a cap, and a test proving both.
 - **Decisions** that a future maintainer would ask "why?" about get a short
