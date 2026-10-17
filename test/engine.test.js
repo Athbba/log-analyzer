@@ -59,7 +59,8 @@ test('state stays under its caps however many IPs attack, and the drops are coun
   // 200,000 failures from 100,000 IPs in one minute (so nothing ages out), plus
   // one IP with 5,000 failures for 2,000 usernames.
   for (let i = 0; i < 200_000; i++) {
-    const ip = `2001:db8::${(i % 100_000).toString(16)}`;
+    const n = i % 100_000;
+    const ip = `10.${n >> 16}.${(n >> 8) & 255}.${n & 255}`;
     engine.push({ type: 'failure', time: start + Math.floor(i / 4_000) * 1000, host: 'web01', pid: 1, line: i, ip, user: 'root', invalidUser: false, method: 'password', count: 1 });
   }
   for (let i = 0; i < 5_000; i++) {
@@ -112,9 +113,11 @@ test('flooding the state with one-off IPs does not evict an attack in progress',
   const engine = createEngine({ limits: { maxKeys: 1_000 } });
   const start = Date.UTC(2026, 8, 7, 12);
   for (let i = 0; i < 4; i++) engine.push(failure('198.51.100.66', start + i * 1000));
-  for (let i = 0; i < 5_000; i++) engine.push(failure(`2001:db8::${i.toString(16)}`, start + 5_000));
+  for (let i = 0; i < 5_000; i++) engine.push(failure(`10.1.${i >> 8}.${i & 255}`, start + 5_000));
   engine.push(failure('198.51.100.66', start + 6_000));
-  assert.deepEqual(engine.findings().map((f) => `${f.rule} ${f.ip}`), ['brute-force 198.51.100.66']);
+  // The flood itself is reported too: thousands of sources guessing root is a
+  // distributed brute force.
+  assert.deepEqual(engine.findings().map((f) => `${f.rule} ${f.ip}`), ['distributed-brute-force null', 'brute-force 198.51.100.66']);
   assert.ok(engine.health.evicted['brute-force: IPs'] > 0, 'the flood itself was evicted');
 });
 
@@ -126,4 +129,14 @@ test('one line from the far future does not age out every rule\'s state', () => 
   engine.push(failure('198.51.100.66', start + 5_000));
   assert.deepEqual(engine.findings().map((f) => `${f.rule} ${f.ip}`), ['brute-force 198.51.100.66']);
   assert.equal(engine.health.evicted['engine: unconfirmed forward time jumps'], 1);
+});
+
+test('an IPv6 attacker using a new address for every guess is caught per /64', () => {
+  const engine = createEngine();
+  const start = Date.UTC(2026, 8, 7, 12);
+  for (let i = 0; i < 5; i++) engine.push(failure(`2001:db8:66:1::${(i + 1).toString(16)}`, start + i * 1000));
+  assert.deepEqual(engine.findings().map((f) => `${f.rule} ${f.ip}`), ['brute-force 2001:db8:66:1::/64']);
+  const exact = createEngine({ ipv6Prefix: 128 });
+  for (let i = 0; i < 5; i++) exact.push(failure(`2001:db8:66:1::${(i + 1).toString(16)}`, start + i * 1000));
+  assert.deepEqual(exact.findings(), [], 'with ipv6Prefix 128, each address is on its own');
 });

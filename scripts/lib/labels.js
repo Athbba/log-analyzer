@@ -10,7 +10,8 @@ import { parseLines } from '../../src/parse.js';
 /**
  * @typedef {object} LabelledIncident
  * @property {string} scenario  The scenario that produces it.
- * @property {string | null} ip  Source IP (null for findings with no single IP).
+ * @property {string | null} [ip]  Source IP; null for findings with no single IP.
+ * @property {string} [subject]  For incidents with no IP: their subject, e.g. "user dave".
  * @property {string[]} findings  Expected findings as "rule:severity", in any order.
  */
 
@@ -44,20 +45,24 @@ export async function checkLabels(text, labels) {
 
   /** @param {{ rule: string, severity: string }[]} findings */
   const summary = (findings) => findings.map((f) => `${f.rule}:${f.severity}`).sort().join(', ');
+  /** @param {{ ip?: string | null, subject?: string | null }} x */
+  const keyOf = (x) => (x.subject ? `subject ${x.subject}` : `ip ${x.ip ?? null}`);
   const seen = new Set();
   for (const label of labels.incidents) {
-    const incident = incidents.find((i) => i.ip === label.ip);
-    seen.add(label.ip);
+    const key = keyOf(label);
+    const incident = incidents.find((i) => keyOf(i) === key);
+    seen.add(key);
+    const name = label.subject ?? label.ip;
     const expected = [...label.findings].sort().join(', ');
     if (!incident) {
-      problems.push(`${label.scenario}: no incident for ${label.ip}, expected ${expected}`);
+      problems.push(`${label.scenario}: no incident for ${name}, expected ${expected}`);
     } else if (summary(incident.findings) !== expected) {
-      problems.push(`${label.scenario}: ${label.ip} has ${summary(incident.findings)}, expected ${expected}`);
+      problems.push(`${label.scenario}: ${name} has ${summary(incident.findings)}, expected ${expected}`);
     }
   }
   if (labels.exhaustive) {
-    for (const incident of incidents.filter((i) => !seen.has(i.ip))) {
-      problems.push(`unexpected incident for ${incident.ip}: ${summary(incident.findings)}`);
+    for (const incident of incidents.filter((i) => !seen.has(keyOf(i)))) {
+      problems.push(`unexpected incident for ${incident.subject ?? incident.ip}: ${summary(incident.findings)}`);
     }
   }
   return problems;

@@ -25,11 +25,15 @@ test('finds exactly the injected attacks in the sample log', () => {
   assert.equal(stats.successes, 44);
 
   assert.deepEqual(incidents.map((i) => [i.ip, i.severity, i.findings.map((f) => `${f.rule}:${f.severity}`)]), [
-    ['198.51.100.23', 'high', ['brute-force:high', 'possible-breach:high', 'unusual-hour:low', 'account-change:high']], // B
+    // B: the new-source rule adds that deploy had never logged in from there.
+    ['198.51.100.23', 'high', ['brute-force:high', 'possible-breach:high', 'new-source:medium', 'unusual-hour:low', 'account-change:high']],
     ['203.0.113.45', 'medium', ['brute-force:medium']], // A
     ['10.0.1.81', 'medium', ['account-change:low', 'account-change:medium']], // G: dave onboards erin
     ['10.0.1.57', 'low', ['possible-breach:low', 'possible-breach:low', 'possible-breach:low']], // F: bob's typos
-    ['10.8.0.22', 'low', ['unusual-hour:low']], // C: on-call dave
+    // Benign lookalikes for the new-source rule, at low: carol from home over
+    // IPv6, and on-call dave over the VPN (C), each a first for that user.
+    ['2001:db8:4a2::/64', 'low', ['new-source:low']],
+    ['10.8.0.22', 'low', ['new-source:low', 'unusual-hour:low']],
   ]);
 
   const [a, b] = [incident('203.0.113.45').findings[0], incident('198.51.100.23').findings[0]];
@@ -72,7 +76,7 @@ test('CLI prints a report and exits 1 when something is high severity', () => {
   assert.match(stdout, /^HIGH {4}198\.51\.100\.23$/m);
   assert.match(stdout, /then logged in as deploy \(password\) at 2026-09-09 03:39:12/);
   assert.match(stdout, /account change {3}new user sysupdate, member of sudo\n +by deploy via sudo, in a session from 198\.51\.100\.23/);
-  assert.match(stdout, /5 incidents: 1 high, 2 medium, 2 low/);
+  assert.match(stdout, /6 incidents: 1 high, 2 medium, 3 low/);
 });
 
 test('CLI --json reads stdin and prints wall-clock times', () => {
@@ -80,9 +84,9 @@ test('CLI --json reads stdin and prints wall-clock times', () => {
   assert.equal(status, 1);
   const report = JSON.parse(stdout);
   assert.equal(report.source, 'stdin');
-  assert.deepEqual(report.summary, { high: 1, medium: 2, low: 2 });
+  assert.deepEqual(report.summary, { high: 1, medium: 2, low: 3 });
   assert.equal(report.incidents[0].findings[0].time, '2026-09-09T03:21:40');
-  assert.equal(report.incidents[0].findings[3].afterBreach.time, '2026-09-09T03:39:12');
+  assert.equal(report.incidents[0].findings.find((f) => f.rule === 'account-change').afterBreach.time, '2026-09-09T03:39:12');
 });
 
 test('CLI exits 0 on a clean log and 2 on bad input', () => {

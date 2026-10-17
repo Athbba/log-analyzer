@@ -7,11 +7,23 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import fc from 'fast-check';
-import { analyze } from '../src/detectors.js';
+import { ORIGINAL_RULES, createEngine } from '../src/core/engine.js';
+import { toIncidents } from '../src/core/incidents.js';
 import { analyze as reference } from './reference/batch-detectors.js';
 
 /** @typedef {import('../src/types.js').AuthEvent} AuthEvent */
 /** @typedef {import('../src/types.js').Incident} Incident */
+
+/**
+ * The engine running only the four rules the reference implements, on events
+ * sorted the way the reference sorts them.
+ * @param {AuthEvent[]} events
+ */
+function analyze(events) {
+  const engine = createEngine({}, { rules: ORIGINAL_RULES });
+  for (const event of [...events].sort((a, b) => a.time - b.time || a.line - b.line)) engine.push(event);
+  return toIncidents(engine.findings());
+}
 
 const START = Date.UTC(2026, 8, 7, 0, 30);
 const IPS = ['198.51.100.1', '198.51.100.2', '203.0.113.3', '10.0.0.4'];
@@ -78,11 +90,11 @@ function toEvents(actions) {
  * Order-independent form of a result: incidents by IP, findings by content.
  * The engine orders ties deterministically (by IP); the batch version left
  * them in an incidental order, so order is compared separately below.
- * @param {Incident[]} incidents
+ * @param {Omit<Incident, 'subject'>[]} incidents
  */
 function normalize(incidents) {
   return incidents
-    .map((i) => ({ ...i, findings: i.findings.map((f) => JSON.stringify(f)).sort() }))
+    .map(({ ip, severity, time, findings }) => ({ ip, severity, time, findings: findings.map((f) => JSON.stringify(f)).sort() }))
     .sort((a, b) => String(a.ip).localeCompare(String(b.ip)));
 }
 
@@ -107,7 +119,7 @@ test('engine and batch rules agree with same-second ties, for the rules without 
   // engine only uses what the log has said so far, so account changes are
   // left out of this comparison; the test above covers them.
   const steps = [0, 0, 1_000, 5_000, MINUTE, 4 * MINUTE, 9 * MINUTE, 10 * MINUTE, 11 * MINUTE, 30 * MINUTE, 31 * MINUTE];
-  /** @param {Incident[]} incidents */
+  /** @param {Omit<Incident, 'subject'>[]} incidents */
   const withoutAccounts = (incidents) => normalize(incidents.map((i) => ({ ...i, findings: i.findings.filter((f) => f.rule !== 'account-change') }))
     .filter((i) => i.findings.length > 0)
     .map((i) => ({ ...i, severity: i.findings.some((f) => f.severity === 'high') ? 'high' : i.findings.some((f) => f.severity === 'medium') ? 'medium' : 'low', time: Math.min(...i.findings.map((f) => f.time)) })));

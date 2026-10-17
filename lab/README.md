@@ -21,20 +21,26 @@ build.
 | `office` | 172.30.0.20 | alice, bob and dave doing normal work |
 | `attacker-guess` | 172.30.0.66 | dictionary attack on common account names |
 | `attacker-breakin` | 172.30.0.77 | guesses `deploy`'s password, plants a sudo user |
+| `attacker-spray` | 172.30.0.88 | one password against ten real accounts |
+| `attacker-dist-1` … `-5` | 172.30.0.101–105 | two guesses each at `dave`'s password |
 
 Scenarios run one after another, in this order:
 
 | Scenario | Script | Expected findings |
 |---|---|---|
-| admin work | [admin-work.sh](client/scenarios/admin-work.sh) | possible breach (low) ×2, account change (low, medium) |
+| admin work | [admin-work.sh](client/scenarios/admin-work.sh) | possible breach (low), account change (low, medium) |
 | password guessing | [guessing.sh](client/scenarios/guessing.sh) | brute force (medium) |
 | break-in + backdoor | [break-in.sh](client/scenarios/break-in.sh) | brute force, possible breach, account change, all high |
+| password spray | [spray.sh](client/scenarios/spray.sh) | password spray and brute force (medium) |
+| distributed attack | [distributed.sh](client/scenarios/distributed.sh), from five clients | distributed brute force on `dave` (medium) |
 
 The expected findings are in [test/fixtures/lab/labels.json](../test/fixtures/lab/labels.json),
-with a note on each. The second low possible breach in the admin work is a
-real false positive the lab exposed: dave's key login comes two seconds after
-bob's mistyped password from the same workstation, and the rule counts
-failures from the IP for any username.
+with a note on each, and the ground truth that docs/evaluation.md measures
+against. The lab's first run exposed a real false positive: dave's key login
+two seconds after bob's mistyped password from the same workstation counted as
+a possible breach, because the rule counted failures from the IP for any
+username. A key login after other users' failures is no longer reported (see
+docs/detections.md).
 
 ## Safety
 

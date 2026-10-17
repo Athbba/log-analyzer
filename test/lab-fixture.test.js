@@ -45,8 +45,10 @@ test('reads the current OpenSSH, sudo and shadow-utils formats the lab records',
   const sudo = events.filter((e) => e.type === 'sudo').map((e) => e.type === 'sudo' && `${e.user}: ${e.command}`);
   assert.ok(sudo.includes('deploy: /usr/sbin/useradd -m -s /bin/bash -G sudo sysupdate'), sudo.join('\n'));
 
-  // RFC 3339 timestamps keep the server clock (10:16 here), whatever the offset.
-  assert.equal(new Date(login.time).toISOString().slice(11, 16), '10:16');
+  // RFC 3339 timestamps keep the server clock, whatever the offset.
+  const raw = LOG.split('\n')[login.line - 1];
+  assert.match(raw, /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d+[+-]\d\d:\d\d /);
+  assert.equal(new Date(login.time).toISOString().slice(0, 19), raw.slice(0, 19));
 });
 
 test('the lab clock is set to about 10:00 whatever time the lab runs', () => {

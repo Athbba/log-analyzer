@@ -42,7 +42,7 @@ const SUDO_MATCH_MS = MINUTE;
  * Runs every rule and returns incidents (one per IP), most severe first.
  * @param {AuthEvent[]} events
  * @param {Partial<Options>} [options]
- * @returns {Incident[]}
+ * @returns {Omit<Incident, "subject">[]}
  */
 export function analyze(events, options = {}) {
   /** @type {Options} */
@@ -286,7 +286,7 @@ function sshSessions(events) {
 
 /**
  * @param {Finding[]} findings
- * @returns {Incident[]}
+ * @returns {Omit<Incident, "subject">[]}
  */
 function toIncidents(findings) {
   /** @param {Severity} severity */

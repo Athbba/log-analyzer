@@ -7,19 +7,26 @@
 
 import { open } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
+import { toConfig } from '../src/core/config.js';
+import { resolveOptions } from '../src/core/options.js';
 import { DEFAULTS } from '../src/detectors.js';
 import { analyzeStream } from '../src/io/analyze-stream.js';
+import { ConfigError, DEFAULT_CONFIG_PATH, loadConfig } from '../src/io/config.js';
 import { duration, formatJson, formatText } from '../src/report.js';
 
-/** @typedef {import('../src/types.js').Options} Options */
+/** @typedef {import('../src/types.js').AnalyzerOptions} AnalyzerOptions */
 
 const USAGE = `Usage: node bin/analyze.js [options] <auth.log | ->
 
-Finds SSH brute-force attempts, logins that follow failed attempts, logins at
-unusual hours, and new or newly-admin accounts. Pass - to read the log from stdin.
+Finds SSH brute force, password spraying, distributed attacks on one account,
+logins that follow failed attempts, logins from new networks or at unusual
+hours, new or newly-admin accounts, and signs of log tampering. Pass - to read
+the log from stdin.
 
 Options:
   --json              Print the results as JSON
+  --config <file>     Settings file (default ${DEFAULT_CONFIG_PATH}, if it exists)
+  --print-config      Print the effective settings as a config file and exit
   --threshold <n>     Failed logins from one IP that count as brute force (default ${DEFAULTS.threshold})
   --window <time>     ...within this window, e.g. 90s, 10m, 1h (default ${duration(DEFAULTS.windowMs)})
   --lookback <time>   How far before a login to look for failures (default ${duration(DEFAULTS.lookbackMs)})
@@ -44,16 +51,29 @@ if (values.help) {
   console.log(USAGE);
   process.exit(0);
 }
-if (positionals.length !== 1) usageError('give exactly one log file, or - for stdin');
-
-/** @type {Options} */
+let config;
+try {
+  config = loadConfig(values.config);
+} catch (err) {
+  if (!(err instanceof ConfigError)) throw err;
+  console.error(`error: ${err.message}`);
+  process.exit(2);
+}
+// Flags override the config file, which overrides the defaults.
+/** @type {AnalyzerOptions} */
 const options = {
-  threshold: values.threshold === undefined ? DEFAULTS.threshold : positiveInt(values.threshold, '--threshold'),
-  windowMs: values.window === undefined ? DEFAULTS.windowMs : parseDuration(values.window, '--window'),
-  lookbackMs: values.lookback === undefined ? DEFAULTS.lookbackMs : parseDuration(values.lookback, '--lookback'),
-  night: values.night === undefined ? DEFAULTS.night : parseHours(values.night),
-  adminGroups: values['admin-groups'] === undefined ? DEFAULTS.adminGroups : parseGroups(values['admin-groups']),
+  ...config.options,
+  threshold: values.threshold === undefined ? config.options.threshold : positiveInt(values.threshold, '--threshold'),
+  windowMs: values.window === undefined ? config.options.windowMs : parseDuration(values.window, '--window'),
+  lookbackMs: values.lookback === undefined ? config.options.lookbackMs : parseDuration(values.lookback, '--lookback'),
+  night: values.night === undefined ? config.options.night : parseHours(values.night),
+  adminGroups: values['admin-groups'] === undefined ? config.options.adminGroups : parseGroups(values['admin-groups']),
 };
+if (values['print-config']) {
+  console.log(JSON.stringify(toConfig(resolveOptions(options)), null, 2));
+  process.exit(0);
+}
+if (positionals.length !== 1) usageError('give exactly one log file, or - for stdin');
 if (values.year !== undefined && !/^\d{4}$/.test(values.year)) usageError('--year must be a four-digit year');
 const year = values.year === undefined ? undefined : Number(values.year);
 
@@ -67,7 +87,7 @@ try {
 }
 
 const { stats, incidents, health } = analysis;
-const result = { source: source === '-' ? 'stdin' : source, stats, options, incidents, health };
+const result = { source: source === '-' ? 'stdin' : source, stats, options: analysis.options, incidents, health };
 
 // Exit quietly if the reader goes away early, e.g. when piped into `head`.
 process.stdout.on('error', (err) => {
@@ -85,6 +105,8 @@ function readArgs() {
       allowPositionals: true,
       options: {
         json: { type: 'boolean' },
+        config: { type: 'string' },
+        'print-config': { type: 'boolean' },
         threshold: { type: 'string' },
         window: { type: 'string' },
         lookback: { type: 'string' },

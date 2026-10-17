@@ -38,13 +38,17 @@ Status: `[x]` done, `[ ]` to do.
 
 ## M2b: New detections (`feat/m2b-detections`)
 
-- [ ] Config file loader with validation; tuning options for every rule. *Check: unit tests for defaults, overrides, rejections.*
-- [ ] Password spraying. *Check: positive + lookalike tests (office NAT, scanner noise).*
-- [ ] Distributed brute force. *Check: positive + lookalike tests (internet root noise, misconfigured service).*
-- [ ] First login from a new source. *Check: positive + lookalike tests (learning period, same /24 or /64, roaming).*
-- [ ] Log tampering: gaps, backwards time, truncation, NUL bytes. *Check: positive + lookalike tests (quiet night, NTP step, DST).*
-- [ ] Generator scenarios + labels; lab scenarios for spraying and distributed attacks. *Check: labels files list every scenario.*
-- [ ] `npm run eval`: precision/recall per rule per dataset → `docs/evaluation.md`. *Check: CI regenerates it and fails if it differs from the committed file.*
+- [x] Config file loader with strict validation; tuning options for every rule. *Check: round trip of the defaults; typos and wrong types rejected; CLI flags override the file; bad file exits 2.*
+- [x] Password spraying. *Check: positive tests plus lookalikes: scanner noise, office-NAT typos, a dictionary attack.*
+- [x] Distributed brute force. *Check: positive tests plus lookalikes: roaming user, nonexistent accounts, IPv6 rotation in one /64, trusted networks.*
+- [x] First login from a new source. *Check: learning period, first-ever login, same /24, shared office network, trusted networks that still build the baseline.*
+- [x] Log tampering: gaps, backwards time, truncation signal, NUL bytes. *Check: NTP steps and DST (with and without offsets) don't alert.*
+- [x] IPv6 counted per /64 in every attempt-counting rule. *Check: rotation within a /64 is one brute force.*
+- [x] Shared-IP false positive from M1 fixed. *Check: lab labels now expect one low possible breach on the office IP.*
+- [x] 11 planted bugs in the new rules. *Check: all 11 caught.*
+- [x] Labelled synthetic corpus (40 seeded datasets) and lab scenarios for spraying and distributed attacks, with truth labels. *Check: lab run matches labels; corpus is deterministic (CI regenerates it).*
+- [x] `npm run eval`: precision/recall per rule → `docs/evaluation.md`. *Check: CI job `eval` fails if the committed file differs.*
+- [x] docs/detections.md: every rule's lines, tuning and false positives. *Check: counts match docs/evaluation.md.*
 
 ## M3: Live mode (`feat/m3-live-mode`)
 

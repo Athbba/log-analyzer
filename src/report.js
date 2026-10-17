@@ -7,7 +7,7 @@ import { SEVERITIES } from './detectors.js';
 
 /** @typedef {import('./types.js').Finding} Finding */
 /** @typedef {import('./types.js').Incident} Incident */
-/** @typedef {import('./types.js').Options} Options */
+/** @typedef {import('./types.js').ResolvedOptions} Options */
 /** @typedef {import('./types.js').ParseStats} ParseStats */
 /** @typedef {import('./types.js').Severity} Severity */
 /**
@@ -23,6 +23,10 @@ const LABELS = {
   'possible-breach': 'possible breach',
   'unusual-hour': 'unusual hour',
   'account-change': 'account change',
+  'password-spray': 'password spray',
+  'distributed-brute-force': 'distributed',
+  'new-source': 'new source',
+  'log-tampering': 'log tampering',
 };
 /** @type {Record<Severity, 'red' | 'yellow' | 'cyan'>} */
 const COLORS = { high: 'red', medium: 'yellow', low: 'cyan' };
@@ -98,9 +102,22 @@ export function formatText({ source, stats, options, incidents, health }, { colo
     `  unusual hour     a login between ${pad2(from)}:00 and ${pad2((to + 23) % 24)}:59`,
     `  account change   a new user, or a user added to ${options.adminGroups.join('/')}; high if made from an IP that broke in`,
   );
+  const { spray, distributed, newSource, tampering } = options;
+  if (spray.enabled) {
+    out.push(`  password spray   ${spray.minUsers}+ real accounts from one source within ${duration(spray.windowMs)}, at most ${spray.maxAttemptsPerUser} tries each`);
+  }
+  if (distributed.enabled) {
+    out.push(`  distributed      one account guessed from ${distributed.minSources}+ sources (${distributed.minAttempts}+ failures) within ${duration(distributed.windowMs)}`);
+  }
+  if (newSource.enabled) {
+    out.push(`  new source       a login from a network the user hasn't logged in from before (after ${duration(newSource.learningMs)} of learning)`);
+  }
+  if (tampering.enabled) {
+    out.push(`  log tampering    no lines for ${duration(tampering.maxGapMs)}, time going back ${duration(tampering.maxBackwardsMs)}+, NUL bytes, or truncation`);
+  }
 
   for (const incident of incidents) {
-    const source = incident.ip === null ? 'no single source IP' : safeText(incident.ip);
+    const source = safeText(incident.ip ?? incident.subject ?? 'no single source IP');
     out.push('', paint(['bold', COLORS[incident.severity]], incident.severity.toUpperCase().padEnd(8)) + paint('bold', source));
     for (const finding of incident.findings) {
       // Every line of a description mixes fixed text with log fields, so the
@@ -151,6 +168,35 @@ function describe(f) {
     }
     case 'unusual-hour':
       return [`${f.user} logged in (${f.method}) at ${hhmm(f.time)}`];
+    case 'password-spray': {
+      const shown = f.users.slice(0, 5).map((u) => `${u.user} (${u.attempts})`).join(', ');
+      const rest = f.users.length > 5 ? `, +${f.users.length - 5} more` : '';
+      return [
+        `${plural(f.userCount, 'account')} tried a few times each, ${plural(f.attempts, 'failed login')} over ${duration(f.until - f.time)}`,
+        `${shown}${rest}`,
+        f.loggedIn
+          ? `then logged in as ${f.loggedIn.user} (${f.loggedIn.method}) at ${stamp(f.loggedIn.time)}`
+          : 'never logged in as any of them',
+      ];
+    }
+    case 'distributed-brute-force': {
+      const shown = f.sources.slice(0, 5).map((s) => `${s.ip} (${s.attempts})`).join(', ');
+      const rest = f.sourceCount > 5 ? `, +${f.sourceCount - 5} more` : '';
+      return [
+        `${f.user}: ${plural(f.attempts, 'failed login')} from ${plural(f.sourceCount, 'source')} over ${duration(f.until - f.time)}`,
+        `${shown}${rest}`,
+        f.loggedIn
+          ? `then ${f.user} logged in from ${f.loggedIn.ip} (${f.loggedIn.method}) at ${stamp(f.loggedIn.time)}`
+          : 'no login from any of them',
+      ];
+    }
+    case 'new-source':
+      return [
+        `${f.user} logged in (${f.method}) from ${f.network}, a network not seen for ${f.user} before`,
+        `previously from ${plural(f.knownNetworks, 'other network')}`,
+      ];
+    case 'log-tampering':
+      return [f.detail, f.kind === 'gap' ? `from ${stamp(f.time)} to ${stamp(f.until)}` : `noticed at line ${num(f.line)}`];
     case 'account-change': {
       const rootUid = f.uid === 0 ? ' with UID 0 (same as root)' : '';
       const lines = [f.created

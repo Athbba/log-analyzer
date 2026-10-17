@@ -1,0 +1,57 @@
+{
+  "bruteForce": {
+    "threshold": 5,
+    "window": "10m",
+    "ipv6Prefix": 64
+  },
+  "possibleBreach": {
+    "lookback": "30m",
+    "ignoreKeyLoginsAfterOthersFailures": true
+  },
+  "unusualHour": {
+    "night": "1-5"
+  },
+  "accountChange": {
+    "adminGroups": [
+      "sudo",
+      "wheel",
+      "admin"
+    ]
+  },
+  "passwordSpray": {
+    "enabled": true,
+    "minUsers": 6,
+    "window": "1h",
+    "maxAttemptsPerUser": 2,
+    "countInvalidUsers": false
+  },
+  "distributedBruteForce": {
+    "enabled": true,
+    "minSources": 4,
+    "minAttempts": 8,
+    "window": "1h",
+    "countInvalidUsers": false,
+    "ignoreUsers": []
+  },
+  "newSource": {
+    "enabled": true,
+    "learning": "1d",
+    "prefixV4": 24,
+    "prefixV6": 64,
+    "remember": "90d",
+    "sharedNetworkUsers": 2
+  },
+  "logTampering": {
+    "enabled": true,
+    "maxGap": "2h",
+    "maxBackwards": "5m",
+    "allowDstJumps": true
+  },
+  "trustedNetworks": [],
+  "limits": {
+    "maxKeys": 100000,
+    "maxEntriesPerKey": 5000,
+    "maxUsersPerFinding": 1000,
+    "memory": "7d"
+  }
+}

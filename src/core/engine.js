@@ -16,14 +16,19 @@ import { Health } from './bounded.js';
 import { resolveOptions } from './options.js';
 import { createAccountChange } from './rules/account-change.js';
 import { createBruteForce } from './rules/brute-force.js';
+import { createDistributedBruteForce } from './rules/distributed-brute-force.js';
+import { createLogTampering } from './rules/log-tampering.js';
+import { createNewSource } from './rules/new-source.js';
+import { createPasswordSpray } from './rules/password-spray.js';
 import { createPossibleBreach } from './rules/possible-breach.js';
 import { createUnusualHour } from './rules/unusual-hour.js';
 
 /** @typedef {import('../types.js').AuthEvent} AuthEvent */
 /** @typedef {import('../types.js').Finding} Finding */
-/** @typedef {import('../types.js').Options} Options */
-/** @typedef {import('../types.js').Limits} Limits */
+/** @typedef {import('../types.js').AnalyzerOptions} AnalyzerOptions */
 /** @typedef {import('../types.js').ResolvedOptions} ResolvedOptions */
+/** @typedef {import('../types.js').LineInfo} LineInfo */
+/** @typedef {import('../types.js').SourceSignal} SourceSignal */
 
 /**
  * What a rule gets from the engine.
@@ -41,6 +46,8 @@ import { createUnusualHour } from './rules/unusual-hour.js';
  * @property {(event: AuthEvent) => void} onEvent  Called for every event, in order.
  * @property {(finding: Finding, isNew: boolean) => void} [onFinding]  Another rule's finding appeared or changed.
  * @property {(time: number) => void} [onAdvance]  The log's clock moved forward to `time`: evict old state.
+ * @property {(info: LineInfo) => void} [onLine]  Every recognized line, for rules about the log itself.
+ * @property {(signal: SourceSignal) => void} [onSignal]  Something the shell saw about the input (truncation).
  * @property {(finding: Finding) => void} [materialize]  Fill in derived fields before the finding is handed out.
  * @property {() => { keys: number, entries: number }} size  State held, for bounded-memory tests.
  */
@@ -54,8 +61,13 @@ import { createUnusualHour } from './rules/unusual-hour.js';
 const MAX_CLOCK_JUMP_MS = 60 * 60_000;
 const JUMP_CONFIRMATIONS = 3;
 
-/** The rules, in the order they see each event. */
-export const RULES = /** @type {RuleFactory[]} */ ([createBruteForce, createPossibleBreach, createUnusualHour, createAccountChange]);
+/** The four rules of v0.1.0, which test/reference/ reimplements in batch form. */
+export const ORIGINAL_RULES = /** @type {RuleFactory[]} */ ([createBruteForce, createPossibleBreach, createUnusualHour, createAccountChange]);
+
+/** All rules, in the order they see each event. */
+export const RULES = /** @type {RuleFactory[]} */ ([
+  ...ORIGINAL_RULES, createPasswordSpray, createDistributedBruteForce, createNewSource, createLogTampering,
+]);
 
 /**
  * @typedef {object} EngineOptions
@@ -68,7 +80,7 @@ export const RULES = /** @type {RuleFactory[]} */ ([createBruteForce, createPoss
  */
 
 /**
- * @param {Partial<Options> & { limits?: Partial<Limits> }} [options]
+ * @param {AnalyzerOptions} [options]
  * @param {EngineOptions} [engineOptions]
  */
 export function createEngine(options = {}, { onFinding, keepFindings = true, rules: factories = RULES } = {}) {
@@ -106,6 +118,21 @@ export function createEngine(options = {}, { onFinding, keepFindings = true, rul
   }
 
   /**
+   * Moves the eviction clock, unless this is an unconfirmed big jump forward.
+   * @param {number} time
+   */
+  function observe(time) {
+    const jump = clock !== -Infinity && time > clock + MAX_CLOCK_JUMP_MS;
+    if (jump && ++jumpVotes < JUMP_CONFIRMATIONS) return;
+    if (!jump && jumpVotes > 0) health.drop('engine: unconfirmed forward time jumps');
+    jumpVotes = 0;
+    if (time > clock) {
+      clock = time;
+      for (const rule of rules) rule.onAdvance?.(clock);
+    }
+  }
+
+  /**
    * Marks a finding for the next flush and tells the other rules about it.
    * @param {Finding} finding
    * @param {boolean} isNew
@@ -124,18 +151,24 @@ export function createEngine(options = {}, { onFinding, keepFindings = true, rul
 
     /** @param {AuthEvent} event */
     push(event) {
-      const jump = clock !== -Infinity && event.time > clock + MAX_CLOCK_JUMP_MS;
-      if (jump && ++jumpVotes < JUMP_CONFIRMATIONS) {
-        // Not yet confirmed: don't evict on its account.
-      } else {
-        if (!jump && jumpVotes > 0) health.drop('engine: unconfirmed forward time jumps');
-        jumpVotes = 0;
-        if (event.time > clock) {
-          clock = event.time;
-          for (const rule of rules) rule.onAdvance?.(clock);
-        }
-      }
+      observe(event.time);
       for (const rule of rules) rule.onEvent(event);
+    },
+
+    /**
+     * Reports a recognized line (whether or not it became an event). The
+     * streaming path calls this for every line; `analyze(events)` can't, so
+     * log-tampering only works on whole logs read through the CLI.
+     * @param {LineInfo} info
+     */
+    line(info) {
+      observe(info.time);
+      for (const rule of rules) rule.onLine?.(info);
+    },
+
+    /** @param {SourceSignal} signal */
+    signal(signal) {
+      for (const rule of rules) rule.onSignal?.(signal);
     },
 
     /**
