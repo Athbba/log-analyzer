@@ -9,6 +9,11 @@ node_modules/
 !samples/auth.log
 !test/fixtures/**/*.log
 
+# Databases written with --db hold copies of the log lines they analyzed.
+*.db
+*.db-wal
+*.db-shm
+
 # Test coverage
 coverage/
 *.lcov
