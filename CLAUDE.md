@@ -38,3 +38,11 @@ npm run lab:fixture  # same, but refresh test/fixtures/lab/auth.log
 - **Decisions** that a future maintainer would ask "why?" about get a short
   ADR in `docs/adr/`.
 - Conventional commits; one branch and PR per milestone; never push to `main`.
+- **Small commits, small PRs.** One logical change per commit, with a
+  conventional commit message.
+- **Rebase and merge only.** Never squash-merge; every commit lands on
+  `main` on its own. Keep rebase merging enabled in the repo settings.
+  Never rewrite anything already on `main`.
+- **Save usage.** Let CI run the Docker lab (`lab-e2e`) instead of running
+  it locally; use the browser only for one final visual check.
+- **Leave `AGENTS.md` out of commits.**
