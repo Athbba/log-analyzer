@@ -286,17 +286,18 @@ function positiveInt(value, flag) {
   return Number(value);
 }
 
-/** @type {Record<string, number>} */
-const UNIT_MS = { s: 1000, m: 60_000, h: 3_600_000 };
-
 /**
  * @param {string} value
  * @param {string} flag
  */
 function parseDuration(value, flag) {
+  // Local, not module-level: this runs from top-level code above any
+  // module-level const below it, which would still be uninitialized.
+  /** @type {Record<string, number>} */
+  const unitMs = { s: 1000, m: 60_000, h: 3_600_000 };
   const m = /^(\d+)(s|m|h)?$/.exec(value);
   if (!m || Number(m[1]) === 0) return usageError(`${flag} must be a duration like 90s, 10m or 1h`);
-  return Number(m[1]) * UNIT_MS[m[2] ?? 'm'];
+  return Number(m[1]) * unitMs[m[2] ?? 'm'];
 }
 
 /** @param {string} value */
