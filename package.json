@@ -13,6 +13,7 @@
   },
   "scripts": {
     "analyze": "node bin/analyze.js",
+    "dashboard": "node bin/dashboard.js",
     "test": "node --test \"test/**/*.test.js\"",
     "lint": "eslint .",
     "typecheck": "tsc -p . && tsc -p test",

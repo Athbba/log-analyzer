@@ -11,6 +11,7 @@ npm run lint         # ESLint
 npm run typecheck    # tsc --checkJs on JSDoc types, strict
 npm run check        # all three, as CI runs them
 node bin/analyze.js --follow <log> [--discord]   # live mode (webhook URL in .env, never read it)
+npm run dashboard -- --db <file>   # local read-only dashboard on 127.0.0.1:4797
 npm run bench        # speed and memory benchmark (--lines N, --collect, --json)
 npm run eval         # precision/recall on labelled data -> docs/evaluation.md (--check in CI)
 npm run lab          # Docker lab: play the scenarios, collect and check auth.log
