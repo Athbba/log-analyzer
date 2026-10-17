@@ -61,8 +61,9 @@ Status: `[x]` done, `[ ]` to do.
 
 ## M4: Storage (`feat/m4-sqlite`)
 
-- [ ] Schema + migrations, store sink. *Check: round-trip tests.*
-- [ ] SQL brute force + SQL unusual hour (+ possible breach if feasible). *Check: equivalence tests on sample, lab, random streams.*
+- [x] Schema v1 (runs, lines, events, incidents, findings), versioned; store for batch and live mode via `--db`. *Check: CLI round trip against the JSON report; live incidents updated and closed; newer schema refused; read-only enforced; hostile strings stored as data.*
+- [x] Drill-down: from a finding to its raw lines. *Check: attacker B's brute force returns its 14 guesses and the login.*
+- [x] SQL brute force + SQL unusual hour. *Check: identical findings to JavaScript on the sample (3 settings), the lab, 29 corpus logs, 300 random streams with ties and IPv6; 4 planted SQL bugs all caught.*
 
 ## M5: Dashboard (`feat/m5-dashboard`)
 

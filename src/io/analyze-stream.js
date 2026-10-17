@@ -9,6 +9,13 @@ import { readLines } from './read-lines.js';
 
 /** @typedef {import('../types.js').AnalyzerOptions} AnalyzerOptions */
 /** @typedef {import('../report.js').RunHealth} RunHealth */
+/** @typedef {import('../types.js').AuthEvent} AuthEvent */
+/** @typedef {import('../types.js').LineInfo} LineInfo */
+
+/**
+ * Called for every line, with what it parsed to (for storage).
+ * @typedef {(line: { text: string, lineNo: number, event: AuthEvent | null, info: LineInfo | null }) => void} LineTap
+ */
 
 export const MAX_LINE_LENGTH = 8192;
 
@@ -19,8 +26,9 @@ export const MAX_LINE_LENGTH = 8192;
  * @param {number} [settings.year]  Year of the first syslog line.
  * @param {number} [settings.now]  For the year guess; defaults to the current time.
  * @param {number} [settings.maxLineLength]
+ * @param {LineTap} [settings.tap]
  */
-export async function analyzeStream(stream, { options = {}, year, now = Date.now(), maxLineLength = MAX_LINE_LENGTH } = {}) {
+export async function analyzeStream(stream, { options = {}, year, now = Date.now(), maxLineLength = MAX_LINE_LENGTH, tap } = {}) {
   const { lines, splitter } = readLines(stream, { maxLength: maxLineLength });
   const parser = createParser({ year, now });
   const engine = createEngine(options);
@@ -29,6 +37,7 @@ export async function analyzeStream(stream, { options = {}, year, now = Date.now
     const { event, info } = parser.read(line, ++lineNo);
     if (info) engine.line(info);
     if (event) engine.push(event);
+    tap?.({ text: line, lineNo, event, info });
   }
   /** @type {RunHealth} */
   const health = { oversizedLines: splitter.oversized, maxLineLength, evicted: { ...engine.health.evicted } };

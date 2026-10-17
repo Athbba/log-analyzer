@@ -33,8 +33,9 @@ import { createFollower } from './follow.js';
  * @param {number} [settings.pollMs]
  * @param {number} [settings.idleMs]  Close incidents after this long without findings (log time).
  * @param {number} [settings.closeDeadlineMs]  How long sinks get to finish at shutdown.
+ * @param {import('./analyze-stream.js').LineTap} [settings.tap]  Called for every line (for storage).
  */
-export function startLive({ path, sinks, options = {}, year, fromStart = false, pollMs = 250, idleMs, closeDeadlineMs = 5000 }) {
+export function startLive({ path, sinks, options = {}, year, fromStart = false, pollMs = 250, idleMs, closeDeadlineMs = 5000, tap }) {
   const follower = createFollower(path, { pollMs, fromStart });
   const parser = createParser({ year, now: Date.now() });
   /** @param {IncidentEvent[]} events */
@@ -73,6 +74,7 @@ export function startLive({ path, sinks, options = {}, year, fromStart = false, 
             engine.line(info);
           }
           if (event) engine.push(event);
+          tap?.({ text: item.text, lineNo, event, info });
           if (++sinceFlush >= 1000) flush();
           break;
         }
