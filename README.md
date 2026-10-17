@@ -122,16 +122,21 @@ HIGH    198.51.100.23
   2026-09-09 03:21:40  brute force      14 failed logins over 16m 1s
                                         2 usernames: deploy (12), root (2)
                                         then logged in as deploy (password) at 2026-09-09 03:39:12
+                                        ATT&CK T1110.001 Brute Force: Password Guessing
   2026-09-09 03:39:12  possible breach  deploy logged in (password) after 14 failed logins in the previous 17m 32s
+                                        ATT&CK T1110.001 Brute Force: Password Guessing, T1078.003 Valid Accounts: Local Accounts
   2026-09-09 03:39:12  new source       deploy logged in (password) from 198.51.100.0/24, a network not seen for deploy before
                                         previously from 1 other network
+                                        ATT&CK T1078.003 Valid Accounts: Local Accounts, T1021.004 Remote Services: SSH
   2026-09-09 03:39:12  unusual hour     deploy logged in (password) at 03:39
+                                        ATT&CK T1078.003 Valid Accounts: Local Accounts
   2026-09-09 03:40:56  account change   new user sysupdate, member of sudo
                                         by deploy via sudo, in a session from 198.51.100.23
                                         198.51.100.23 broke in as deploy at 2026-09-09 03:39:12 after 14 failed logins
+                                        ATT&CK T1136.001 Create Account: Local Account, T1098.007 Account Manipulation: Additional Local or Domain Groups
 ```
 
-In words: B guessed the `deploy` account's password over about 17 minutes, logged in at 3:39 AM from a network `deploy` had never used, and less than two minutes later created a new sudo user called `sysupdate` as a backdoor. Five rules fire, and they appear together under one IP.
+In words: B guessed the `deploy` account's password over about 17 minutes, logged in at 3:39 AM from a network `deploy` had never used, and less than two minutes later created a new sudo user called `sysupdate` as a backdoor. Five rules fire, and they appear together under one IP, each labelled with the MITRE ATT&CK techniques it is evidence of ([docs/detections.md](docs/detections.md)).
 
 <details>
 <summary>Full report for the sample log</summary>
@@ -155,38 +160,52 @@ HIGH    198.51.100.23
   2026-09-09 03:21:40  brute force      14 failed logins over 16m 1s
                                         2 usernames: deploy (12), root (2)
                                         then logged in as deploy (password) at 2026-09-09 03:39:12
+                                        ATT&CK T1110.001 Brute Force: Password Guessing
   2026-09-09 03:39:12  possible breach  deploy logged in (password) after 14 failed logins in the previous 17m 32s
+                                        ATT&CK T1110.001 Brute Force: Password Guessing, T1078.003 Valid Accounts: Local Accounts
   2026-09-09 03:39:12  new source       deploy logged in (password) from 198.51.100.0/24, a network not seen for deploy before
                                         previously from 1 other network
+                                        ATT&CK T1078.003 Valid Accounts: Local Accounts, T1021.004 Remote Services: SSH
   2026-09-09 03:39:12  unusual hour     deploy logged in (password) at 03:39
+                                        ATT&CK T1078.003 Valid Accounts: Local Accounts
   2026-09-09 03:40:56  account change   new user sysupdate, member of sudo
                                         by deploy via sudo, in a session from 198.51.100.23
                                         198.51.100.23 broke in as deploy at 2026-09-09 03:39:12 after 14 failed logins
+                                        ATT&CK T1136.001 Create Account: Local Account, T1098.007 Account Manipulation: Additional Local or Domain Groups
 
 MEDIUM  203.0.113.45
   2026-09-08 02:14:10  brute force      36 failed logins over 2m 58s
                                         16 usernames, 15 nonexistent: root (18), admin (4), administrator (1), ftpuser (1), git (1), +11 more
                                         never logged in
+                                        ATT&CK T1110.001 Brute Force: Password Guessing
 
 MEDIUM  10.0.1.81
   2026-09-10 11:22:17  account change   new user erin
                                         by dave via sudo, in a session from 10.0.1.81
+                                        ATT&CK T1136.001 Create Account: Local Account
   2026-09-10 11:23:53  account change   erin added to sudo
                                         by dave via sudo, in a session from 10.0.1.81
+                                        ATT&CK T1098.007 Account Manipulation: Additional Local or Domain Groups
 
 LOW     10.0.1.57
   2026-09-07 09:01:50  possible breach  bob logged in (password) 6s after 1 failed login
+                                        ATT&CK T1110.001 Brute Force: Password Guessing, T1078.003 Valid Accounts: Local Accounts
   2026-09-09 09:03:04  possible breach  bob logged in (password) 5s after 1 failed login
+                                        ATT&CK T1110.001 Brute Force: Password Guessing, T1078.003 Valid Accounts: Local Accounts
   2026-09-10 09:19:38  possible breach  bob logged in (password) 6s after 1 failed login
+                                        ATT&CK T1110.001 Brute Force: Password Guessing, T1078.003 Valid Accounts: Local Accounts
 
 LOW     2001:db8:4a2::/64
   2026-09-09 10:27:32  new source       carol logged in (publickey) from 2001:db8:4a2::/64, a network not seen for carol before
                                         previously from 1 other network
+                                        ATT&CK T1078.003 Valid Accounts: Local Accounts, T1021.004 Remote Services: SSH
 
 LOW     10.8.0.22
   2026-09-10 01:52:13  new source       dave logged in (publickey) from 10.8.0.0/24, a network not seen for dave before
                                         previously from 1 other network
+                                        ATT&CK T1078.003 Valid Accounts: Local Accounts, T1021.004 Remote Services: SSH
   2026-09-10 01:52:13  unusual hour     dave logged in (publickey) at 01:52
+                                        ATT&CK T1078.003 Valid Accounts: Local Accounts
 
 6 incidents: 1 high, 2 medium, 3 low
 ```
