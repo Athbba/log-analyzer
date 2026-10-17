@@ -5,7 +5,7 @@
 import { styleText } from 'node:util';
 import { withAttack } from '../../core/attack.js';
 import { safeText } from '../../core/text.js';
-import { LABELS, attackLine, describe, stamp } from '../../report.js';
+import { LABELS, attackLine, describe, stamp, wallClockReplacer } from '../../report.js';
 
 /** @typedef {import('../../core/live-incidents.js').IncidentEvent} IncidentEvent */
 /** @typedef {import('../live.js').Sink} Sink */
@@ -49,9 +49,7 @@ export function createTerminalSink({ write, color = false, minSeverity = 'low' }
  * @returns {Sink}
  */
 export function createJsonLinesSink({ write }) {
-  const timeKeys = new Set(['time', 'until', 'last', 'firstFailure']);
-  /** @param {string} key @param {unknown} value */
-  const replacer = (key, value) => (timeKeys.has(key) && typeof value === 'number' ? new Date(value).toISOString().slice(0, 19) : value);
+  const replacer = wallClockReplacer(['time', 'until', 'last', 'firstFailure']);
   return {
     name: 'json',
     onIncident({ type, incident, finding }) {

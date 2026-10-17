@@ -231,11 +231,21 @@ export function describe(f) {
 }
 
 /**
+ * A JSON.stringify replacer that prints the numbers under `keys` as
+ * wall-clock ISO strings without a zone, e.g. "2026-09-09T03:39:12".
+ * @param {string[]} keys
+ * @returns {(key: string, value: unknown) => unknown}
+ */
+export function wallClockReplacer(keys) {
+  const timeKeys = new Set(keys);
+  return (key, value) => (timeKeys.has(key) && typeof value === 'number' ? new Date(value).toISOString().slice(0, 19) : value);
+}
+
+/**
  * The JSON report. Times are printed as wall-clock ISO strings without a zone.
  * @param {Result} result
  */
 export function formatJson({ source, stats, options, incidents, health }) {
-  const timeKeys = new Set(['time', 'until', 'firstFailure', 'first', 'last']);
   const report = {
     source,
     stats,
@@ -249,8 +259,5 @@ export function formatJson({ source, stats, options, incidents, health }) {
     ...(health && { health }),
     incidents: incidents.map((i) => ({ ...i, findings: i.findings.map(withAttack) })),
   };
-  /** @param {string} key @param {unknown} value */
-  const replacer = (key, value) =>
-    timeKeys.has(key) && typeof value === 'number' ? new Date(value).toISOString().slice(0, 19) : value;
-  return JSON.stringify(report, replacer, 2) + '\n';
+  return JSON.stringify(report, wallClockReplacer(['time', 'until', 'firstFailure', 'first', 'last']), 2) + '\n';
 }
