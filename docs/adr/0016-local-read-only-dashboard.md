@@ -28,7 +28,10 @@ front-end build.
 - **Loopback only.** The server refuses to listen on anything but
   `127.0.0.1` or `::1`. It answers only requests whose `Host` header is its
   own loopback address and port (421 otherwise), which defeats DNS
-  rebinding.
+  rebinding. It also refuses (403) requests the browser marks
+  `Sec-Fetch-Site: cross-site` or `same-site`, so a page on another site
+  can't load it in an image or a no-cors fetch to time its answers or keep
+  it busy. Typed URLs, its own links and curl are still served.
 - **Read-only.** GET and HEAD only (405 otherwise); the database is opened
   read-only, so even a bug in a query can't change it.
 - **No JSON API.** Machine-readable output already exists (`--json`, and
@@ -36,7 +39,10 @@ front-end build.
 - **Parameterized SQL, bounded results.** Filter values are bound
   parameters; `LIKE` wildcards in the search are escaped; severities and
   rules are checked against fixed lists; numbers in paths and queries are
-  limited to nine digits; lists and drill-downs are capped.
+  limited to nine digits. The incident list shows at most 500 (with the
+  real total), an incident page at most 200 findings (with the real count),
+  and each finding at most 60 raw lines: one IP guessing in bursts for
+  weeks can make a single incident with thousands of findings.
 - **Errors never echo request data**, and every response, errors included,
   carries the security headers.
 
@@ -47,6 +53,8 @@ front-end build.
 - The time filter in SPEC is the timeline itself (each run's span); finer
   time filtering is left for later.
 - The dashboard is for this machine only. Viewing it from elsewhere means an
-  SSH tunnel, which keeps the Host check intact.
+  SSH tunnel to the same port number (`ssh -L 4797:127.0.0.1:4797 host`),
+  since the Host check requires the dashboard's own port.
 - Tests render hostile usernames into every page and assert they come out
-  as text, and check headers, methods, Host rejection and unknown paths.
+  as text, and check headers, methods, Host and cross-site rejection,
+  unknown paths, and the caps on a run with over 500 incidents.

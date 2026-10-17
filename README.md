@@ -111,7 +111,7 @@ npm run dashboard -- --db runs.db      # http://127.0.0.1:4797/ (--port, --ipv6)
 
 ![An incident with its findings and raw log lines](docs/images/dashboard-incident.jpg)
 
-Log content is hostile, so the dashboard is deliberately narrow ([ADR-0016](docs/adr/0016-local-read-only-dashboard.md)): it listens on loopback only and answers only its own `Host` (against DNS rebinding), serves GET and HEAD only, opens the database read-only, and sends no JavaScript at all, under a Content-Security-Policy of `default-src 'none'`. Every log field is escaped, including control characters and bidi overrides; tests render hostile usernames into every page and check they come out as text.
+Log content is hostile, so the dashboard is deliberately narrow ([ADR-0016](docs/adr/0016-local-read-only-dashboard.md)): it listens on loopback only and answers only its own `Host` (against DNS rebinding) and not requests from other sites, serves GET and HEAD only, opens the database read-only, and sends no JavaScript at all, under a Content-Security-Policy of `default-src 'none'`. Every log field is escaped, including control characters and bidi overrides; tests render hostile usernames into every page and check they come out as text.
 
 ## Example: one attacker, start to finish
 
