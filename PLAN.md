@@ -6,6 +6,11 @@ when its check passes in CI, not just locally.
 
 Status: `[x]` done, `[ ]` to do.
 
+Working rules (also in CLAUDE.md): small commits with conventional messages;
+small pull requests; merge with "rebase and merge", never squash, and never
+rewrite `main`; CI runs the Docker lab, not the local machine; the browser is
+for one final visual check only; `AGENTS.md` stays out of commits.
+
 ## M0: Foundation (`chore/m0-foundation`)
 
 - [x] SPEC.md, PLAN.md, CLAUDE.md, ADR-0001 to ADR-0005. *Check: files exist and are linked from the README.*
