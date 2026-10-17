@@ -72,9 +72,9 @@ for one final visual check only; `AGENTS.md` stays out of commits.
 
 ## M5: Dashboard (`feat/m5-dashboard`)
 
-- [ ] Server: 127.0.0.1, Host check, CSP, read-only DB, JSON API. *Check: HTTP tests for headers, methods, Host rejection.*
-- [ ] UI: timeline, incident drill-down, raw lines, filters. *Check: rendered HTML tests; manual check in the browser.*
-- [ ] Hostile-data tests. *Check: malicious usernames render as text.*
+- [x] Server: 127.0.0.1 or ::1 only, Host check, CSP with no script, GET/HEAD only, read-only DB. No JSON API: `--json` and the SQLite file cover that ([ADR-0016](docs/adr/0016-local-read-only-dashboard.md)). *Check: HTTP tests for headers on every response, 405 for other methods, 421 for other Hosts, 404 for unknown paths, refusal to bind non-loopback.*
+- [x] UI: SVG timeline, incident drill-down to raw lines, filters by severity, rule and IP/username; `npm run dashboard`. *Check: rendered HTML tests; one visual check in the browser (screenshots in `docs/images/`).*
+- [x] Hostile-data tests. *Check: `<script>`, attribute breakouts and bidi overrides in usernames render as inert text on every page.*
 
 ## M6: ATT&CK (`feat/m6-attack`)
 
