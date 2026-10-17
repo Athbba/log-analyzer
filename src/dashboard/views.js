@@ -197,6 +197,17 @@ ${list}
 }
 
 /**
+ * A finding's ATT&CK techniques, each linked to its page on attack.mitre.org.
+ * The URLs come from the fixed table in core/attack.js, never from the log.
+ * @param {Finding} finding
+ */
+function attackHtml(finding) {
+  const techniques = techniquesFor(finding);
+  if (techniques.length === 0) return '';
+  return html`<p class="attack">ATT&amp;CK ${techniques.map((t, n) => html`${n > 0 ? ', ' : ''}<a href="${techniqueUrl(t.id)}" rel="noreferrer">${t.id}</a> ${t.name}`)}</p>`;
+}
+
+/**
  * One incident: its findings, each with the raw log lines behind it.
  * @param {object} data
  * @param {RunSummary} data.run
@@ -218,7 +229,7 @@ export function incidentPage({ run, incident, findings, total }) {
     return html`<li class="finding" id="finding-${id}">
 <div class="finding-head"><time>${stamp(finding.time)}</time><span class="rule sev-text-${finding.severity}">${capital(LABELS[finding.rule])}</span><span class="sev-word">${finding.severity}</span></div>
 <p class="what">${first}</p>${rest.map((line) => html`<p class="detail">${line}</p>`)}
-<p class="attack">ATT&amp;CK ${techniquesFor(finding).map((t, n) => html`${n > 0 ? ', ' : ''}<a href="${techniqueUrl(t.id)}" rel="noreferrer">${t.id}</a> ${t.name}`)}</p>
+${attackHtml(finding)}
 ${lines.length > 0 ? html`<details>
 <summary>${more ? `First ${plural(lines.length, 'log line')}` : plural(lines.length, 'log line')}</summary>
 <pre class="log">${lines.map((l) => html`<span class="ln">${l.line}</span>${l.text}\n`)}</pre>

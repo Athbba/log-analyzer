@@ -127,7 +127,8 @@ export function formatText({ source, stats, options, incidents, health }, { colo
       const [first, ...more] = describe(finding).map(safeText);
       out.push(`  ${paint('dim', stamp(finding.time))}  ${paint(COLORS[finding.severity], LABELS[finding.rule].padEnd(17))}${first}`);
       for (const line of more) out.push(INDENT + line);
-      out.push(INDENT + paint('dim', attackLine(finding)));
+      const attack = attackLine(finding);
+      if (attack) out.push(INDENT + paint('dim', attack));
     }
   }
 
@@ -144,11 +145,13 @@ export function formatText({ source, stats, options, incidents, health }, { colo
 
 /**
  * A finding's ATT&CK techniques as one line, e.g. "ATT&CK T1110.001 Brute
- * Force: Password Guessing". Fixed text only, no log fields.
+ * Force: Password Guessing", or '' if it has none. Fixed text only, no log fields.
  * @param {Finding} finding
  */
-export const attackLine = (finding) =>
-  `ATT&CK ${techniquesFor(finding).map((t) => `${t.id} ${t.name}`).join(', ')}`;
+export function attackLine(finding) {
+  const techniques = techniquesFor(finding);
+  return techniques.length > 0 ? `ATT&CK ${techniques.map((t) => `${t.id} ${t.name}`).join(', ')}` : '';
+}
 
 /**
  * The text lines describing one finding. They contain log fields: escape them
