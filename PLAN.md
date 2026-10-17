@@ -78,8 +78,8 @@ for one final visual check only; `AGENTS.md` stays out of commits.
 
 ## M6: ATT&CK (`feat/m6-attack`)
 
-- [ ] Technique mapping in core; shown in all outputs. *Check: tests per rule; JSON schema includes `attack`.*
-- [ ] `docs/detections.md`. *Check: every rule has a section; links valid.*
+- [x] Technique mapping in core; shown in all outputs. IDs checked against attack.mitre.org (ATT&CK v20, which moved T1070.002 to T1685.006) ([ADR-0017](docs/adr/0017-attack-labels.md)). *Check: tests per rule and per kind of account change; `attack` on every finding in the terminal report, `--json`, live JSON lines, SQLite and the dashboard.*
+- [x] `docs/detections.md`: ATT&CK mapping table and a technique line per rule. *Check: test asserts every rule is in the table, every technique is linked, and local links resolve.*
 
 ## M7: Advanced quality (`feat/m7-quality`)
 
