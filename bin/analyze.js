@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-// Command-line entry point: reads an auth.log (or stdin), runs the detectors
-// and prints a report.
+// Command-line entry point. Analyzes an auth.log (or stdin) and prints a
+// report, or, with --follow, watches a log as it is written and reports
+// incidents as they happen, optionally sending Discord alerts.
 //
-// Exit codes: 0 nothing high-severity found, 1 high-severity findings,
-// 2 bad arguments or unreadable input.
+// Exit codes: 0 nothing high-severity found (or live mode stopped cleanly),
+// 1 high-severity findings, 2 bad arguments, a bad config, or unreadable input.
 
+import { existsSync } from 'node:fs';
 import { open } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
 import { toConfig } from '../src/core/config.js';
@@ -12,11 +14,17 @@ import { resolveOptions } from '../src/core/options.js';
 import { DEFAULTS } from '../src/detectors.js';
 import { analyzeStream } from '../src/io/analyze-stream.js';
 import { ConfigError, DEFAULT_CONFIG_PATH, loadConfig } from '../src/io/config.js';
+import { startLive } from '../src/io/live.js';
+import { createDiscordSink } from '../src/io/sinks/discord.js';
+import { createJsonLinesSink, createTerminalSink } from '../src/io/sinks/terminal.js';
 import { duration, formatJson, formatText } from '../src/report.js';
 
 /** @typedef {import('../src/types.js').AnalyzerOptions} AnalyzerOptions */
+/** @typedef {import('../src/types.js').Incident} Incident */
+/** @typedef {import('../src/io/live.js').Sink} Sink */
 
 const USAGE = `Usage: node bin/analyze.js [options] <auth.log | ->
+       node bin/analyze.js --follow [options] <auth.log>
 
 Finds SSH brute force, password spraying, distributed attacks on one account,
 logins that follow failed attempts, logins from new networks or at unusual
@@ -24,7 +32,10 @@ hours, new or newly-admin accounts, and signs of log tampering. Pass - to read
 the log from stdin.
 
 Options:
-  --json              Print the results as JSON
+  --json              Print the results as JSON (with --follow: one JSON object per line)
+  --follow            Keep watching the log, through rotation, and report incidents as they happen
+  --from-start        With --follow, read what is already in the file first
+  --discord           Send alerts to the Discord webhook in DISCORD_WEBHOOK_URL (or .env)
   --config <file>     Settings file (default ${DEFAULT_CONFIG_PATH}, if it exists)
   --print-config      Print the effective settings as a config file and exit
   --threshold <n>     Failed logins from one IP that count as brute force (default ${DEFAULTS.threshold})
@@ -35,7 +46,8 @@ Options:
   --year <yyyy>       Year of the first line; syslog timestamps have none (default: guessed)
   -h, --help          Show this help
 
-Exit status: 0 if nothing high-severity was found, 1 if something was, 2 on error.`;
+Exit status: 0 if nothing high-severity was found (or --follow was stopped),
+1 if something was, 2 on error.`;
 
 /**
  * @param {string} message
@@ -46,18 +58,36 @@ function usageError(message) {
   process.exit(2);
 }
 
+/**
+ * @param {string} message
+ * @returns {never}
+ */
+function fail(message) {
+  console.error(`error: ${message}`);
+  process.exit(2);
+}
+
 const { values, positionals } = readArgs();
 if (values.help) {
   console.log(USAGE);
   process.exit(0);
 }
+// Secrets (the webhook URL) come from the environment or a .env file in the
+// working directory. Variables already set in the environment win.
+if (existsSync('.env')) {
+  try {
+    process.loadEnvFile('.env');
+  } catch (err) {
+    fail(`can't read .env: ${errorMessage(err)}`);
+  }
+}
+/** @type {ReturnType<typeof loadConfig>} */
 let config;
 try {
   config = loadConfig(values.config);
 } catch (err) {
   if (!(err instanceof ConfigError)) throw err;
-  console.error(`error: ${err.message}`);
-  process.exit(2);
+  fail(err.message);
 }
 // Flags override the config file, which overrides the defaults.
 /** @type {AnalyzerOptions} */
@@ -70,34 +100,114 @@ const options = {
   adminGroups: values['admin-groups'] === undefined ? config.options.adminGroups : parseGroups(values['admin-groups']),
 };
 if (values['print-config']) {
-  console.log(JSON.stringify(toConfig(resolveOptions(options)), null, 2));
+  console.log(JSON.stringify(toConfig(resolveOptions(options), config.settings), null, 2));
   process.exit(0);
 }
 if (positionals.length !== 1) usageError('give exactly one log file, or - for stdin');
 if (values.year !== undefined && !/^\d{4}$/.test(values.year)) usageError('--year must be a four-digit year');
+if (values['from-start'] && !values.follow) usageError('--from-start only makes sense with --follow');
 const year = values.year === undefined ? undefined : Number(values.year);
-
 const source = positionals[0];
-let analysis;
-try {
-  analysis = await analyzeStream(await openInput(source), { options, year });
-} catch (err) {
-  console.error(`error: can't read ${source}: ${errorMessage(err)}`);
-  process.exit(2);
-}
 
-const { stats, incidents, health } = analysis;
-const result = { source: source === '-' ? 'stdin' : source, stats, options: analysis.options, incidents, health };
+/** @type {ReturnType<typeof createDiscordSink> | null} */
+let discord = null;
+if (values.discord) {
+  const url = process.env.DISCORD_WEBHOOK_URL;
+  if (!url) fail('--discord needs DISCORD_WEBHOOK_URL, in the environment or in .env');
+  try {
+    discord = createDiscordSink({ url, ...config.settings.discord });
+  } catch (err) {
+    fail(errorMessage(err));
+  }
+}
 
 // Exit quietly if the reader goes away early, e.g. when piped into `head`.
 process.stdout.on('error', (err) => {
-  if (err.code === 'EPIPE') process.exit(process.exitCode ?? 0);
+  if (/** @type {NodeJS.ErrnoException} */ (err).code === 'EPIPE') process.exit(process.exitCode ?? 0);
   throw err;
 });
-process.stdout.write(values.json
-  ? formatJson(result)
-  : formatText(result, { color: process.stdout.isTTY && !process.env.NO_COLOR }));
-process.exitCode = incidents.some((i) => i.severity === 'high') ? 1 : 0;
+
+if (values.follow) {
+  if (source === '-') usageError('--follow needs a file, not stdin');
+  await follow(source, discord);
+} else {
+  await analyzeOnce(source, discord);
+}
+
+/**
+ * @param {string} path
+ * @param {ReturnType<typeof createDiscordSink> | null} alerts
+ */
+async function follow(path, alerts) {
+  /** @param {string} text */
+  const write = (text) => { process.stdout.write(text); };
+  /** @type {Sink[]} */
+  const sinks = [values.json ? createJsonLinesSink({ write }) : createTerminalSink({ write, color: process.stdout.isTTY && !process.env.NO_COLOR })];
+  if (alerts) sinks.push(alerts);
+  const live = startLive({
+    path, sinks, options, year, fromStart: values['from-start'] ?? false,
+    pollMs: config.settings.live.pollMs, idleMs: config.settings.live.idleMs,
+  });
+  let stopping = false;
+  for (const signal of /** @type {const} */ (['SIGINT', 'SIGTERM'])) {
+    process.on(signal, () => {
+      if (stopping) process.exit(130); // a second signal: stop now
+      stopping = true;
+      console.error(`${signal}: stopping (sending pending alerts for up to 5s)`);
+      void live.stop();
+    });
+  }
+  if (!values.json) console.error(`following ${path} (Ctrl+C to stop)`);
+  let result;
+  try {
+    result = await live.done;
+  } catch (err) {
+    fail(`can't follow ${path}: ${errorMessage(err)}`);
+  }
+  const report = alerts ? result.sinks.at(-1) : null;
+  console.error(`stopped after ${result.lines.toLocaleString('en-US')} lines${report ? `; Discord: ${JSON.stringify(report)}` : ''}`);
+  process.exit(0);
+}
+
+/**
+ * @param {string} path
+ * @param {ReturnType<typeof createDiscordSink> | null} alerts
+ */
+async function analyzeOnce(path, alerts) {
+  let analysis;
+  try {
+    analysis = await analyzeStream(await openInput(path), { options, year });
+  } catch (err) {
+    fail(`can't read ${path}: ${errorMessage(err)}`);
+  }
+  const { stats, incidents, health } = analysis;
+  const result = { source: path === '-' ? 'stdin' : path, stats, options: analysis.options, incidents, health };
+  process.stdout.write(values.json
+    ? formatJson(result)
+    : formatText(result, { color: process.stdout.isTTY && !process.env.NO_COLOR }));
+  process.exitCode = incidents.some((i) => i.severity === 'high') ? 1 : 0;
+  if (alerts) {
+    // One alert per incident in the report, at or above the alert threshold.
+    for (const incident of incidents) alerts.onIncident(asOpened(incident));
+    const delivery = await alerts.close(10_000);
+    console.error(`Discord: ${JSON.stringify(delivery)}`);
+  }
+}
+
+/**
+ * A report incident as the "opened" event alerting expects.
+ * @param {Incident} incident
+ * @returns {import('../src/core/live-incidents.js').IncidentEvent}
+ */
+function asOpened(incident) {
+  const key = incident.ip !== null ? `ip ${incident.ip}` : `subject ${incident.subject}`;
+  const last = Math.max(...incident.findings.map((f) => ('until' in f ? f.until : f.time)));
+  return {
+    type: 'opened',
+    finding: incident.findings[0],
+    incident: { ...incident, id: `${key} (report)`, key, last, droppedFindings: 0 },
+  };
+}
 
 function readArgs() {
   try {
@@ -105,6 +215,9 @@ function readArgs() {
       allowPositionals: true,
       options: {
         json: { type: 'boolean' },
+        follow: { type: 'boolean' },
+        'from-start': { type: 'boolean' },
+        discord: { type: 'boolean' },
         config: { type: 'string' },
         'print-config': { type: 'boolean' },
         threshold: { type: 'string' },

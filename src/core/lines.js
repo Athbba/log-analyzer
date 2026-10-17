@@ -38,7 +38,9 @@ export class LineSplitter {
       lines.push(this.#finish());
       start = newline + 1;
     }
-    this.#take(chunk.subarray(start));
+    // The unfinished tail is kept until the next chunk, so it is copied: the
+    // caller may reuse its buffer for the next read.
+    this.#take(chunk.subarray(start), true);
     return lines;
   }
 
@@ -53,8 +55,11 @@ export class LineSplitter {
     return this.#finish();
   }
 
-  /** @param {Buffer} bytes */
-  #take(bytes) {
+  /**
+   * @param {Buffer} bytes
+   * @param {boolean} [keep]  Whether the bytes outlive this push and must be copied.
+   */
+  #take(bytes, keep = false) {
     if (this.#skipping || bytes.length === 0) return;
     const room = this.maxLength - this.#partLength;
     if (bytes.length > room) {
@@ -63,7 +68,7 @@ export class LineSplitter {
       this.#partLength = 0;
       return;
     }
-    this.#parts.push(bytes);
+    this.#parts.push(keep ? Buffer.from(bytes) : bytes);
     this.#partLength += bytes.length;
   }
 

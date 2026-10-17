@@ -48,6 +48,15 @@
     "allowDstJumps": true
   },
   "trustedNetworks": [],
+  "discord": {
+    "minSeverity": "medium",
+    "burst": 5,
+    "perMinute": 20
+  },
+  "live": {
+    "incidentIdle": "1d",
+    "poll": "1s"
+  },
   "limits": {
     "maxKeys": 100000,
     "maxEntriesPerKey": 5000,

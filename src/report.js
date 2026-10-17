@@ -17,8 +17,9 @@ import { SEVERITIES } from './detectors.js';
  */
 /** @typedef {{ source: string, stats: ParseStats, options: Options, incidents: Incident[], health?: RunHealth }} Result */
 
+/** Short names of the rules, as printed. */
 /** @type {Record<Finding['rule'], string>} */
-const LABELS = {
+export const LABELS = {
   'brute-force': 'brute force',
   'possible-breach': 'possible breach',
   'unusual-hour': 'unusual hour',
@@ -32,8 +33,8 @@ const LABELS = {
 const COLORS = { high: 'red', medium: 'yellow', low: 'cyan' };
 const INDENT = ' '.repeat(2 + 19 + 2 + 17);
 
-/** @param {number} ms */
-const stamp = (ms) => new Date(ms).toISOString().slice(0, 19).replace('T', ' ');
+/** A wall-clock time as "2026-09-09 03:39:12". @param {number} ms */
+export const stamp = (ms) => new Date(ms).toISOString().slice(0, 19).replace('T', ' ');
 /** @param {number} ms */
 const hhmm = (ms) => stamp(ms).slice(11, 16);
 /** @param {number} n */
@@ -140,11 +141,12 @@ export function formatText({ source, stats, options, incidents, health }, { colo
 }
 
 /**
- * The text lines describing one finding.
+ * The text lines describing one finding. They contain log fields: escape them
+ * for the medium they are shown in.
  * @param {Finding} f
  * @returns {string[]}
  */
-function describe(f) {
+export function describe(f) {
   switch (f.rule) {
     case 'brute-force': {
       const shown = f.users.slice(0, 5).map((u) => `${u.user} (${u.attempts})`).join(', ');

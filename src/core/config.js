@@ -11,6 +11,20 @@ import { parseCidr } from './net.js';
 
 /** @typedef {import('../types.js').AnalyzerOptions} AnalyzerOptions */
 /** @typedef {import('../types.js').ResolvedOptions} ResolvedOptions */
+/** @typedef {import('../types.js').Severity} Severity */
+
+/**
+ * Settings for the shell rather than the detectors: alerting and live mode.
+ * @typedef {object} ShellSettings
+ * @property {{ minSeverity: Severity, burst: number, perMinute: number }} discord
+ * @property {{ idleMs: number, pollMs: number }} live
+ */
+
+/** @type {ShellSettings} */
+export const SHELL_DEFAULTS = {
+  discord: { minSeverity: 'medium', burst: 5, perMinute: 20 },
+  live: { idleMs: 24 * 3_600_000, pollMs: 1000 },
+};
 
 const UNITS = /** @type {Record<string, number>} */ ({ s: 1000, m: 60_000, h: 3_600_000, d: 86_400_000 });
 
@@ -72,6 +86,8 @@ const strings = (pattern, what) => (v) =>
     ? { ok: true, value: [...v] }
     : { ok: false, expected: `a list of ${what}` };
 /** @type {Check} */
+const severity = (v) => (v === 'high' || v === 'medium' || v === 'low' ? { ok: true, value: v } : { ok: false, expected: '"high", "medium" or "low"' });
+/** @type {Check} */
 const cidrs = (v) =>
   Array.isArray(v) && v.every((s) => typeof s === 'string' && parseCidr(s) !== null)
     ? { ok: true, value: [...v] }
@@ -123,6 +139,15 @@ const SPEC = {
     allowDstJumps: [bool, 'tampering.allowDstJumps'],
   },
   trustedNetworks: [cidrs, 'trustedNetworks'],
+  discord: {
+    minSeverity: [severity, 'shell.discord.minSeverity'],
+    burst: [int(1, 50), 'shell.discord.burst'],
+    perMinute: [int(1, 600), 'shell.discord.perMinute'],
+  },
+  live: {
+    incidentIdle: [duration, 'shell.live.idleMs'],
+    poll: [duration, 'shell.live.pollMs'],
+  },
   limits: {
     maxKeys: [int(1), 'limits.maxKeys'],
     maxEntriesPerKey: [int(1), 'limits.maxEntriesPerKey'],
@@ -135,24 +160,28 @@ const SPEC = {
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /**
- * Validates a parsed config file and turns it into engine options.
+ * Validates a parsed config file and turns it into engine options plus the
+ * shell's own settings.
  * @param {unknown} raw
- * @returns {{ options: AnalyzerOptions, errors: string[] }}
+ * @returns {{ options: AnalyzerOptions, settings: ShellSettings, errors: string[] }}
  */
 export function parseConfig(raw) {
   /** @type {Record<string, any>} */
   const options = {};
+  /** @type {Record<string, any>} */
+  const shell = structuredClone(SHELL_DEFAULTS);
   /** @type {string[]} */
   const errors = [];
-  if (!isObject(raw)) return { options, errors: ['the config must be a JSON object'] };
+  if (!isObject(raw)) return { options, settings: SHELL_DEFAULTS, errors: ['the config must be a JSON object'] };
 
   /**
-   * @param {string} path  Where the value goes, e.g. "spray.minUsers".
+   * @param {string} path  Where the value goes, e.g. "spray.minUsers", or "shell.live.pollMs".
    * @param {unknown} value
    */
   const set = (path, value) => {
-    const keys = path.split('.');
-    let target = options;
+    const isShell = path.startsWith('shell.');
+    const keys = (isShell ? path.slice(6) : path).split('.');
+    let target = isShell ? shell : options;
     for (const key of keys.slice(0, -1)) target = target[key] ??= {};
     target[keys[keys.length - 1]] = value;
   };
@@ -183,14 +212,15 @@ export function parseConfig(raw) {
       }
     }
   }
-  return { options, errors };
+  return { options, settings: /** @type {ShellSettings} */ (shell), errors };
 }
 
 /**
  * The config-file form of resolved options, for `--print-config`.
  * @param {ResolvedOptions} o
+ * @param {ShellSettings} [shell]
  */
-export function toConfig(o) {
+export function toConfig(o, shell = SHELL_DEFAULTS) {
   return {
     bruteForce: { threshold: o.threshold, window: formatDuration(o.windowMs), ipv6Prefix: o.ipv6Prefix },
     possibleBreach: { lookback: formatDuration(o.lookbackMs), ignoreKeyLoginsAfterOthersFailures: o.ignoreKeyLoginsAfterOthersFailures },
@@ -215,6 +245,8 @@ export function toConfig(o) {
       maxBackwards: formatDuration(o.tampering.maxBackwardsMs), allowDstJumps: o.tampering.allowDstJumps,
     },
     trustedNetworks: o.trustedNetworks,
+    discord: { ...shell.discord },
+    live: { incidentIdle: formatDuration(shell.live.idleMs), poll: formatDuration(shell.live.pollMs) },
     limits: {
       maxKeys: o.limits.maxKeys, maxEntriesPerKey: o.limits.maxEntriesPerKey,
       maxUsersPerFinding: o.limits.maxUsersPerFinding, memory: formatDuration(o.limits.memoryMs),

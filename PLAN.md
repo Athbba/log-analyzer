@@ -52,11 +52,12 @@ Status: `[x]` done, `[ ]` to do.
 
 ## M3: Live mode (`feat/m3-live-mode`)
 
-- [ ] File follower: polling, inode change, truncation, partial lines, missing file. *Check: tests for each rotation style on real files.*
-- [ ] Live pipeline + signals + flush deadline. *Check: child-process test sends SIGTERM and checks exit 0 and flushed output.*
-- [ ] Discord sink: dedup, rate limit, retry/backoff, bounded queue, safe content. *Check: tests against a local mock webhook, including 429 and 500.*
-- [ ] Soak test: memory stays flat over a long live run. *Check: RSS growth below a set bound.*
-- [ ] `.env` loading for `DISCORD_WEBHOOK_URL`; `.env.example`. *Check: test with a temp env file.*
+- [x] File follower: polling, inode change, copytruncate vs truncation, partial lines, missing file. *Check: tests for each on real files, on Windows and on Linux (Docker and CI).*
+- [x] Live incident tracker: opened / escalated / updated / closed, idle close, caps. *Check: one opened per attack, one escalated per rise; caps tested.*
+- [x] Live pipeline + `--follow` + signals + flush deadline. *Check: child-process test sends SIGTERM, exit 0, last events flushed (Linux).*
+- [x] Discord sink: dedup, rate limit, retry/backoff, bounded queue, safe content, secret URL. *Check: 7 tests against a local mock webhook, incl. 429, 5xx, 4xx, slow and hanging servers.*
+- [x] Soak test: 100,000 hostile lines through a live run keep state under its caps. *Check: `engine.size()` asserted.*
+- [x] `.env` loading for `DISCORD_WEBHOOK_URL`; `.env.example`. *Check: CLI test with a temp `.env` and the mock webhook.*
 
 ## M4: Storage (`feat/m4-sqlite`)
 
