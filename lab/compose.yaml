@@ -1,0 +1,62 @@
+# The Docker lab: one SSH server and the clients that log in to it, on an
+# internal network with no route to the outside. Run it with `npm run lab`
+# (scripts/lab.js), which also collects the resulting auth.log.
+name: log-analyzer-lab
+
+x-client: &client
+  build: ./client
+  image: log-analyzer-lab/client:local
+  profiles: [clients]
+  volumes:
+    - lab-keys:/lab-keys:ro
+  depends_on:
+    target:
+      condition: service_healthy
+
+services:
+  target:
+    build: ./target
+    image: log-analyzer-lab/target:local
+    hostname: lab-target
+    environment:
+      # A POSIX TZ string chosen by scripts/lab.js so the lab's clock reads
+      # mid-morning whenever it runs (see lab/README.md).
+      TZ: ${LAB_TZ:-UTC0}
+    volumes:
+      - lab-keys:/lab-keys
+    networks:
+      lab:
+        ipv4_address: 172.30.0.10
+        aliases: [lab-target]
+
+  # The office workstation: alice, bob and dave doing their normal work.
+  office:
+    <<: *client
+    networks:
+      lab:
+        ipv4_address: 172.30.0.20
+
+  # Attacker running a dictionary attack against common account names.
+  attacker-guess:
+    <<: *client
+    networks:
+      lab:
+        ipv4_address: 172.30.0.66
+
+  # Attacker who guesses deploy's password and plants a backdoor account.
+  attacker-breakin:
+    <<: *client
+    networks:
+      lab:
+        ipv4_address: 172.30.0.77
+
+networks:
+  lab:
+    # No gateway to the host's network: the containers can only reach each other.
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+
+volumes:
+  lab-keys:

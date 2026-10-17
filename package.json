@@ -17,7 +17,9 @@
     "lint": "eslint .",
     "typecheck": "tsc -p . && tsc -p test",
     "check": "npm run lint && npm run typecheck && npm test",
-    "generate-sample": "node scripts/generate-sample-log.js"
+    "generate-sample": "node scripts/generate-sample-log.js",
+    "lab": "node scripts/lab.js run",
+    "lab:fixture": "node scripts/lab.js run --out test/fixtures/lab/auth.log"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
