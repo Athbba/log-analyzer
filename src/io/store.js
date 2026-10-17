@@ -195,8 +195,7 @@ export function openStore(path, { readOnly = false } = {}) {
      */
     saveIncidents(run, incidents) {
       flush();
-      db.exec('BEGIN');
-      try {
+      inTransaction(db, () => {
         for (const incident of incidents) {
           const key = incident.ip !== null ? `ip ${incident.ip}` : `subject ${incident.subject}`;
           const last = Math.max(...incident.findings.map((f) => ('until' in f ? f.until : f.time)));
@@ -204,11 +203,7 @@ export function openStore(path, { readOnly = false } = {}) {
             .run(run, key, incident.ip, incident.subject, incident.severity, incident.time, last).lastInsertRowid);
           for (const finding of incident.findings) insertFinding(id, run, finding);
         }
-        db.exec('COMMIT');
-      } catch (err) {
-        db.exec('ROLLBACK');
-        throw err;
-      }
+      });
     },
 
     /**
@@ -277,10 +272,21 @@ function migrate(db) {
   const version = /** @type {{ user_version: number }} */ (db.prepare('PRAGMA user_version').get()).user_version;
   if (version === SCHEMA_VERSION) return;
   if (version > SCHEMA_VERSION) throw new Error(`database schema is version ${version}, newer than this analyzer (${SCHEMA_VERSION})`);
-  db.exec('BEGIN');
-  try {
+  inTransaction(db, () => {
     db.exec(SCHEMA);
     db.exec(`PRAGMA user_version = ${SCHEMA_VERSION}`);
+  });
+}
+
+/**
+ * Runs `work` in one transaction: committed if it returns, rolled back if it throws.
+ * @param {DatabaseSync} db
+ * @param {() => void} work
+ */
+function inTransaction(db, work) {
+  db.exec('BEGIN');
+  try {
+    work();
     db.exec('COMMIT');
   } catch (err) {
     db.exec('ROLLBACK');
