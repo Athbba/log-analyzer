@@ -15,7 +15,7 @@ npm run dashboard -- --db runs.db                    # open http://127.0.0.1:479
 
 Needs Node.js 22.13 or later. Nothing else to install.
 
-![Dashboard: a timeline of failed logins and the list of incidents](docs/images/dashboard-overview-carbon.png)
+![Dashboard: run summary, timeline of failed logins and incidents, filters and the incident list](docs/images/dashboard.png)
 
 ## What it does
 

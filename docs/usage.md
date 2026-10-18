@@ -94,9 +94,7 @@ node bin/analyze.js samples/auth.log --db runs.db
 npm run dashboard -- --db runs.db      # http://127.0.0.1:4797/ (--port, --ipv6)
 ```
 
-![Dashboard overview: timeline and incident list](images/dashboard-overview-carbon.png)
-
-![An incident with its findings and raw log lines](images/dashboard-incident-carbon.png)
+![Dashboard: run summary, timeline of failed logins and incidents, filters and the incident list](images/dashboard.png)
 
 Log content is hostile, so the dashboard is deliberately narrow ([ADR-0016](adr/0016-local-read-only-dashboard.md), [ADR-0018](adr/0018-dashboard-interactions.md)): it listens on loopback only and answers only its own `Host` (against DNS rebinding) and not requests from other sites, serves GET and HEAD only, and opens the database read-only. A small local script enables the brush, tooltips and clipboard; fonts are bundled locally. CSP forbids inline execution and external resources. Every log field is escaped, including control characters and bidi overrides; tests render hostile usernames into every page and check they come out as text.
 
