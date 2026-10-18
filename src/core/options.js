@@ -37,7 +37,7 @@ export const DEFAULT_LIMITS = {
  * docs/detections.md and measured in docs/evaluation.md.
  * @type {ExtendedOptions}
  */
-export const EXTENDED_DEFAULTS = {
+const EXTENDED_DEFAULTS = {
   trustedNetworks: [],
   ipv6Prefix: 64,
   ignoreKeyLoginsAfterOthersFailures: true,

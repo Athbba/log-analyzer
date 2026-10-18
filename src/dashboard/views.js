@@ -29,14 +29,14 @@ const isFiltered = (f) => f.severities.length > 0 || f.rule !== null || f.q !== 
 /** @param {number} first @param {number} last */
 const span = (first, last) => `${stamp(first)} – ${stamp(last)}`;
 /** @param {number} run @param {Filters} [filters] */
-export function filterQuery(run, filters = EMPTY_FILTERS) {
+function filterQuery(run, filters = EMPTY_FILTERS) {
   return { run, severity: filters.severities, rule: filters.rule ?? undefined, q: filters.q, from: filters.from ?? undefined, to: filters.to ?? undefined };
 }
 /** @param {string} severity */
 const badge = (severity) => html`<span class="sev sev-${severity}">${severity === 'medium' ? 'MED' : severity.toUpperCase()}</span>`;
 
 /** @param {{title:string, body:Html}} page */
-export function layout({ title, body }) {
+function layout({ title, body }) {
   return html`<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -151,7 +151,7 @@ function attackHtml(finding) {
 /** Splits only safe text into fixed classes; never interprets log markup.
  * @param {string} text
  */
-export function highlightLog(text) {
+function highlightLog(text) {
   const parts = safeText(text).split(/(Failed password|Accepted password|Accepted publickey|\b(?:\d{1,3}\.){3}\d{1,3}\b|\b\d{4}-\d{2}-\d{2}T[\d:.+Z-]+|\b[A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}\b|\bsshd(?:-session|-auth)?\[\d+\]|\b(?:for(?: invalid user)?|from)\s+\S+)/g);
   return html`${parts.map((part, i) => {
     if (i % 2 === 0) return html`${part}`;
