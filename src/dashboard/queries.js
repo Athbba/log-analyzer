@@ -174,6 +174,30 @@ export function incidentDetail(db, id, linesPerFinding = 60, maxFindings = 200) 
 }
 
 /**
+ * Finding times for the incidents drawn on the timeline, at most `perIncident`
+ * each, so a busy incident can't crowd out another's marks.
+ * @param {DatabaseSync} db
+ * @param {number[]} ids  The charted incidents (a few dozen at most).
+ * @param {number} [perIncident]
+ */
+export function findingMarks(db, ids, perIncident = 200) {
+  /** @type {Map<number, number[]>} */
+  const marks = new Map();
+  if (ids.length === 0) return marks;
+  const rows = /** @type {{ incident: number, time: number }[]} */ (db.prepare(
+    `SELECT incident, time FROM (
+       SELECT incident, time, ROW_NUMBER() OVER (PARTITION BY incident ORDER BY time, id) AS n
+       FROM findings WHERE incident IN (${ids.map(() => '?').join(', ')}))
+     WHERE n <= ? ORDER BY incident, time`).all(...ids, perIncident));
+  for (const { incident, time } of rows) {
+    const list = marks.get(incident);
+    if (list) list.push(time);
+    else marks.set(incident, [time]);
+  }
+  return marks;
+}
+
+/**
  * Failed logins over the run, in `buckets` equal slices of its time span.
  * @param {DatabaseSync} db
  * @param {number} run

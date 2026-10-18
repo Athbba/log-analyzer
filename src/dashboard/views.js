@@ -44,6 +44,9 @@ ${body}<div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div
 </body></html>`.value;
 }
 
+/** The timeline draws at most this many incidents, the most severe first. */
+export const CHART_INCIDENTS = 40;
+
 /** @param {{run:number, first:number, last:number, trace:number[], incidents:IncidentRow[], marks:Map<number,number[]>, filters?:Filters}} data */
 export function timeline({ run, first, last, trace, incidents, marks, filters = EMPTY_FILTERS }) {
   const width = 1000, left = 64, right = 984, chartWidth = right - left;
@@ -57,7 +60,7 @@ export function timeline({ run, first, last, trace, incidents, marks, filters = 
     const h = Math.max(1, n / peak * 56);
     return html`<rect class="trace" x="${(left + i * barWidth).toFixed(1)}" y="${(64 - h).toFixed(1)}" width="${Math.max(1, barWidth - 1).toFixed(1)}" height="${h.toFixed(1)}"/>`;
   });
-  const shown = incidents.slice(0, 40);
+  const shown = incidents.slice(0, CHART_INCIDENTS);
   const lanes = [];
   let y = 88;
   for (const severity of SEVERITIES) {

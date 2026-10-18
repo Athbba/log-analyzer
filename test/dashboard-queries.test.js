@@ -3,7 +3,7 @@ import { Readable } from 'node:stream';
 import { test } from 'node:test';
 import { analyzeStream } from '../src/io/analyze-stream.js';
 import { openStore } from '../src/io/store.js';
-import { incidentCounts, incidentDetail, incidentsFor, incidentSummary, runSummary } from '../src/dashboard/queries.js';
+import { findingMarks, incidentCounts, incidentDetail, incidentsFor, incidentSummary, runSummary } from '../src/dashboard/queries.js';
 import { incidentPage, overviewPage } from '../src/dashboard/views.js';
 import { parseRangeTime } from '../src/dashboard/server.js';
 
@@ -136,4 +136,25 @@ test('incident rows show the first two rules and count the rest, with every rule
   assert.match(busy, /<span class="sr-only">, new source, unusual hour, account change<\/span>/, 'the rest are read out');
   assert.equal((quiet.match(/class="rule-chip"/g) ?? []).length, 2);
   assert.doesNotMatch(quiet, /more/, 'no overflow when two rules fit');
+});
+
+test('timeline marks come from the charted incidents, however many findings come before them', async () => {
+  // An early IP with many bursts, then a late one: a run-wide time cap would
+  // spend itself on the early incident and leave the late one unmarked.
+  const lines = [];
+  for (let b = 0; b < 30; b++) {
+    for (let g = 0; g < 6; g++) lines.push(`${syslogTime(b * 30 * 60_000 + g * 1000)} web01 sshd[1]: Failed password for root from 192.0.2.1 port 1 ssh2`);
+  }
+  for (let g = 0; g < 6; g++) lines.push(`${syslogTime(40 * 30 * 60_000 + g * 1000)} web01 sshd[1]: Failed password for root from 192.0.2.2 port 1 ssh2`);
+  const { store } = await storeRun(lines);
+  try {
+    const ids = Object.fromEntries(/** @type {{ id: number, ip: string }[]} */ (store.db.prepare('SELECT id, ip FROM incidents').all()).map((r) => [r.ip, r.id]));
+    const late = findingMarks(store.db, [ids['192.0.2.2']]);
+    assert.deepEqual([...late.keys()], [ids['192.0.2.2']], 'only the incidents asked for');
+    assert.equal(late.get(ids['192.0.2.2'])?.length, 1);
+    const capped = findingMarks(store.db, [ids['192.0.2.1'], ids['192.0.2.2']], 5);
+    assert.equal(capped.get(ids['192.0.2.1'])?.length, 5, 'each incident is capped on its own');
+    assert.equal(capped.get(ids['192.0.2.2'])?.length, 1, 'so a busy incident cannot crowd out another');
+    assert.deepEqual(findingMarks(store.db, []), new Map());
+  } finally { store.close(); }
 });
