@@ -7,7 +7,7 @@ import js from '@eslint/js';
 const NODE_GLOBALS = Object.fromEntries([
   'AbortController', 'AbortSignal', 'Buffer', 'TextDecoder', 'TextEncoder', 'URL', 'URLSearchParams',
   'clearImmediate', 'clearInterval', 'clearTimeout', 'console', 'fetch', 'performance', 'process',
-  'queueMicrotask', 'setImmediate', 'setInterval', 'setTimeout', 'structuredClone',
+  'queueMicrotask', 'setImmediate', 'setInterval', 'setTimeout', 'structuredClone', 'WebSocket',
 ].map((name) => [name, 'readonly']));
 
 export default [
