@@ -42,15 +42,16 @@ h1 { font-size: 20px; font-weight: 600; line-height: 1.3; overflow-wrap: anywher
 h2 { font-size: 13px; font-weight: 600; }
 h3 { font-size: 14px; font-weight: 600; }
 p { max-width: 80ch; }
-main, .masthead-inner { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+main, .masthead-inner, .footer-inner { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 main { padding-bottom: 32px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .skip { position: fixed; left: 16px; top: -100px; z-index: 10; padding: 8px 16px; background: var(--surface); border: 1px solid var(--focus); }
 .skip:focus { top: 8px; }
 .masthead { height: 40px; border-bottom: 1px solid var(--border); background: var(--surface); }
 .masthead-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 100%; }
-.home { font: 600 12px var(--mono); text-decoration: none; }
-.local { display: inline-flex; align-items: center; gap: 8px; color: var(--secondary); font: 11px var(--mono); white-space: nowrap; }
+.home { font-size: 14px; font-weight: 600; text-decoration: none; }
+.site-footer { border-top: 1px solid var(--border); }
+.footer-inner { display: flex; align-items: center; gap: 8px; padding-block: 16px; color: var(--secondary); font-size: 12px; }
 .status-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
 .summary { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 24px 0 16px; }
 .run-picker { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; max-width: 100%; }
@@ -194,7 +195,7 @@ button:hover { background: var(--button-hover); border-color: var(--secondary); 
 .log-meta { color: var(--muted); } .log-failure { color: var(--high); } .log-success { color: var(--success); } .log-address { color: var(--address); } .log-user { color: var(--user); }
 .chart-tooltip { position: fixed; z-index: 20; max-width: min(400px, calc(100vw - 16px)); padding: 12px; background: var(--log-head); color: var(--text); border: 1px solid var(--secondary); font: 11px/1.6 var(--mono); pointer-events: none; overflow-wrap: anywhere; }
 @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; } .filters { position: static; } .filter-body { max-width: 480px; } .metrics .metric-scope { margin-left: 0; } }
-@media (max-width: 600px) { main, .masthead-inner { padding-inline: 16px; } .home { font-size: 11px; } .local { font-size: 10px; gap: 4px; } .summary { padding-top: 24px; } .telemetry { display: grid; } .telemetry > span { border-right: 0; border-bottom: 1px solid var(--border); } .telemetry > span:last-child { border-bottom: 0; } .incident-head { grid-template-columns: 1fr; padding: 16px; gap: 16px; } .detail-meta { grid-column: 1; } .attack { margin-left: 0; width: 100%; } .case-facts { padding: var(--space-4); } .case-facts dl > div { grid-template-columns: 1fr; gap: var(--space-1); } .range-footer > span { overflow-wrap: anywhere; } .disclosure-label { display: none; } }
+@media (max-width: 600px) { main, .masthead-inner { padding-inline: 16px; } .footer-inner { padding-inline: 16px; } .summary { padding-top: 24px; } .telemetry { display: grid; } .telemetry > span { border-right: 0; border-bottom: 1px solid var(--border); } .telemetry > span:last-child { border-bottom: 0; } .incident-head { grid-template-columns: 1fr; padding: 16px; gap: 16px; } .detail-meta { grid-column: 1; } .attack { margin-left: 0; width: 100%; } .case-facts { padding: var(--space-4); } .case-facts dl > div { grid-template-columns: 1fr; gap: var(--space-1); } .range-footer > span { overflow-wrap: anywhere; } .disclosure-label { display: none; } }
 @media (forced-colors: active) { .sev, .filter-square, .evidence, .brush-track { border-color: CanvasText; } .check:has(input:checked) .filter-square { background: Highlight; forced-color-adjust: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
 /* A half-width window or 200% zoom: each row stacks into source, then rules, then time. */
