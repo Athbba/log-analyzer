@@ -92,8 +92,8 @@ for one final visual check only; `AGENTS.md` stays out of commits.
 
 What the carbon redesign (ADR-0018) still lacks; findings and evidence in [docs/superpowers/specs/2026-10-18-dashboard-gap-review.md](docs/superpowers/specs/2026-10-18-dashboard-gap-review.md).
 
-- [ ] Incident case summary: rules, users and techniques over every finding, not the first 200. *Check: test on an incident with 250 findings; browser review.*
-- [ ] Evidence: first finding open, line-number range and real total in the summary. *Check: rendered HTML test for the range and the capped total.*
+- [x] Incident case summary: rules, users and techniques over every finding, not the first 200. *Check: test on an incident with 250 findings; browser review.*
+- [x] Evidence: first finding open, line-number range and real total in the summary. *Check: rendered HTML test for the range and the capped total.*
 - [ ] Narrow screens and rule chips: stacked rows under 600 px, filters folded, compact metadata, first two rules then "+N more". *Check: no clipped columns at 375 px in both themes; works without JavaScript.*
 - [ ] Timeline bars identifiable without hover. *Check: each bar has a visible source label or matching key at desktop and 375 px.*
 - [ ] Labels and scope copy: 12 px minimum, sentence case, "Medium" spelled out, one scope sentence for the counts. *Check: browser review; existing count tests still pass.*
