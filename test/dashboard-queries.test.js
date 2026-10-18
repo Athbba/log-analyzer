@@ -3,7 +3,7 @@ import { Readable } from 'node:stream';
 import { test } from 'node:test';
 import { analyzeStream } from '../src/io/analyze-stream.js';
 import { openStore } from '../src/io/store.js';
-import { incidentCounts, incidentsFor } from '../src/dashboard/queries.js';
+import { incidentCounts, incidentDetail, incidentsFor, incidentSummary } from '../src/dashboard/queries.js';
 import { parseRangeTime } from '../src/dashboard/server.js';
 
 const filters = { severities: [], rule: null, q: '' };
@@ -41,3 +41,64 @@ test('time input accepts exact server-clock dates and rejects normalization or u
     assert.throws(() => parseRangeTime(invalid), /invalid time range/, invalid);
   }
 });
+
+/** A syslog timestamp, `ms` after Jan 1 2026 00:00 on the server clock. @param {number} ms */
+const syslogTime = (ms) => {
+  const d = new Date(Date.UTC(2026, 0, 1) + ms);
+  return `${d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })} ${String(d.getUTCDate()).padStart(2, ' ')} ${d.toISOString().slice(11, 19)}`;
+};
+
+/** Stores `lines` as one run in an in-memory store. @param {string[]} lines */
+async function storeRun(lines) {
+  const store = openStore(':memory:');
+  const run = store.beginRun({ source: 'synthetic.log', mode: 'file', options: {} });
+  const { incidents } = await analyzeStream(Readable.from([lines.join('\n') + '\n']), { year: 2026, tap: store.tap(run, 5000) });
+  store.saveIncidents(run, incidents);
+  store.finishRun(run, {});
+  return { store, run };
+}
+
+test('the incident summary covers every finding, not just the 200 the page lists', async () => {
+  // One IP guessing in 205 bursts, 30 minutes apart: 205 brute-force findings
+  // in one incident. Only the last burst tries "zed".
+  const lines = [];
+  for (let b = 0; b < 205; b++) {
+    const user = b === 204 ? 'zed' : 'root';
+    for (let g = 0; g < 6; g++) lines.push(`${syslogTime(b * 30 * 60_000 + g * 1000)} web01 sshd[1]: Failed password for ${user} from 198.51.100.7 port 1 ssh2`);
+  }
+  const { store } = await storeRun(lines);
+  try {
+    const { id } = /** @type {{ id: number }} */ (store.db.prepare('SELECT id FROM incidents').get());
+    const detail = /** @type {NonNullable<ReturnType<typeof incidentDetail>>} */ (incidentDetail(store.db, id));
+    assert.equal(detail.findings.length, 200);
+    assert.equal(detail.total, 205);
+
+    const summary = incidentSummary(store.db, id);
+    assert.deepEqual(summary.rules, ['brute-force']);
+    assert.deepEqual(summary.users, ['root', 'zed'], 'a user seen only after the first 200 findings is still listed');
+    assert.equal(summary.userCount, 2);
+    assert.deepEqual(summary.techniques.map((t) => t.id), ['T1110.001']);
+
+    const capped = incidentSummary(store.db, id, 1);
+    assert.deepEqual(capped.users, ['root'], 'users are capped');
+    assert.equal(capped.userCount, 2, 'with the real count');
+  } finally { store.close(); }
+});
+
+test('the incident summary reads users from every kind of finding and techniques from account changes', async () => {
+  const { store } = await storeRun([
+    ...Array.from({ length: 6 }, (_, g) => `${syslogTime(g * 1000)} web01 sshd[1]: Failed password for admin from 192.0.2.9 port 1 ssh2`),
+    `${syslogTime(10_000)} web01 sshd[1]: Accepted password for deploy from 192.0.2.9 port 1 ssh2`,
+    `${syslogTime(20_000)} web01 sudo:   deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/sbin/useradd -G sudo backdoor`,
+    `${syslogTime(20_000)} web01 useradd[9]: new user: name=backdoor, UID=1200, GID=1200, home=/home/backdoor, shell=/bin/bash`,
+  ]);
+  try {
+    const ids = /** @type {{ id: number }[]} */ (store.db.prepare('SELECT id FROM incidents ORDER BY id').all()).map((r) => r.id);
+    const all = ids.map((id) => incidentSummary(store.db, id));
+    const users = new Set(all.flatMap((s) => s.users));
+    for (const user of ['admin', 'deploy', 'backdoor']) assert.ok(users.has(user), `${user} is listed`);
+    const techniques = new Set(all.flatMap((s) => s.techniques.map((t) => t.id)));
+    assert.ok(techniques.has('T1136.001'), 'account creation is mapped from the stored finding');
+  } finally { store.close(); }
+});
+
