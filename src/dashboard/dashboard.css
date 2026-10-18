@@ -137,8 +137,9 @@ button:hover { background: var(--button-hover); border-color: var(--secondary); 
 .incident-list li:last-child a { border-bottom: 0; }
 .incident-list a:hover, .incident-list a:focus-visible { background: var(--hover); border-left-color: var(--focus); }
 .where { font: 600 12px/1.6 var(--mono); overflow-wrap: anywhere; }
-.rules { display: flex; flex-wrap: wrap; gap: 4px; }
-.rule-chip { background: var(--chip); border: 1px solid var(--chip-border); border-radius: 3px; padding: 2px 6px; font-size: 11px; white-space: normal; }
+.rules { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.rule-chip { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: var(--chip); border: 1px solid var(--chip-border); border-radius: 3px; padding: 2px 6px; font-size: 11px; }
+.rule-more { flex-shrink: 0; color: var(--secondary); font: 11px var(--mono); white-space: nowrap; }
 .count, .when { text-align: right; font: 11px/1.6 var(--mono); }
 .when { color: var(--secondary); }
 .range-end-time { display: block; }
