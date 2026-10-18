@@ -4,13 +4,13 @@
 
 :root {
   color-scheme: dark;
-  --canvas: #090a0d; --surface: #101217; --hover: #171a21; --border: #222630;
+  --canvas: #090a0c; --surface: #111317; --hover: #161920; --border: #22262f;
   --text: #f3f4f6; --secondary: #9ca3af; --muted: #929aaa; --focus: #3b82f6;
-  --input: #090a0d; --input-border: #262b36; --button: #1e2430; --button-border: #323b4d; --button-hover: #283040;
+  --input: #0d0f12; --input-border: #262a34; --button: #161920; --button-border: #2c313c; --button-hover: #1e222b;
   --chip: #181b22; --chip-border: #2a2f3d; --log: #07080a; --log-head: #12151c;
   --high: #ef4444; --high-bg: #2a1215; --high-border: #5c1e24;
   --medium: #f59e0b; --medium-bg: #291e0b; --medium-border: #573d13;
-  --low: #60a5fa; --low-bg: #0f1d33; --low-border: #1e3a66;
+  --low: #3b82f6; --low-bg: #0f1d33; --low-border: #1e3a66;
   --success: #73cf9c; --address: #77cbd6; --user: #edbb72; --trace: #73849d;
   --mono: "JetBrains Mono", Consolas, monospace;
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
@@ -81,9 +81,10 @@ figcaption { display: flex; gap: 16px; flex-wrap: wrap; color: var(--secondary);
 .tick { stroke: var(--border); stroke-width: 1; }
 .baseline { stroke: var(--secondary); stroke-width: 1; }
 .tick-label, .lane-label { fill: var(--secondary); font: 11px var(--mono); }
-.timeline .bar.sev-high { fill: var(--high); }
-.timeline .bar.sev-medium { fill: var(--medium); }
-.timeline .bar.sev-low { fill: var(--low); }
+.timeline .bar { stroke-width: 1; }
+.timeline .bar.sev-high { fill: var(--high-border); stroke: var(--high); }
+.timeline .bar.sev-medium { fill: var(--medium-border); stroke: var(--medium); }
+.timeline .bar.sev-low { fill: var(--low-border); stroke: var(--low); }
 .timeline .mark { fill: var(--surface); stroke: var(--text); stroke-width: 1; pointer-events: none; }
 .timeline-incident:hover .bar, .timeline-incident:focus-visible .bar { stroke: var(--text); stroke-width: 2; }
 .brush { margin: 0 1.6% 8px 6.4%; display: none; }
@@ -94,7 +95,7 @@ figcaption { display: flex; gap: 16px; flex-wrap: wrap; color: var(--secondary);
 .brush input::-webkit-slider-runnable-track { height: 24px; background: transparent; }
 .brush input::-moz-range-track { height: 24px; background: transparent; }
 .brush input::-webkit-slider-thumb { appearance: none; width: 12px; height: 24px; border: 2px solid var(--text); border-radius: 2px; background: var(--button-hover); cursor: ew-resize; pointer-events: auto; }
-.brush input::-moz-range-thumb { width: 8px; height: 20px; border: 2px solid var(--text); border-radius: 2px; background: var(--button-hover); cursor: ew-resize; pointer-events: auto; }
+.brush input::-moz-range-thumb { width: 8px; height: 24px; border: 2px solid var(--text); border-radius: 2px; background: var(--button-hover); cursor: ew-resize; pointer-events: auto; }
 .brush input:focus-visible { outline: none; }
 .brush input:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--focus); outline-offset: 2px; }
 .brush input:focus-visible::-moz-range-thumb { outline: 2px solid var(--focus); outline-offset: 2px; }
@@ -107,8 +108,8 @@ figcaption { display: flex; gap: 16px; flex-wrap: wrap; color: var(--secondary);
 fieldset { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 legend, .filter-body > label { color: var(--secondary); font-size: 12px; font-weight: 600; }
 legend { padding: 0 0 8px; }
-.check { display: flex; align-items: center; position: relative; gap: 8px; min-height: 34px; border: 1px solid transparent; padding: 4px 8px; cursor: pointer; }
-.check:hover { background: var(--hover); }
+.check { display: flex; align-items: center; position: relative; gap: 8px; min-height: 32px; border: 1px solid transparent; padding: 4px 8px; cursor: pointer; }
+.check:hover { background: var(--hover); border-color: var(--border); }
 .check:has(input:checked) { background: var(--button); border-color: var(--button-border); }
 .check:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
 .check input { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); }
@@ -116,11 +117,11 @@ legend { padding: 0 0 8px; }
 .check:has(input:checked) .filter-square { background: currentColor; }
 .facet-count { margin-left: auto; font: 12px var(--mono); color: var(--secondary); }
 .filter-body > label { display: block; margin: 16px 0 8px; }
-input[type="search"], input[type="datetime-local"], select { height: 34px; border: 1px solid var(--input-border); border-radius: 4px; background: var(--input); color: var(--text); padding: 4px 8px; min-width: 0; max-width: 100%; }
+input[type="search"], input[type="datetime-local"], select { height: 32px; border: 1px solid var(--input-border); border-radius: 4px; background: var(--input); color: var(--text); padding: 4px 8px; min-width: 0; max-width: 100%; }
 .filter-body > input, .filter-body > select { width: 100%; }
 input[type="search"], input[type="datetime-local"] { font-family: var(--mono); font-size: 11px; }
 input:focus-visible, select:focus-visible { border-color: var(--focus); outline: 1px solid var(--focus); outline-offset: 1px; }
-button { min-height: 34px; border: 1px solid var(--button-border); border-radius: 4px; background: var(--button); color: var(--text); padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+button { min-height: 32px; border: 1px solid var(--button-border); border-radius: 4px; background: var(--button); color: var(--text); padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
 button:hover { background: var(--button-hover); border-color: var(--secondary); }
 .actions { display: flex; gap: 16px; align-items: center; margin-top: 16px; }
 .actions button { flex: 1; }
@@ -171,18 +172,18 @@ button:hover { background: var(--button-hover); border-color: var(--secondary); 
 .finding-head .rule { font-weight: 600; }
 .attack { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
 .attack-chip { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--chip-border); border-radius: 3px; background: var(--chip); padding: 4px 8px; text-decoration: none; color: var(--secondary); font-size: 11px; }
-.attack-chip:hover { border-color: var(--secondary); background: var(--hover); }
+.attack-chip:hover { border-color: var(--secondary); background: var(--button-hover); }
 .attack-id { font-family: var(--mono); color: var(--text); }
 .what { margin-top: 12px; }
 .detail { color: var(--secondary); margin-top: 4px; }
 .evidence { position: relative; margin-top: 16px; border: 1px solid var(--border); border-radius: 4px; background: var(--log); }
-.evidence summary { display: flex; align-items: center; gap: 12px; min-height: 36px; padding: 6px 12px; background: var(--log-head); cursor: pointer; font: 11px var(--mono); list-style: none; }
+.evidence summary { display: flex; align-items: center; gap: 12px; min-height: 32px; padding: 4px 12px; background: var(--log-head); cursor: pointer; font: 11px var(--mono); list-style: none; }
 .evidence summary::-webkit-details-marker { display: none; }
 .evidence summary::before { content: "+"; width: 12px; color: var(--secondary); }
 .evidence details[open] summary::before { content: "−"; }
 .disclosure-label { color: var(--secondary); }
 .js .evidence summary { padding-right: 120px; }
-.copy-button { position: absolute; right: 8px; top: 4px; min-height: 28px; padding: 4px 8px; font: 11px var(--mono); }
+.copy-button { position: absolute; right: 8px; top: 4px; min-height: 24px; padding: 4px 8px; font: 11px var(--mono); }
 .log { max-height: 320px; overflow: auto; margin: 0; padding: 12px 0; border-top: 1px solid var(--border); background: var(--log); font: 12px/1.6 var(--mono); white-space: pre; tab-size: 4; }
 .log-line { display: block; min-width: max-content; padding-right: 16px; }
 .ln { display: inline-block; width: 64px; margin-right: 12px; padding-right: 12px; text-align: right; color: var(--muted); border-right: 1px solid var(--border); user-select: none; }

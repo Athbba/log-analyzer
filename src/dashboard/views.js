@@ -123,7 +123,7 @@ ${hasSpan ? timeline({ run: run.id, first: /** @type {number} */ (run.first), la
 
 /** @param {Finding} finding */
 function attackHtml(finding) {
-  return html`<span class="attack">${techniquesFor(finding).map((t) => html`<a class="attack-chip" href="${techniqueUrl(t.id)}" rel="noreferrer"><span class="attack-id">${t.id}</span><span> · ${t.name} ↗</span></a>`)}</span>`;
+  return html`<span class="attack">${techniquesFor(finding).map((t) => html`<a class="attack-chip" href="${techniqueUrl(t.id)}" rel="noreferrer"><span class="attack-id">${t.id}</span><span> · ${t.name}</span></a>`)}</span>`;
 }
 
 /** Splits only safe text into fixed classes; never interprets log markup.
@@ -171,7 +171,7 @@ function evidenceLabel(lines, count, more) {
 export function incidentPage({ run, incident, findings, total, filters = EMPTY_FILTERS, summary }) {
   const opened = findings.findIndex((f) => f.lines.length > 0);
   const where = incident.ip ?? incident.subject ?? 'Multiple sources';
-  const body = html`<main id="main" class="incident"><nav class="back" aria-label="Breadcrumb"><a href="${href('/', filterQuery(run.id, filters))}">← ${run.source}</a></nav>
+  const body = html`<main id="main" class="incident"><nav class="back" aria-label="Breadcrumb"><a href="${href('/', filterQuery(run.id, filters))}">Incidents · ${run.source}</a></nav>
 <header class="incident-head"><div><p class="eyebrow">Incident ${num(incident.id)}</p><h1>${where}</h1></div><div class="incident-state">${badge(incident.severity)}<span class="state-label">${incident.closed ? 'CLOSED' : 'OPEN'}</span></div>
 <div class="detail-meta"><span>${span(incident.time, incident.last)}</span><span>${findings.length < total ? `first ${num(findings.length)} of ${plural(total, 'finding')}` : plural(findings.length, 'finding')}</span><span>SERVER LOCAL</span></div></header>
 ${summary ? caseFacts(summary, findings.length, total) : ''}
