@@ -85,7 +85,9 @@ export function alertPayload(event) {
   }
   const hidden = incident.findings.length - Math.min(incident.findings.length, LISTED) + incident.droppedFindings;
   if (hidden > 0) lines.push(`… and ${hidden} earlier finding${hidden === 1 ? '' : 's'}`);
-  const body = cut(inCodeBlock(lines.join(NL)), 3900);
+  // Each line is escaped on its own, so a newline forged inside a log field is
+  // shown as an escape while the lines of the alert keep their real line breaks.
+  const body = cut(lines.map(inCodeBlock).join(NL), 3900);
   return {
     username: 'log-analyzer',
     allowed_mentions: { parse: [] },
