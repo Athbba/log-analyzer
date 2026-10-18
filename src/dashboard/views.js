@@ -19,6 +19,13 @@ const plural = (n, word) => `${num(n)} ${word}${n === 1 ? '' : 's'}`;
 const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 /** @param {number|null|undefined} value */
 const localInput = (value) => value === null || value === undefined ? '' : new Date(value).toISOString().slice(0, 23);
+/** A rule's plain-language name; a name this version doesn't know is shown as stored.
+ * Own keys only, so `constructor` can't pull in an inherited property. @param {string} rule */
+const ruleLabel = (rule) => Object.hasOwn(LABELS, rule) ? LABELS[/** @type {Finding['rule']} */ (rule)] : rule;
+/** Rule names from a comma-separated list, in the fixed rule order. @param {string} list */
+const ruleLabels = (list) => list.split(',').sort((a, b) => RULES.indexOf(a) - RULES.indexOf(b)).map(ruleLabel);
+/** Whether any filter narrows the list. @param {Filters} f */
+const isFiltered = (f) => f.severities.length > 0 || f.rule !== null || f.q !== '' || (f.from ?? null) !== null || (f.to ?? null) !== null;
 /** @param {number} first @param {number} last */
 const span = (first, last) => `${stamp(first)} – ${stamp(last)}`;
 /** @param {number} run @param {Filters} [filters] */
@@ -75,7 +82,7 @@ export function timeline({ run, first, last, trace, incidents, marks, filters = 
       if (lane === -1) lane = ends.length;
       ends[lane] = x2;
       const cy = y + lane * 16;
-      const rules = incident.rules.split(',').map((r) => LABELS[/** @type {Finding['rule']} */ (r)] ?? r).join(', ');
+      const rules = ruleLabels(incident.rules).join(', ');
       const label = `${capital(severity)}: ${incident.ip ?? incident.subject ?? 'Multiple sources'} · ${rules} · ${span(incident.time, incident.last)}`;
       const dots = (marks.get(incident.id) ?? []).slice(0, 200).map((t) => html`<circle class="mark" cx="${Math.min(right - 3, x(t)).toFixed(1)}" cy="${cy + 6}" r="2"/>`);
       lanes.push(html`<a class="timeline-incident" href="${href(`/incidents/${incident.id}`, filterQuery(run, filters))}" aria-label="${label}" data-tooltip="${label}"><title>${label}</title><rect class="bar sev-${severity}" x="${x1.toFixed(1)}" y="${cy}" width="${(x2 - x1).toFixed(1)}" height="12" rx="2"/>${dots}</a>`);
@@ -107,14 +114,14 @@ ${incidents.length > shown.length ? html`<p class="chart-note">Showing ${num(sho
  * @param {string} list  Comma-separated rule names from the query.
  */
 function ruleCell(list) {
-  const rules = list.split(',').sort((a, b) => RULES.indexOf(a) - RULES.indexOf(b)).map((r) => LABELS[/** @type {Finding['rule']} */ (r)] ?? r);
+  const rules = ruleLabels(list);
   const rest = rules.slice(2);
   return html`<span class="rules" title="${capital(rules.join(', '))}">${rules.slice(0, 2).map((r) => html`<span class="rule-chip">${capital(r)}</span>`)}${rest.length ? html`<span class="rule-more" aria-hidden="true">+${rest.length} more</span><span class="sr-only">, ${rest.join(', ')}</span>` : ''}</span>`;
 }
 
 /** @param {{run:RunSummary, runs:{id:number,source:string,started_at:string}[], incidents:IncidentRow[], total:number, trace:number[], marks:Map<number,number[]>, filters:Filters, counts?:Counts, facets?:Counts}} data */
 export function overviewPage({ run, runs, incidents, total, trace, marks, filters, counts, facets }) {
-  const filtered = filters.severities.length > 0 || filters.rule !== null || filters.q !== '' || (filters.from !== null && filters.from !== undefined) || (filters.to !== null && filters.to !== undefined);
+  const filtered = isFiltered(filters);
   const hasSpan = run.first !== null && run.last !== null;
   const totals = counts ?? { high: 0, medium: 0, low: 0, total: incidents.length };
   const options = facets ?? totals;
@@ -128,7 +135,7 @@ ${badge(i.severity)}<span class="where">${i.ip ?? i.subject ?? 'Multiple sources
 ${hasSpan ? timeline({ run: run.id, first: /** @type {number} */ (run.first), last: /** @type {number} */ (run.last), trace, incidents, marks, filters }) : ''}
 <div class="workspace"><form id="filters-form" class="filters" method="get" action="/">
 <div class="panel-head"><h2>Filters</h2></div><div class="filter-body"><input type="hidden" name="run" value="${run.id}"><fieldset><legend>Severity</legend>${SEVERITIES.map((s) => html`<label class="check"><input type="checkbox" name="severity" value="${s}"${filters.severities.includes(s) ? new Html(' checked') : ''}><span class="filter-square sev-text-${s}"></span><span>${capital(s)}</span><span class="facet-count">${num(options[/** @type {'high'|'medium'|'low'} */ (s)])}</span></label>`)}</fieldset>
-<label for="rule">Rule</label><select id="rule" name="rule"><option value="">Any rule</option>${RULES.map((r) => html`<option value="${r}"${filters.rule === r ? new Html(' selected') : ''}>${capital(LABELS[/** @type {Finding['rule']} */ (r)])}</option>`)}</select>
+<label for="rule">Rule</label><select id="rule" name="rule"><option value="">Any rule</option>${RULES.map((r) => html`<option value="${r}"${filters.rule === r ? new Html(' selected') : ''}>${capital(ruleLabel(r))}</option>`)}</select>
 <label for="q">IP or user</label><input id="q" name="q" type="search" maxlength="100" value="${filters.q}" autocomplete="off" spellcheck="false" placeholder="Search IP or username">
 <label for="from">Window start</label><input id="from" name="from" type="datetime-local" step="0.001" value="${localInput(filters.from)}"><label for="to">Window end</label><input id="to" name="to" type="datetime-local" step="0.001" value="${localInput(filters.to)}"><p class="field-note">Server-local time. Counts include matching incidents before the display limit.</p>
 <div class="actions"><button type="submit">Filter</button>${filtered ? html`<a href="${href('/', { run: run.id })}">Reset</a>` : ''}</div></div></form>
@@ -148,7 +155,7 @@ export function highlightLog(text) {
   const parts = safeText(text).split(/(Failed password|Accepted password|Accepted publickey|\b(?:\d{1,3}\.){3}\d{1,3}\b|\b\d{4}-\d{2}-\d{2}T[\d:.+Z-]+|\b[A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}\b|\bsshd(?:-session|-auth)?\[\d+\]|\b(?:for(?: invalid user)?|from)\s+\S+)/g);
   return html`${parts.map((part, i) => {
     if (i % 2 === 0) return html`${part}`;
-    const style = part === 'Failed password' ? 'log-failure' : part.startsWith('Accepted ') ? 'log-success' : /^(?:\d{1,3}\.){3}\d{1,3}$/.test(part) || part.startsWith('from ') ? 'log-address' : /^(?:invalid user|for) /.test(part) ? 'log-user' : 'log-time';
+    const style = part === 'Failed password' ? 'log-failure' : part.startsWith('Accepted ') ? 'log-success' : /^(?:\d{1,3}\.){3}\d{1,3}$/.test(part) || part.startsWith('from ') ? 'log-address' : /^(?:invalid user|for) /.test(part) ? 'log-user' : 'log-meta';
     return html`<span class="${style}">${part}</span>`;
   })}`;
 }
@@ -160,7 +167,7 @@ export function highlightLog(text) {
  * @param {number} shown @param {number} total
  */
 function caseFacts({ rules, users, userCount, techniques }, shown, total) {
-  const ruleNames = rules.map((r) => LABELS[/** @type {Finding['rule']} */ (r)] ?? r);
+  const ruleNames = rules.map(ruleLabel);
   return html`<section class="case-facts" aria-label="Incident summary">${shown < total ? html`<p class="facts-scope">Across all ${plural(total, 'finding')}, including those not listed below.</p>` : ''}<dl>
 <div><dt>Rules</dt>
 <dd>${capital(ruleNames.join(', '))}</dd></div>
@@ -193,9 +200,9 @@ ${summary ? caseFacts(summary, findings.length, total) : ''}
 <div class="findings-title"><h2>Findings &amp; evidence</h2><span>Chronological order</span></div>
 <ol class="findings">${findings.map(({ id, finding, lines, more, count }, n) => {
     const [first, ...rest] = describe(finding);
-    return html`<li class="finding" id="finding-${id}"><div class="finding-head"><time>${stamp(finding.time)}</time><span class="rule">${capital(LABELS[finding.rule])}</span>${badge(finding.severity)}${attackHtml(finding)}</div>
+    return html`<li class="finding" id="finding-${id}"><div class="finding-head"><time>${stamp(finding.time)}</time><span class="rule">${capital(ruleLabel(finding.rule))}</span>${badge(finding.severity)}${attackHtml(finding)}</div>
 <p class="what">${first}</p>${rest.map((line) => html`<p class="detail">${line}</p>`)}
-${lines.length ? html`<div class="evidence"><details${n === opened ? new Html(' open') : ''}><summary><span>${evidenceLabel(lines, count ?? lines.length, more)}</span><span class="disclosure-label">Raw evidence</span></summary><pre class="log" id="evidence-${id}" tabindex="0" aria-label="Log evidence for ${LABELS[finding.rule]}">${lines.map((l) => html`<span class="log-line"><span class="ln" aria-hidden="true">${l.line}</span><code class="log-raw">${highlightLog(l.text)}</code></span>`)}</pre></details><button type="button" class="copy-button" data-copy="evidence-${id}" aria-label="Copy raw log lines for finding ${id}" hidden>Copy raw</button></div>` : html`<p class="detail">No stored log lines for this finding.</p>`}</li>`;
+${lines.length ? html`<div class="evidence"><details${n === opened ? new Html(' open') : ''}><summary><span>${evidenceLabel(lines, count ?? lines.length, more)}</span><span class="disclosure-label">Raw evidence</span></summary><pre class="log" id="evidence-${id}" tabindex="0" aria-label="Log evidence for ${ruleLabel(finding.rule)}">${lines.map((l) => html`<span class="log-line"><span class="ln" aria-hidden="true">${l.line}</span><code class="log-raw">${highlightLog(l.text)}</code></span>`)}</pre></details><button type="button" class="copy-button" data-copy="evidence-${id}" aria-label="Copy raw log lines for finding ${id}" hidden>Copy raw</button></div>` : html`<p class="detail">No stored log lines for this finding.</p>`}</li>`;
   })}</ol></main>`;
   return layout({ title: `${capital(incident.severity)} incident: ${where}`, body });
 }
