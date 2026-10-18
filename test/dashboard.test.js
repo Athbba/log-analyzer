@@ -86,7 +86,8 @@ function get(base, path, { method = 'GET', host, headers = {} } = {}) {
  * @param {string} body
  */
 function assertInert(body) {
-  assert.doesNotMatch(body, /<script/i, 'no script element');
+  const untrustedScripts = body.replace('<script type="module" src="/static/dashboard.js"></script>', '');
+  assert.doesNotMatch(untrustedScripts, /<script/i, 'only the fixed local script is allowed');
   assert.doesNotMatch(body, /<img|<svg onload|<iframe|<object|<embed/i, 'no injected element');
   // Every "<" from the log is escaped, so each literal <...> is one of our tags;
   // the attributes inside them are what could run code.
@@ -97,7 +98,7 @@ function assertInert(body) {
   for (const tag of body.matchAll(/<([a-z][a-z0-9-]*)\b/gi)) {
     assert.ok(['html', 'head', 'meta', 'title', 'link', 'body', 'header', 'a', 'span', 'main', 'section', 'div', 'h1', 'h2', 'p', 'form', 'label',
       'select', 'option', 'button', 'figure', 'svg', 'rect', 'line', 'text', 'circle', 'figcaption', 'input', 'fieldset', 'legend', 'ol', 'li',
-      'time', 'details', 'summary', 'pre'].includes(tag[1].toLowerCase()), `unexpected <${tag[1]}>`);
+      'time', 'details', 'summary', 'pre', 'script', 'output', 'nav', 'h3', 'code', 'g'].includes(tag[1].toLowerCase()), `unexpected <${tag[1]}>`);
   }
   assert.ok(!body.includes(ESC) && !body.includes(RLO), 'no raw escape or bidi character');
 }
@@ -138,7 +139,7 @@ test('every response carries the security headers, including errors', async (t) 
       assert.equal(res.headers[name], value, `${name} on ${path}`);
     }
   }
-  assert.match(SECURITY_HEADERS['content-security-policy'], /script-src 'none'/);
+  assert.match(SECURITY_HEADERS['content-security-policy'], /script-src 'self'/);
   assert.match(SECURITY_HEADERS['content-security-policy'], /frame-ancestors 'none'/);
   assert.doesNotMatch(SECURITY_HEADERS['content-security-policy'], /unsafe/);
 });
@@ -227,6 +228,56 @@ test('the dashboard refuses to listen anywhere but loopback', () => {
   assert.throws(() => createDashboard({ dbPath: ':memory:', host: '192.168.1.10' }), /only listens on loopback/);
 });
 
+test('range filtering rejects invalid bounds and preserves filters through incident navigation', async (t) => {
+  const { url } = await hostileDashboard(t);
+  for (const query of ['from=bad', 'from=9999999999999999', 'from=2&to=1', 'from=2026-02-30T00:00', 'to=-1']) {
+    assert.equal((await get(url, `/?${query}`)).status, 400, query);
+  }
+  const from = Date.UTC(2026, 8, 7, 10, 0);
+  const to = from + 25_000;
+  const path = `/?run=1&severity=medium&rule=brute-force&q=192.0.2.1&from=${from}&to=${to}`;
+  const res = await get(url, path);
+  assert.equal(res.status, 200);
+  assert.match(res.body, /class="where">192\.0\.2\.1</);
+  assert.doesNotMatch(res.body, /class="where">192\.0\.2\.2</);
+  const link = /href="(\/incidents\/\d+\?[^\"]+)"/.exec(res.body)?.[1];
+  assert.ok(link);
+  const decoded = link.replaceAll('&amp;', '&');
+  const next = new URL(decoded, url);
+  assert.equal(next.searchParams.get('from'), String(from));
+  assert.equal(next.searchParams.get('q'), '192.0.2.1');
+  const detail = await get(url, decoded);
+  assert.equal(detail.status, 200);
+  assert.match(detail.body, /href="\/\?run=1&amp;severity=medium&amp;rule=brute-force&amp;q=192\.0\.2\.1&amp;from=/);
+  assert.match((await get(url, `/?from=${to + 86400000}`)).body, /No incidents match these filters/);
+  assert.equal((await get(url, '/?from=2026-09-07T10%3A00&to=2026-09-07T10%3A01')).status, 200);
+});
+
+test('local script and fonts have fixed routes, secure headers and HEAD support', async (t) => {
+  const { url } = await hostileDashboard(t);
+  for (const [path, type] of [['/static/dashboard.js', 'text/javascript'], ['/static/fonts/ibm-plex-sans-regular.woff2', 'font/woff2']]) {
+    const res = await get(url, path);
+    assert.equal(res.status, 200, path);
+    assert.ok(String(res.headers['content-type']).startsWith(type));
+    assert.equal(res.headers['x-content-type-options'], 'nosniff');
+    assert.equal((await get(url, path, { method: 'HEAD' })).body, '');
+    assert.equal((await get(url, path, { host: 'evil.example' })).status, 421);
+    assert.equal((await get(url, path, { headers: { 'sec-fetch-site': 'cross-site' } })).status, 403);
+  }
+  assert.equal((await get(url, '/static/fonts/not-a-font.woff2')).status, 404);
+  assert.doesNotMatch(SECURITY_HEADERS['content-security-policy'], /unsafe-inline|unsafe-eval/);
+});
+
+test('evidence highlighting keeps hostile content inert and provides plain-text copy targets', async (t) => {
+  const { url } = await hostileDashboard(t);
+  const page = await get(url, '/incidents/1?run=1');
+  assertInert(page.body);
+  assert.match(page.body, /data-copy=/);
+  assert.match(page.body, /class="log-raw"/);
+  assert.match(page.body, /class="log-failure">Failed password<\/span>/);
+  assert.match(page.body, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+});
+
 test('the template escapes by default and builds same-site links only', () => {
   assert.equal(html`<p title="${'"x"'}">${'<b>'}</p>`.value, '<p title="&quot;x&quot;">&lt;b&gt;</p>');
   assert.equal(html`<ul>${['<a>', html`<li>ok</li>`]}</ul>`.value, '<ul>&lt;a&gt;<li>ok</li></ul>');
@@ -242,5 +293,7 @@ test('the dashboard shows each finding\'s techniques, linked to attack.mitre.org
   const incident = { id: 1, ip: '192.0.2.1', subject: null, severity: 'medium', time: 0, last: 0, closed: 1 };
   const finding = /** @type {any} */ ({ rule: 'log-tampering', severity: 'medium', ip: null, time: 0, kind: 'gap', until: 0, line: 1, detail: 'no lines' });
   const page = incidentPage({ run, incident, findings: [{ id: 7, finding, lines: [], more: false }], total: 1 });
-  assert.match(page, /<a href="https:\/\/attack\.mitre\.org\/techniques\/T1685\/006\/" rel="noreferrer">T1685\.006<\/a> Disable or Modify Tools: Clear Linux or Mac System Logs/);
+  assert.match(page, /href="https:\/\/attack\.mitre\.org\/techniques\/T1685\/006\/" rel="noreferrer"><span class="attack-id">T1685\.006<\/span>/);
+  assert.match(page, /Disable or Modify Tools: Clear Linux or Mac System Logs/);
 });
+
