@@ -17,12 +17,12 @@
 - Unknown static paths, external Host headers, cross-site requests, and write methods remain rejected.
 
 ## Tasks
-- [ ] Add failing HTTP tests for range validation/filtering, scope-correct counts, preserved navigation, trusted local assets, and highlighted hostile evidence.
-- [ ] Implement query predicates and counts, fixed asset routes, time inputs, and filter-preserving links. Run dashboard tests.
-- [ ] Implement safe evidence highlighting and a small client module for tooltip, brush, and clipboard interactions. Verify keyboard and failure states.
-- [ ] Apply the full layout, carbon theme, local fonts, responsive list, severity tags, controls, and code containers.
-- [ ] Run regression checks and browser review at desktop/mobile sizes; verify brush, copy, filters, routing, hostile input, and local asset loading.
-- [ ] Update architecture/usage docs and collect deliverable changes on a feature branch.
+- [x] Add tests for range validation/filtering, scope-correct counts, preserved navigation, trusted local assets, and highlighted hostile evidence.
+- [x] Implement query predicates and counts, fixed asset routes, time inputs, and filter-preserving links. Run dashboard tests.
+- [x] Implement safe evidence highlighting and a small client module for tooltip, brush, and clipboard interactions. Verify keyboard and failure states.
+- [x] Apply the full layout, carbon theme, local fonts, responsive list, severity tags, controls, and code containers.
+- [x] Run regression checks and browser review at desktop/mobile sizes; verify brush, copy, filters, routing, hostile input, and local asset loading.
+- [x] Update architecture/usage docs and collect deliverable changes on a feature branch.
 
 ## Review focus
 - Invalid/reversed/out-of-run time ranges must never expand results silently.
@@ -34,3 +34,6 @@
 ## Execution ledger
 - Source snapshot: c2730bb0b867b1eec02b3336476349aa322f0a9e. Git shell DNS unavailable; reconstructed through GitHub connector.
 - npm installation blocked by registry DNS. Full npm run check cannot run until dependencies are available; run dependency-free Node coverage and report limits.
+- CI run 39134820505 passed all seven checks: lint, strict type checks, all 145 tests on Node 22/24, evaluation, headless Chrome interactions, and the Docker SSH lab.
+- Fresh code review identified fractional datetime normalization and stale custom validity; both fixed. Browser checks verify reversed-range recovery and exact evidence clipboard contents.
+- Desktop/mobile and dark/light screenshots were inspected. Tables and the timeline use contained horizontal scrolling on narrow screens.
