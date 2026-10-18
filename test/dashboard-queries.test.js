@@ -3,7 +3,8 @@ import { Readable } from 'node:stream';
 import { test } from 'node:test';
 import { analyzeStream } from '../src/io/analyze-stream.js';
 import { openStore } from '../src/io/store.js';
-import { incidentCounts, incidentDetail, incidentsFor, incidentSummary } from '../src/dashboard/queries.js';
+import { incidentCounts, incidentDetail, incidentsFor, incidentSummary, runSummary } from '../src/dashboard/queries.js';
+import { incidentPage } from '../src/dashboard/views.js';
 import { parseRangeTime } from '../src/dashboard/server.js';
 
 const filters = { severities: [], rule: null, q: '' };
@@ -102,3 +103,21 @@ test('the incident summary reads users from every kind of finding and techniques
   } finally { store.close(); }
 });
 
+test('evidence reports its line range and the real total when the page shows only the first lines', async () => {
+  // 70 guesses inside one minute and a bit: one brute-force finding backed by 70 lines.
+  const lines = Array.from({ length: 70 }, (_, g) => `${syslogTime(g * 1000)} web01 sshd[1]: Failed password for root from 203.0.113.5 port 1 ssh2`);
+  const { store, run } = await storeRun(lines);
+  try {
+    const { id } = /** @type {{ id: number }} */ (store.db.prepare('SELECT id FROM incidents').get());
+    const detail = /** @type {NonNullable<ReturnType<typeof incidentDetail>>} */ (incidentDetail(store.db, id));
+    const [first] = detail.findings;
+    assert.equal(first.lines.length, 60);
+    assert.equal(first.more, true);
+    assert.equal(first.count, 70, 'the real number of lines behind the finding');
+
+    const page = incidentPage({ run: /** @type {any} */ (runSummary(store.db, run)), ...detail, summary: incidentSummary(store.db, id) });
+    assert.match(page, /First 60 of 70 log lines, lines 1–60/);
+    assert.match(page, /<details open>/, 'the first finding opens with its evidence showing');
+    assert.match(page, /<dt>Users<\/dt>\s*<dd>root<\/dd>/);
+  } finally { store.close(); }
+});
