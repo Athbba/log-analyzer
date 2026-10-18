@@ -3,7 +3,7 @@ import { techniquesFor, techniqueUrl } from '../core/attack.js';
 import { safeText } from '../core/text.js';
 import { LABELS, describe, stamp } from '../report.js';
 import { Html, href, html } from './html.js';
-import { RULES, SEVERITIES } from './queries.js';
+import { EVIDENCE_COUNT_CAP, RULES, SEVERITIES } from './queries.js';
 
 /** @typedef {import('./queries.js').Filters} Filters */
 /** @typedef {import('../types.js').Finding} Finding */
@@ -156,19 +156,31 @@ function caseFacts({ rules, users, userCount, techniques }, shown, total) {
 </dl></section>`;
 }
 
-/** @param {{run:RunSummary, incident:{id:number,ip:string|null,subject:string|null,severity:string,time:number,last:number,closed:number}, findings:{id:number,finding:Finding,lines:{line:number,text:string}[],more:boolean}[],total:number,filters?:Filters,summary?:Parameters<typeof caseFacts>[0]}} data */
+/**
+ * What an evidence block holds: how many lines, of how many, and which.
+ * @param {{line:number}[]} lines @param {number} count @param {boolean} more
+ */
+function evidenceLabel(lines, count, more) {
+  const last = lines[lines.length - 1].line;
+  const range = lines.length === 1 ? `line ${num(last)}` : `lines ${num(lines[0].line)}–${num(last)}`;
+  if (!more) return `${plural(lines.length, 'log line')}, ${range}`;
+  return `First ${num(lines.length)} of ${num(count)}${count >= EVIDENCE_COUNT_CAP ? '+' : ''} log lines, ${range}`;
+}
+
+/** @param {{run:RunSummary, incident:{id:number,ip:string|null,subject:string|null,severity:string,time:number,last:number,closed:number}, findings:{id:number,finding:Finding,lines:{line:number,text:string}[],more:boolean,count?:number}[],total:number,filters?:Filters,summary?:Parameters<typeof caseFacts>[0]}} data */
 export function incidentPage({ run, incident, findings, total, filters = EMPTY_FILTERS, summary }) {
+  const opened = findings.findIndex((f) => f.lines.length > 0);
   const where = incident.ip ?? incident.subject ?? 'Multiple sources';
   const body = html`<main id="main" class="incident"><nav class="back" aria-label="Breadcrumb"><a href="${href('/', filterQuery(run.id, filters))}">← ${run.source}</a></nav>
 <header class="incident-head"><div><p class="eyebrow">Incident ${num(incident.id)}</p><h1>${where}</h1></div><div class="incident-state">${badge(incident.severity)}<span class="state-label">${incident.closed ? 'CLOSED' : 'OPEN'}</span></div>
 <div class="detail-meta"><span>${span(incident.time, incident.last)}</span><span>${findings.length < total ? `first ${num(findings.length)} of ${plural(total, 'finding')}` : plural(findings.length, 'finding')}</span><span>SERVER LOCAL</span></div></header>
 ${summary ? caseFacts(summary, findings.length, total) : ''}
 <div class="findings-title"><h2>Findings &amp; evidence</h2><span>Chronological order</span></div>
-<ol class="findings">${findings.map(({ id, finding, lines, more }) => {
+<ol class="findings">${findings.map(({ id, finding, lines, more, count }, n) => {
     const [first, ...rest] = describe(finding);
     return html`<li class="finding" id="finding-${id}"><div class="finding-head"><time>${stamp(finding.time)}</time><span class="rule">${capital(LABELS[finding.rule])}</span>${badge(finding.severity)}${attackHtml(finding)}</div>
 <p class="what">${first}</p>${rest.map((line) => html`<p class="detail">${line}</p>`)}
-${lines.length ? html`<div class="evidence"><details><summary><span>${more ? `First ${plural(lines.length, 'log line')}` : plural(lines.length, 'log line')}</span><span class="disclosure-label">Raw evidence</span></summary><pre class="log" id="evidence-${id}" tabindex="0" aria-label="Log evidence for ${LABELS[finding.rule]}">${lines.map((l) => html`<span class="log-line"><span class="ln" aria-hidden="true">${l.line}</span><code class="log-raw">${highlightLog(l.text)}</code></span>`)}</pre></details><button type="button" class="copy-button" data-copy="evidence-${id}" aria-label="Copy raw log lines for finding ${id}" hidden>Copy raw</button></div>` : html`<p class="detail">No stored log lines for this finding.</p>`}</li>`;
+${lines.length ? html`<div class="evidence"><details${n === opened ? new Html(' open') : ''}><summary><span>${evidenceLabel(lines, count ?? lines.length, more)}</span><span class="disclosure-label">Raw evidence</span></summary><pre class="log" id="evidence-${id}" tabindex="0" aria-label="Log evidence for ${LABELS[finding.rule]}">${lines.map((l) => html`<span class="log-line"><span class="ln" aria-hidden="true">${l.line}</span><code class="log-raw">${highlightLog(l.text)}</code></span>`)}</pre></details><button type="button" class="copy-button" data-copy="evidence-${id}" aria-label="Copy raw log lines for finding ${id}" hidden>Copy raw</button></div>` : html`<p class="detail">No stored log lines for this finding.</p>`}</li>`;
   })}</ol></main>`;
   return layout({ title: `${capital(incident.severity)} incident: ${where}`, body });
 }

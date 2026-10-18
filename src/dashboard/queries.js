@@ -2,7 +2,7 @@
 // bound parameter, and filter values are checked against fixed lists first.
 
 import { techniquesFor } from '../core/attack.js';
-import { evidence } from '../io/store.js';
+import { evidence, evidenceCount } from '../io/store.js';
 
 /** @typedef {import('node:sqlite').DatabaseSync} DatabaseSync */
 /** @typedef {import('../types.js').Finding} Finding */
@@ -106,6 +106,9 @@ export function countIncidents(db, run) {
   return Number(/** @type {{ n: number }} */ (db.prepare('SELECT COUNT(*) AS n FROM incidents WHERE run = ?').get(run)).n);
 }
 
+/** Evidence lines are counted up to this many; more shows as "10,000+". */
+export const EVIDENCE_COUNT_CAP = 10_000;
+
 /**
  * What a whole incident involves, over all its findings rather than the
  * first `maxFindings` the page lists: its rules (in RULES order), the
@@ -162,7 +165,10 @@ export function incidentDetail(db, id, linesPerFinding = 60, maxFindings = 200) 
     /** @type {Finding} */
     const finding = JSON.parse(row.data);
     const lines = evidence(db, incident.run, finding, linesPerFinding + 1);
-    return { id: row.id, finding, lines: lines.slice(0, linesPerFinding), more: lines.length > linesPerFinding };
+    const more = lines.length > linesPerFinding;
+    // Counted only when capped, and only up to EVIDENCE_COUNT_CAP.
+    const count = more ? evidenceCount(db, incident.run, finding, EVIDENCE_COUNT_CAP) : lines.length;
+    return { id: row.id, finding, lines: lines.slice(0, linesPerFinding), more, count };
   });
   return { incident, findings, total };
 }
