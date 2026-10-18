@@ -17,7 +17,7 @@ import { readLines } from './read-lines.js';
  * @typedef {(line: { text: string, lineNo: number, event: AuthEvent | null, info: LineInfo | null }) => void} LineTap
  */
 
-export const MAX_LINE_LENGTH = 8192;
+const MAX_LINE_LENGTH = 8192;
 
 /**
  * @param {AsyncIterable<Buffer | string>} stream

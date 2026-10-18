@@ -64,7 +64,7 @@ export function duration(ms) {
  * @param {Incident[]} incidents
  * @returns {Record<Severity, number>}
  */
-export function countBySeverity(incidents) {
+function countBySeverity(incidents) {
   return /** @type {Record<Severity, number>} */ (
     Object.fromEntries(SEVERITIES.map((s) => [s, incidents.filter((i) => i.severity === s).length])));
 }
