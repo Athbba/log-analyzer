@@ -14,8 +14,8 @@ import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { errorMessage } from '../io/cli.js';
 import { openStore } from '../io/store.js';
-import { countIncidents, failureTrace, incidentCounts, incidentDetail, incidentsFor, incidentSummary, listRuns, RULES, runSummary, SEVERITIES } from './queries.js';
-import { errorPage, incidentPage, overviewPage } from './views.js';
+import { countIncidents, failureTrace, findingMarks, incidentCounts, incidentDetail, incidentsFor, incidentSummary, listRuns, RULES, runSummary, SEVERITIES } from './queries.js';
+import { CHART_INCIDENTS, errorPage, incidentPage, overviewPage } from './views.js';
 
 /** @typedef {import('node:http').IncomingMessage} IncomingMessage */
 /** @typedef {import('node:http').ServerResponse} ServerResponse */
@@ -134,11 +134,11 @@ export function createDashboard({ dbPath, host = '127.0.0.1', port = 4797 }) {
       return page(400, errorPage(400, 'Invalid time window. Use valid server-clock dates with start no later than end.'));
     }
     const filters = {
-        severities: url.searchParams.getAll('severity').filter((s) => SEVERITIES.includes(s)),
-        rule: RULES.includes(url.searchParams.get('rule') ?? '') ? url.searchParams.get('rule') : null,
-        q: (url.searchParams.get('q') ?? '').trim().slice(0, 100),
-        from, to,
-      };
+      severities: url.searchParams.getAll('severity').filter((s) => SEVERITIES.includes(s)),
+      rule: RULES.includes(url.searchParams.get('rule') ?? '') ? url.searchParams.get('rule') : null,
+      q: (url.searchParams.get('q') ?? '').trim().slice(0, 100),
+      from, to,
+    };
     if (url.pathname === '/') {
       const incidents = incidentsFor(db, run.id, filters);
       const total = countIncidents(db, run.id);
@@ -146,14 +146,7 @@ export function createDashboard({ dbPath, host = '127.0.0.1', port = 4797 }) {
       const facets = incidentCounts(db, run.id, { ...filters, severities: [] });
       const hasSpan = run.first !== null && run.last !== null;
       const trace = hasSpan ? failureTrace(db, run.id, run.first, run.last, 160) : [];
-      /** @type {Map<number, number[]>} */
-      const marks = new Map();
-      for (const { incident, time } of /** @type {{ incident: number, time: number }[]} */ (
-        db.prepare('SELECT incident, time FROM findings WHERE run = ? ORDER BY time LIMIT 20000').all(run.id))) {
-        const list = marks.get(incident);
-        if (list) list.push(time);
-        else marks.set(incident, [time]);
-      }
+      const marks = findingMarks(db, incidents.slice(0, CHART_INCIDENTS).map((i) => i.id));
       return page(200, overviewPage({ run, runs, incidents, total, trace, marks, filters, counts, facets }));
     }
 
