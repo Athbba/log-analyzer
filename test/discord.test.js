@@ -157,3 +157,12 @@ test('only Discord webhooks over HTTPS, or loopback, are accepted', () => {
     assert.throws(() => checkWebhookUrl(bad), (err) => err instanceof Error && !err.message.includes('SECRET'), bad);
   }
 });
+
+test('alert lines are separated by real line breaks, while a newline inside a log field stays escaped', () => {
+  const plain = alertPayload(event('opened', 'high')).embeds[0].description;
+  assert.ok(!plain.includes(String.raw`\x0a`), 'no escaped newline between the lines of one finding');
+  assert.ok(plain.split('\n').length >= 4, 'fence, finding lines and fence on their own lines');
+
+  const forged = alertPayload(event('opened', 'high', { users: [{ user: 'root\nFAKE LINE', attempts: 5 }] })).embeds[0].description;
+  assert.ok(forged.includes(String.raw`root\x0aFAKE LINE`), 'a forged newline in a username is shown, not obeyed');
+});
