@@ -101,6 +101,19 @@ try {
   assert.equal(await browser.evaluate('document.querySelector(".brush").getBoundingClientRect().top >= document.querySelector(".timeline svg").getBoundingClientRect().bottom'), true, 'brush is below all timeline lanes and labels');
   await browser.evaluate('document.fonts.ready');
   assert.equal(await browser.evaluate('document.fonts.check(\'12px "IBM Plex Sans"\') && document.fonts.check(\'12px "JetBrains Mono"\')'), true);
+  mkdirSync('reports/dashboard-ui', { recursive: true });
+  const overviewShots = /** @type {[string,number,string][]} */ ([['overview-dark',1440,'dark'], ['overview-mobile',390,'dark'], ['overview-light',1440,'light']]);
+  for (const [name, width, theme] of overviewShots) {
+    await browser.send('Emulation.setDeviceMetricsOverride', { width, height: 1000, deviceScaleFactor: 1, mobile: width < 600 });
+    await browser.send('Emulation.setEmulatedMedia', { features: [{ name:'prefers-color-scheme', value:theme }] });
+    assert.equal(await browser.evaluate('document.documentElement.scrollWidth <= innerWidth'), true, `${name} has no page overflow`);
+    const shot = await browser.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true });
+    writeFileSync(`reports/dashboard-ui/${name}.png`, Buffer.from(shot.data, 'base64'));
+  }
+  await browser.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
+  await browser.send('Emulation.setEmulatedMedia', { features: [{ name:'prefers-color-scheme', value:'dark' }] });
+  await browser.evaluate('document.querySelector(".timeline-incident").focus()');
+  assert.equal(await browser.evaluate('!document.querySelector("#chart-tooltip").hidden'), true, 'incident focus shows tooltip');
 
   const first = await browser.evaluate('Number(document.querySelector(".range-start").value)');
   const rect = await browser.evaluate('(() => { const r = document.querySelector(".range-start").getBoundingClientRect(); return { x: r.left + 6, y: r.top + 12, end: r.left + r.width / 4 }; })()');
@@ -122,11 +135,11 @@ try {
   assert.ok(detail.includes('q=198.51.100.23'));
   await browser.navigate(detail);
   await browser.evaluate('document.querySelector("details").open=true');
-  const expected = await browser.evaluate('Array.from(document.querySelectorAll(".log .log-raw"), e => e.textContent).join("\\n")');
+  const expected = await browser.evaluate('Array.from(document.querySelector(".log").querySelectorAll(".log-raw"), e => e.textContent).join("\\n") + "\\n"');
   await browser.evaluate('document.querySelector(".copy-button").click()');
   let copied = '';
   for (let i=0; i<20 && !copied; i++) { copied = await browser.evaluate('navigator.clipboard.readText()'); if (!copied) await new Promise(resolve=>setTimeout(resolve,50)); }
-  assert.ok(copied.includes(expected.split('\n')[0]), 'clipboard contains evidence without gutter');
+  assert.equal(copied, expected, 'clipboard contains exactly the selected evidence without gutter');
   const back = await browser.evaluate('document.querySelector(".back a").href');
   assert.ok(back.includes('q=198.51.100.23') && back.includes('from='));
 
