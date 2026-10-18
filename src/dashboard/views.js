@@ -45,8 +45,8 @@ export function layout({ title, body }) {
 <script type="module" src="/static/dashboard.js"></script>
 </head><body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="masthead"><div class="masthead-inner"><a class="home" href="/">SSH Log Analyzer</a><span class="local"><span class="status-dot"></span>LOCAL · READ-ONLY</span></div></header>
-${body}<div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
+<header class="masthead"><div class="masthead-inner"><a class="home" href="/">SSH Log Analyzer</a></div></header>
+${body}<footer class="site-footer"><div class="footer-inner"><span class="status-dot" aria-hidden="true"></span>Local and read-only: served on this machine, database opened read-only.</div></footer><div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
 <div id="copy-status" class="sr-only" role="status" aria-live="polite"></div>
 </body></html>`.value;
 }
