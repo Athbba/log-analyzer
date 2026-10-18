@@ -87,7 +87,7 @@ node bin/analyze.js samples/auth.log --db runs.db
 Two rules, brute force and unusual hour, are also written in SQL (`src/io/sql-rules.js`). They are a second, independent implementation. Tests require them to produce exactly the findings of the JavaScript rules on the sample, the lab recording, 29 corpus logs, and 300 random event streams. The one exception is logs with spliced lines, which the tampering rule reports: there the streaming engine follows file order while SQL orders by time ([ADR-0015](adr/0015-sqlite-storage.md)).
 ### Dashboard
 
-A local web view of a database written with `--db`: a timeline of failed logins with each incident marked on it, filters by severity, rule and IP or username, and every incident's findings down to the raw log lines behind them.
+A local web view of a database written with `--db`: a timeline of failed logins with each incident marked on it, filters by severity, rule, IP or username and server-local time window, and every incident's findings down to the raw log lines behind them.
 
 ```sh
 node bin/analyze.js samples/auth.log --db runs.db
@@ -98,7 +98,19 @@ npm run dashboard -- --db runs.db      # http://127.0.0.1:4797/ (--port, --ipv6)
 
 ![An incident with its findings and raw log lines](images/dashboard-incident.jpg)
 
-Log content is hostile, so the dashboard is deliberately narrow ([ADR-0016](adr/0016-local-read-only-dashboard.md)): it listens on loopback only and answers only its own `Host` (against DNS rebinding) and not requests from other sites, serves GET and HEAD only, opens the database read-only, and sends no JavaScript at all, under a Content-Security-Policy of `default-src 'none'`. Every log field is escaped, including control characters and bidi overrides; tests render hostile usernames into every page and check they come out as text.
+Log content is hostile, so the dashboard is deliberately narrow ([ADR-0016](adr/0016-local-read-only-dashboard.md), [ADR-0018](adr/0018-dashboard-interactions.md)): it listens on loopback only and answers only its own `Host` (against DNS rebinding) and not requests from other sites, serves GET and HEAD only, and opens the database read-only. A small local script enables the brush, tooltips and clipboard; fonts are bundled locally. CSP forbids inline execution and external resources. Every log field is escaped, including control characters and bidi overrides; tests render hostile usernames into every page and check they come out as text.
+
+Drag either range handle or use the keyboard arrows, then select **Apply window**.
+The date inputs provide the same filter without JavaScript. Time bounds include
+incidents whose first-to-last finding span overlaps the selected window; all
+times use the log server's clock, without a browser-timezone conversion. The
+histogram retains full-run context. **Full window** removes only the time bounds;
+**Reset** removes all filters. Incident links and the breadcrumb preserve filters.
+
+**Copy raw** copies the displayed stored evidence without gutter numbers. Control
+characters remain visible escapes. If the clipboard is unavailable, open evidence
+receives focus for manual selection. More than 500 matching incidents are counted
+in full but only 500 are displayed; the chart shows at most 40 priority incidents.
 
 ## Log formats
 
@@ -183,4 +195,5 @@ LOW     10.8.0.22
 
 6 incidents: 1 high, 2 medium, 3 low
 ```
+
 

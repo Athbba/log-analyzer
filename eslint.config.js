@@ -14,6 +14,10 @@ export default [
   { ignores: ['node_modules/', 'coverage/', 'reports/', '.stryker-tmp/'] },
   js.configs.recommended,
   {
+    files: ['src/dashboard/dashboard.js'],
+    languageOptions: { globals: Object.fromEntries(['document', 'window', 'navigator', 'HTMLElement', 'HTMLInputElement', 'HTMLButtonElement', 'PointerEvent'].map((name) => [name, 'readonly'])) },
+  },
+  {
     languageOptions: { ecmaVersion: 2024, sourceType: 'module', globals: NODE_GLOBALS },
     linterOptions: { reportUnusedDisableDirectives: 'error' },
     rules: {
@@ -51,3 +55,4 @@ export default [
     },
   },
 ];
+

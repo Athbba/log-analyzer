@@ -17,6 +17,8 @@ export const RULES = [
  * @property {string[]} severities  Subset of SEVERITIES; empty means all.
  * @property {string | null} rule  One of RULES, or null for any.
  * @property {string} q  Text to find in the source IP, subject or users ('' for none).
+ * @property {number | null} [from] Inclusive server-clock range start.
+ * @property {number | null} [to] Inclusive server-clock range end.
  */
 
 /** @param {DatabaseSync} db */
@@ -38,12 +40,11 @@ export function runSummary(db, id) {
 }
 
 /**
- * Incidents of a run matching the filters, most severe first.
- * @param {DatabaseSync} db
+ * Validated, bound predicates shared by the list and uncapped totals.
  * @param {number} run
  * @param {Filters} filters
  */
-export function incidentsFor(db, run, { severities, rule, q }) {
+function incidentWhere(run, { severities, rule, q, from, to }) {
   const where = ['i.run = ?'];
   /** @type {(string | number)[]} */
   const params = [run];
@@ -62,14 +63,37 @@ export function incidentsFor(db, run, { severities, rule, q }) {
       OR EXISTS (SELECT 1 FROM findings u WHERE u.incident = i.id AND u.user LIKE ? ESCAPE '!'))`);
     params.push(like, like, like);
   }
+  if (from !== undefined && from !== null) { where.push('i.last >= ?'); params.push(from); }
+  if (to !== undefined && to !== null) { where.push('i.time <= ?'); params.push(to); }
+  return { where: where.join(' AND '), params };
+}
+
+/** @param {DatabaseSync} db @param {number} run @param {Filters} filters */
+export function incidentsFor(db, run, filters) {
+  const { where, params } = incidentWhere(run, filters);
   return /** @type {{ id: number, ip: string | null, subject: string | null, severity: string, time: number, last: number, closed: number, findings: number, rules: string }[]} */ (
     db.prepare(`SELECT i.id, i.ip, i.subject, i.severity, i.time, i.last, i.closed,
         COUNT(f.id) AS findings, group_concat(DISTINCT f.rule) AS rules
       FROM incidents i JOIN findings f ON f.incident = i.id
-      WHERE ${where.join(' AND ')}
+      WHERE ${where}
       GROUP BY i.id
       ORDER BY CASE i.severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END, i.time, i.id
       LIMIT 500`).all(...params));
+}
+
+/** Counts the complete matching set, before the 500-row display cap.
+ * @param {DatabaseSync} db @param {number} run @param {Filters} filters
+ */
+export function incidentCounts(db, run, filters) {
+  const { where, params } = incidentWhere(run, filters);
+  const rows = /** @type {{ severity: string, n: number }[]} */ (db.prepare(
+    `SELECT i.severity, COUNT(*) AS n FROM incidents i WHERE ${where} GROUP BY i.severity`).all(...params));
+  const counts = { high: 0, medium: 0, low: 0, total: 0 };
+  for (const row of rows) {
+    if (row.severity === 'high' || row.severity === 'medium' || row.severity === 'low') counts[row.severity] = row.n;
+    counts.total += row.n;
+  }
+  return counts;
 }
 
 /**
@@ -120,3 +144,4 @@ export function failureTrace(db, run, first, last, buckets) {
   for (const { bucket, n } of rows) if (bucket >= 0) counts[bucket] = n;
   return counts;
 }
+
