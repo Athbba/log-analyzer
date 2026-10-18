@@ -88,6 +88,17 @@ for one final visual check only; `AGENTS.md` stays out of commits.
 - [ ] Stryker mutation testing with a break threshold. *Check: score recorded in docs.*
 - [ ] Benchmark (speed + memory) in CI. *Check: numbers in README match the CI output.*
 
+## Dashboard follow-up (`feat/dashboard-redesign`)
+
+What the carbon redesign (ADR-0018) still lacks; findings and evidence in [docs/superpowers/specs/2026-10-18-dashboard-gap-review.md](docs/superpowers/specs/2026-10-18-dashboard-gap-review.md).
+
+- [ ] Incident case summary: rules, users and techniques over every finding, not the first 200. *Check: test on an incident with 250 findings; browser review.*
+- [ ] Evidence: first finding open, line-number range and real total in the summary. *Check: rendered HTML test for the range and the capped total.*
+- [ ] Narrow screens and rule chips: stacked rows under 600 px, filters folded, compact metadata, first two rules then "+N more". *Check: no clipped columns at 375 px in both themes; works without JavaScript.*
+- [ ] Timeline bars identifiable without hover. *Check: each bar has a visible source label or matching key at desktop and 375 px.*
+- [ ] Labels and scope copy: 12 px minimum, sentence case, "Medium" spelled out, one scope sentence for the counts. *Check: browser review; existing count tests still pass.*
+
 ## Deferred
 
-- [ ] Dashboard time filter (SPEC M5: "filters by … time"). For now the SVG timeline stands in for it: it shows each run's span, and finer time filtering is left for later ([ADR-0016](docs/adr/0016-local-read-only-dashboard.md)). *Check: a from/to filter on the incident list, with tests for bounds and bad input.*
+- [ ] Dashboard sorting, pagination past the caps, exports, a per-source page, run comparison, a manual theme switch. *Check: each its own tested change.*
+- [x] Dashboard time filter (SPEC M5: "filters by … time"). Landed with the carbon redesign: a brush and validated from/to fields ([ADR-0018](docs/adr/0018-dashboard-interactions.md)). *Check: a from/to filter on the incident list, with tests for bounds and bad input.*
