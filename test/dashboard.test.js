@@ -98,7 +98,7 @@ function assertInert(body) {
   for (const tag of body.matchAll(/<([a-z][a-z0-9-]*)\b/gi)) {
     assert.ok(['html', 'head', 'meta', 'title', 'link', 'body', 'header', 'a', 'span', 'main', 'section', 'div', 'h1', 'h2', 'p', 'form', 'label',
       'select', 'option', 'button', 'figure', 'svg', 'rect', 'line', 'text', 'circle', 'figcaption', 'input', 'fieldset', 'legend', 'ol', 'li',
-      'time', 'details', 'summary', 'pre', 'script', 'output', 'nav', 'h3', 'code', 'g'].includes(tag[1].toLowerCase()), `unexpected <${tag[1]}>`);
+      'time', 'details', 'summary', 'pre', 'script', 'output', 'nav', 'h3', 'code', 'g', 'dl', 'dt', 'dd'].includes(tag[1].toLowerCase()), `unexpected <${tag[1]}>`);
   }
   assert.ok(!body.includes(ESC) && !body.includes(RLO), 'no raw escape or bidi character');
 }

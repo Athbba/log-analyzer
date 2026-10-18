@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { errorMessage } from '../io/cli.js';
 import { openStore } from '../io/store.js';
-import { countIncidents, failureTrace, incidentCounts, incidentDetail, incidentsFor, listRuns, RULES, runSummary, SEVERITIES } from './queries.js';
+import { countIncidents, failureTrace, incidentCounts, incidentDetail, incidentsFor, incidentSummary, listRuns, RULES, runSummary, SEVERITIES } from './queries.js';
 import { errorPage, incidentPage, overviewPage } from './views.js';
 
 /** @typedef {import('node:http').IncomingMessage} IncomingMessage */
@@ -161,7 +161,7 @@ export function createDashboard({ dbPath, host = '127.0.0.1', port = 4797 }) {
     if (match) {
       const detail = incidentDetail(db, Number(match[1]));
       if (!detail || detail.incident.run !== run.id) return page(404, errorPage(404, 'There is no incident with that number in this run.'));
-      return page(200, incidentPage({ run, ...detail, filters }));
+      return page(200, incidentPage({ run, ...detail, filters, summary: incidentSummary(db, detail.incident.id) }));
     }
     return page(404, errorPage(404, 'There is no such page.'));
   }

@@ -1,6 +1,7 @@
 // Read-only queries for the dashboard. Every value from the request is a
 // bound parameter, and filter values are checked against fixed lists first.
 
+import { techniquesFor } from '../core/attack.js';
 import { evidence } from '../io/store.js';
 
 /** @typedef {import('node:sqlite').DatabaseSync} DatabaseSync */
@@ -103,6 +104,45 @@ export function incidentCounts(db, run, filters) {
  */
 export function countIncidents(db, run) {
   return Number(/** @type {{ n: number }} */ (db.prepare('SELECT COUNT(*) AS n FROM incidents WHERE run = ?').get(run)).n);
+}
+
+/**
+ * What a whole incident involves, over all its findings rather than the
+ * first `maxFindings` the page lists: its rules (in RULES order), the
+ * usernames its findings name (sorted, at most `maxUsers`, with the real
+ * count) and its ATT&CK techniques.
+ * @param {DatabaseSync} db
+ * @param {number} id
+ * @param {number} [maxUsers]
+ */
+export function incidentSummary(db, id, maxUsers = 20) {
+  // Account changes map to techniques by what changed, so those two facts come
+  // along; every other rule maps by name alone. At most a few dozen rows.
+  const kinds = /** @type {{ rule: string, created: number | null, privileged: number | null }[]} */ (db.prepare(
+    `SELECT DISTINCT rule,
+       CASE WHEN rule = 'account-change' THEN json_extract(data, '$.created') END AS created,
+       CASE WHEN rule = 'account-change' THEN json_array_length(data, '$.privilegedGroups') > 0 END AS privileged
+     FROM findings WHERE incident = ?`).all(id));
+  const rules = RULES.filter((r) => kinds.some((k) => k.rule === r));
+  /** @type {Map<string, { id: string, name: string }>} */
+  const techniques = new Map();
+  for (const k of kinds) {
+    const finding = /** @type {Finding} */ (/** @type {unknown} */ ({ rule: k.rule, created: Boolean(k.created), privilegedGroups: k.privileged ? [''] : [] }));
+    for (const t of techniquesFor(finding)) techniques.set(t.id, t);
+  }
+
+  // A finding names users in its user column, its tally of tried usernames,
+  // and the login that followed.
+  const names = `SELECT user AS name FROM findings WHERE incident = ? AND user IS NOT NULL
+    UNION SELECT json_extract(j.value, '$.user') FROM findings f, json_each(f.data, '$.users') j
+      WHERE f.incident = ? AND j.type = 'object'
+    UNION SELECT json_extract(data, '$.loggedIn.user') FROM findings WHERE incident = ?`;
+  const users = /** @type {{ name: string }[]} */ (db.prepare(
+    `SELECT name FROM (${names}) WHERE name IS NOT NULL ORDER BY name LIMIT ?`).all(id, id, id, maxUsers)).map((r) => r.name);
+  const userCount = Number(/** @type {{ n: number }} */ (db.prepare(
+    `SELECT COUNT(*) AS n FROM (${names}) WHERE name IS NOT NULL`).get(id, id, id)).n);
+
+  return { rules, users, userCount, techniques: [...techniques.values()].sort((a, b) => a.id.localeCompare(b.id)) };
 }
 
 /**

@@ -138,12 +138,31 @@ export function highlightLog(text) {
   })}`;
 }
 
-/** @param {{run:RunSummary, incident:{id:number,ip:string|null,subject:string|null,severity:string,time:number,last:number,closed:number}, findings:{id:number,finding:Finding,lines:{line:number,text:string}[],more:boolean}[],total:number,filters?:Filters}} data */
-export function incidentPage({ run, incident, findings, total, filters = EMPTY_FILTERS }) {
+/**
+ * The incident at a glance, from every finding (incidentSummary), with its
+ * scope stated when the page lists only some of them.
+ * @param {{rules:string[], users:string[], userCount:number, techniques:{id:string,name:string}[]}} summary
+ * @param {number} shown @param {number} total
+ */
+function caseFacts({ rules, users, userCount, techniques }, shown, total) {
+  const ruleNames = rules.map((r) => LABELS[/** @type {Finding['rule']} */ (r)] ?? r);
+  return html`<section class="case-facts" aria-label="Incident summary">${shown < total ? html`<p class="facts-scope">Across all ${plural(total, 'finding')}, including those not listed below.</p>` : ''}<dl>
+<div><dt>Rules</dt>
+<dd>${capital(ruleNames.join(', '))}</dd></div>
+<div><dt>Users</dt>
+<dd>${users.length ? `${users.join(', ')}${userCount > users.length ? `, +${num(userCount - users.length)} more` : ''}` : 'None named'}</dd></div>
+<div><dt>ATT&amp;CK</dt>
+<dd>${techniques.length ? techniques.map((t, n) => html`${n > 0 ? ', ' : ''}<a href="${techniqueUrl(t.id)}" rel="noreferrer">${t.id}</a> ${t.name}`) : 'None mapped'}</dd></div>
+</dl></section>`;
+}
+
+/** @param {{run:RunSummary, incident:{id:number,ip:string|null,subject:string|null,severity:string,time:number,last:number,closed:number}, findings:{id:number,finding:Finding,lines:{line:number,text:string}[],more:boolean}[],total:number,filters?:Filters,summary?:Parameters<typeof caseFacts>[0]}} data */
+export function incidentPage({ run, incident, findings, total, filters = EMPTY_FILTERS, summary }) {
   const where = incident.ip ?? incident.subject ?? 'Multiple sources';
   const body = html`<main id="main" class="incident"><nav class="back" aria-label="Breadcrumb"><a href="${href('/', filterQuery(run.id, filters))}">← ${run.source}</a></nav>
 <header class="incident-head"><div><p class="eyebrow">Incident ${num(incident.id)}</p><h1>${where}</h1></div><div class="incident-state">${badge(incident.severity)}<span class="state-label">${incident.closed ? 'CLOSED' : 'OPEN'}</span></div>
 <div class="detail-meta"><span>${span(incident.time, incident.last)}</span><span>${findings.length < total ? `first ${num(findings.length)} of ${plural(total, 'finding')}` : plural(findings.length, 'finding')}</span><span>SERVER LOCAL</span></div></header>
+${summary ? caseFacts(summary, findings.length, total) : ''}
 <div class="findings-title"><h2>Findings &amp; evidence</h2><span>Chronological order</span></div>
 <ol class="findings">${findings.map(({ id, finding, lines, more }) => {
     const [first, ...rest] = describe(finding);
