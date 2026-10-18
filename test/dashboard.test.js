@@ -240,7 +240,7 @@ test('range filtering rejects invalid bounds and preserves filters through incid
   assert.equal(res.status, 200);
   assert.match(res.body, /class="where">192\.0\.2\.1</);
   assert.doesNotMatch(res.body, /class="where">192\.0\.2\.2</);
-  const link = /href="(\/incidents\/\d+\?[^\"]+)"/.exec(res.body)?.[1];
+  const link = /href="(\/incidents\/\d+\?[^"]+)"/.exec(res.body)?.[1];
   assert.ok(link);
   const decoded = link.replaceAll('&amp;', '&');
   const next = new URL(decoded, url);

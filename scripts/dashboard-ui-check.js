@@ -131,7 +131,8 @@ try {
   assert.ok(back.includes('q=198.51.100.23') && back.includes('from='));
 
   mkdirSync('reports/dashboard-ui', { recursive: true });
-  for (const [name, width, theme] of [['detail-dark',1440,'dark'], ['detail-mobile',390,'dark'], ['detail-light',1440,'light']]) {
+  const screenshots = /** @type {[string,number,string][]} */ ([['detail-dark',1440,'dark'], ['detail-mobile',390,'dark'], ['detail-light',1440,'light']]);
+  for (const [name, width, theme] of screenshots) {
     await browser.send('Emulation.setDeviceMetricsOverride', { width, height: 1000, deviceScaleFactor: 1, mobile: width < 600 });
     await browser.send('Emulation.setEmulatedMedia', { features: [{ name:'prefers-color-scheme', value:theme }] });
     assert.equal(await browser.evaluate('document.documentElement.scrollWidth <= innerWidth'), true, `${name} has no page overflow`);
