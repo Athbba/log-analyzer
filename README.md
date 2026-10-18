@@ -3,7 +3,6 @@
 [![CI](https://github.com/Athbba/log-analyzer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Athbba/log-analyzer/actions/workflows/ci.yml)
 ![Node.js 22.13+](https://img.shields.io/badge/node-%E2%89%A522.13-339933)
 ![Runtime dependencies: 0](https://img.shields.io/badge/runtime%20dependencies-0-blue)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 **Reads a Linux SSH login log (`auth.log`) and tells you who attacked the server, how, and whether they got in.**
 
@@ -92,8 +91,4 @@ I built this to learn how SOC analysts read authentication logs: how sshd, sudo 
 Development is AI-assisted: I set the direction, requirements and standards, and review the results; much of the code is written with Claude Code working under that direction. [CLAUDE.md](CLAUDE.md) holds the rules it works by.
 
 It is a learning project, not a production security tool, and has been tested on synthetic and lab logs rather than real-world traffic. On a real server, use fail2ban, auditd and a SIEM. The [spec](SPEC.md), [plan](PLAN.md) and [decision records](docs/adr/) explain the choices behind it, and the [changelog](CHANGELOG.md) lists what changed in each version.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
 

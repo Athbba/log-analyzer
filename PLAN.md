@@ -90,7 +90,7 @@ for one final visual check only; `AGENTS.md` stays out of commits.
 
 ## Dashboard follow-up (`feat/dashboard-redesign`)
 
-What the carbon redesign (ADR-0018) still lacks; findings and evidence in [docs/superpowers/specs/2026-10-18-dashboard-gap-review.md](docs/superpowers/specs/2026-10-18-dashboard-gap-review.md).
+What the carbon redesign (ADR-0018) still lacked after a browser and code review.
 
 - [x] Incident case summary: rules, users and techniques over every finding, not the first 200. *Check: test on an incident with 250 findings; browser review.*
 - [x] Evidence: first finding open, line-number range and real total in the summary. *Check: rendered HTML test for the range and the capped total.*
