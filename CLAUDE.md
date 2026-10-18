@@ -45,5 +45,47 @@ npm run lab:fixture  # same, but refresh test/fixtures/lab/auth.log
   `main` on its own. Keep rebase merging enabled in the repo settings.
   Never rewrite anything already on `main`.
 - **Save usage.** Let CI run the Docker lab (`lab-e2e`) instead of running
-  it locally; use the browser only for one final visual check.
+  it locally. For dashboard changes, use a focused browser review before and
+  after implementation, covering desktop, mobile, and both color themes.
+  Reuse the running server and avoid repeated checks unless changes justify
+  them.
 - **Leave `AGENTS.md` out of commits.**
+
+## Dashboard development
+
+- Preserve the existing server-rendered HTML and CSS architecture, offline
+  operation, and zero runtime dependencies.
+- Browser JavaScript is progressive enhancement only
+  ([ADR-0018](docs/adr/0018-dashboard-interactions.md)): one fixed
+  same-origin module, `src/dashboard/dashboard.js`, served on an exact static
+  route. Every page, filter, link and disclosure must still work with scripts
+  blocked. No inline scripts or event handlers, `eval`, `innerHTML` or other
+  HTML injection, network calls, or write endpoints; the script sets text with
+  `textContent` only.
+- Preserve the Content-Security-Policy (`script-src` and `font-src` `'self'`
+  only, everything else as strict as today), loopback binding, Host and Fetch
+  Metadata checks, GET/HEAD only, read-only database access, parameterized
+  SQL, validated time-window parameters (bad input is a 400, never a silently
+  wider result), and bounded results.
+- Render all log-derived content through the existing escaping helpers,
+  including highlighted log fragments and `data-` attributes the script
+  reads. Treat log content as untrusted data.
+- For substantial visual changes, use the frontend-design skill when
+  installed. Use relevant Superpowers skills for planning, debugging, and
+  verification when installed. If a skill is unavailable, report that and
+  continue using the repository's instructions.
+- Design for incident investigation: clear severity, source, time, findings,
+  and supporting evidence.
+- Keep light and dark themes, visible keyboard focus, readable contrast,
+  semantic HTML, and responsive layouts.
+- Use consistent CSS variables for colors, typography, spacing, borders, and
+  component states. Keep fonts and assets local: the bundled WOFF2 files in
+  `src/dashboard/fonts/` (with their OFL licence files) or system fonts.
+- Summary numbers must state their scope and remain accurate when results
+  are filtered, paginated, or capped.
+- For behavior changes, follow the existing tests-first rule. Verify visual
+  changes in the running dashboard; do not add tests that merely assert
+  decorative CSS values. Interactions (brush, tooltip, copy) are checked in
+  headless Chrome by `scripts/dashboard-ui-check.js`, which CI runs as the
+  `dashboard-ui` job; extend it for new interactions and let CI run it.
+- Report the checks actually run and any remaining limitations.
