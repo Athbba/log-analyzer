@@ -97,6 +97,18 @@ ${incidents.length > shown.length ? html`<p class="chart-note">Showing ${num(sho
 </figure>`;
 }
 
+/**
+ * An incident row's rules: the first two as chips in the fixed rule order, then
+ * how many more, so every row keeps one height. All of them are in the text a
+ * screen reader reads and in the hover title.
+ * @param {string} list  Comma-separated rule names from the query.
+ */
+function ruleCell(list) {
+  const rules = list.split(',').sort((a, b) => RULES.indexOf(a) - RULES.indexOf(b)).map((r) => LABELS[/** @type {Finding['rule']} */ (r)] ?? r);
+  const rest = rules.slice(2);
+  return html`<span class="rules" title="${capital(rules.join(', '))}">${rules.slice(0, 2).map((r) => html`<span class="rule-chip">${capital(r)}</span>`)}${rest.length ? html`<span class="rule-more" aria-hidden="true">+${rest.length} more</span><span class="sr-only">, ${rest.join(', ')}</span>` : ''}</span>`;
+}
+
 /** @param {{run:RunSummary, runs:{id:number,source:string,started_at:string}[], incidents:IncidentRow[], total:number, trace:number[], marks:Map<number,number[]>, filters:Filters, counts?:Counts, facets?:Counts}} data */
 export function overviewPage({ run, runs, incidents, total, trace, marks, filters, counts, facets }) {
   const filtered = filters.severities.length > 0 || filters.rule !== null || filters.q !== '' || (filters.from !== null && filters.from !== undefined) || (filters.to !== null && filters.to !== undefined);
@@ -105,7 +117,7 @@ export function overviewPage({ run, runs, incidents, total, trace, marks, filter
   const options = facets ?? totals;
   const picker = runs.length > 1 ? html`<form class="run-picker" method="get" action="/"><label for="run">Analysis run</label><select id="run" name="run">${runs.map((r) => html`<option value="${r.id}"${r.id === run.id ? new Html(' selected') : ''}>#${r.id} ${r.source} (${r.started_at.slice(0, 16).replace('T', ' ')} UTC)</option>`)}</select><button type="submit">Open</button></form>` : '';
   const list = incidents.length === 0 ? html`<div class="empty"><h3>${filtered ? 'No incidents match these filters.' : 'No incidents in this run.'}</h3><p>${filtered ? html`Adjust the window or <a href="${href('/', { run: run.id })}">reset all filters</a>.` : 'No configured detection rules flagged this sample. This does not establish that the source is safe.'}</p></div>` : html`<div class="table-scroll"><div class="incident-table"><div class="table-head" aria-hidden="true"><span>Severity</span><span>Source IP</span><span>Triggered rules</span><span>Findings</span><span>Time window</span></div><ol class="incident-list">${incidents.map((i) => html`<li><a href="${href(`/incidents/${i.id}`, filterQuery(run.id, filters))}">
-${badge(i.severity)}<span class="where">${i.ip ?? i.subject ?? 'Multiple sources'}</span><span class="rules">${i.rules.split(',').map((r) => html`<span class="rule-chip">${capital(LABELS[/** @type {Finding['rule']} */ (r)] ?? r)}</span>`)}</span><span class="count"><span class="sr-only">Findings: </span>${num(i.findings)}</span><span class="when">${stamp(i.time)}<span class="range-end-time">${stamp(i.last)}</span></span></a></li>`)}</ol></div></div>`;
+${badge(i.severity)}<span class="where">${i.ip ?? i.subject ?? 'Multiple sources'}</span>${ruleCell(i.rules)}<span class="count"><span class="sr-only">Findings: </span>${num(i.findings)}</span><span class="when">${stamp(i.time)}<span class="range-end-time">${stamp(i.last)}</span></span></a></li>`)}</ol></div></div>`;
   const body = html`<main id="main">
 <section class="summary"><div><p class="eyebrow">Analysis workspace</p><h1>${run.source}</h1></div>${picker}</section>
 <div class="telemetry"><span><span class="meta-key">Lines</span><span>${num(run.lines)}</span></span><span><span class="meta-key">Window</span><span>${hasSpan ? span(/** @type {number} */ (run.first), /** @type {number} */ (run.last)) : 'Unavailable'}</span></span><span><span class="meta-key">Source</span><span>${run.mode === 'follow' ? 'FOLLOW' : 'FILE'}</span></span><span><span class="meta-key">Clock</span><span>SERVER LOCAL</span></span></div>

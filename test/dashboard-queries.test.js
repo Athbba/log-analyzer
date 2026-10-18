@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import { analyzeStream } from '../src/io/analyze-stream.js';
 import { openStore } from '../src/io/store.js';
 import { incidentCounts, incidentDetail, incidentsFor, incidentSummary, runSummary } from '../src/dashboard/queries.js';
-import { incidentPage } from '../src/dashboard/views.js';
+import { incidentPage, overviewPage } from '../src/dashboard/views.js';
 import { parseRangeTime } from '../src/dashboard/server.js';
 
 const filters = { severities: [], rule: null, q: '' };
@@ -120,4 +120,20 @@ test('evidence reports its line range and the real total when the page shows onl
     assert.match(page, /<details open>/, 'the first finding opens with its evidence showing');
     assert.match(page, /<dt>Users<\/dt>\s*<dd>root<\/dd>/);
   } finally { store.close(); }
+});
+
+test('incident rows show the first two rules and count the rest, with every rule in the accessible text', () => {
+  const run = { id: 1, source: 's.log', mode: 'file', started_at: '2026-01-01T00:00:00Z', first: null, last: null, lines: 0 };
+  const row = (/** @type {number} */ id, /** @type {string} */ rules) => ({ id, ip: `192.0.2.${id}`, subject: null, severity: 'high', time: 0, last: 0, findings: 1, rules });
+  const page = overviewPage({
+    run, runs: [], total: 2, trace: [], marks: new Map(), filters,
+    incidents: [row(1, 'unusual-hour,account-change,brute-force,new-source,possible-breach'), row(2, 'new-source,brute-force')],
+  });
+  const [busy, quiet] = [...page.matchAll(/<span class="rules"[^>]*>(.*?)<\/span><span class="count">/g)].map((m) => m[1]);
+  assert.equal((busy.match(/class="rule-chip"/g) ?? []).length, 2, 'two chips on a busy row');
+  assert.match(busy, /Brute force<\/span><span class="rule-chip">Possible breach<\/span>/, 'in the fixed rule order');
+  assert.match(busy, /\+3 more/);
+  assert.match(busy, /<span class="sr-only">, new source, unusual hour, account change<\/span>/, 'the rest are read out');
+  assert.equal((quiet.match(/class="rule-chip"/g) ?? []).length, 2);
+  assert.doesNotMatch(quiet, /more/, 'no overflow when two rules fit');
 });
