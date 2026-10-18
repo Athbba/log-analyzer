@@ -297,8 +297,38 @@ function inTransaction(db, work) {
 /** @typedef {ReturnType<typeof openStore>} Store */
 
 /**
- * The raw log lines behind a finding, for drill-down: the events its rule
- * looked at, found again by subject and time. At most `limit` lines.
+ * Where the raw lines behind a finding are: the events its rule looked at,
+ * found again by subject and time.
+ * @param {Finding} f
+ * @returns {{ from: string, where: string, params: import('node:sqlite').SQLInputValue[] }}
+ */
+function evidenceSource(f) {
+  const events = 'events e JOIN lines l ON l.run = e.run AND l.line = e.line';
+  /** @param {string} where @param {import('node:sqlite').SQLInputValue[]} params */
+  const on = (where, ...params) => ({ from: events, where: `e.run = ? AND ${where}`, params });
+  switch (f.rule) {
+    case 'brute-force':
+    case 'password-spray': {
+      const until = f.loggedIn ? Math.max(f.until, f.loggedIn.time) : f.until;
+      return on("e.source = ? AND e.type IN ('failure', 'success') AND e.time BETWEEN ? AND ?", f.ip, f.time, until);
+    }
+    case 'distributed-brute-force':
+      return on("e.user = ? AND e.type IN ('failure', 'success') AND e.time BETWEEN ? AND ?", f.user, f.time, f.loggedIn ? f.loggedIn.time : f.until);
+    case 'possible-breach':
+      return on("e.ip = ? AND e.type IN ('failure', 'success') AND e.time BETWEEN ? AND ?", f.ip, f.firstFailure, f.time);
+    case 'new-source':
+    case 'unusual-hour':
+      return on("e.type = 'success' AND e.ip = ? AND e.user = ? AND e.time = ?", f.ip, f.user, f.time);
+    case 'account-change':
+      return on("((e.type = 'account' AND e.user = ?) OR (e.type = 'sudo' AND e.command LIKE ? ESCAPE '!')) AND e.time BETWEEN ? AND ?",
+        f.user, `%${f.user.replace(/[!%_]/g, (c) => `!${c}`)}%`, f.time - 60_000, f.time + 60_000);
+    case 'log-tampering':
+      return { from: 'lines l', where: 'l.run = ? AND l.line BETWEEN ? AND ?', params: [f.line - 1, f.line] };
+  }
+}
+
+/**
+ * The raw log lines behind a finding, for drill-down. At most `limit` lines.
  * @param {DatabaseSync} db
  * @param {number} run
  * @param {Finding} f
@@ -306,28 +336,20 @@ function inTransaction(db, work) {
  * @returns {{ line: number, time: number | null, text: string }[]}
  */
 export function evidence(db, run, f, limit = 200) {
-  /** @param {string} where @param {import('node:sqlite').SQLInputValue[]} params */
-  const lines = (where, ...params) => /** @type {{ line: number, time: number | null, text: string }[]} */ (db.prepare(
-    `SELECT l.line, l.time, l.text FROM events e JOIN lines l ON l.run = e.run AND l.line = e.line
-     WHERE e.run = ? AND ${where} ORDER BY l.line LIMIT ?`).all(run, ...params, limit));
-  switch (f.rule) {
-    case 'brute-force':
-    case 'password-spray': {
-      const until = f.loggedIn ? Math.max(f.until, f.loggedIn.time) : f.until;
-      return lines("e.source = ? AND e.type IN ('failure', 'success') AND e.time BETWEEN ? AND ?", f.ip, f.time, until);
-    }
-    case 'distributed-brute-force':
-      return lines("e.user = ? AND e.type IN ('failure', 'success') AND e.time BETWEEN ? AND ?", f.user, f.time, f.loggedIn ? f.loggedIn.time : f.until);
-    case 'possible-breach':
-      return lines("e.ip = ? AND e.type IN ('failure', 'success') AND e.time BETWEEN ? AND ?", f.ip, f.firstFailure, f.time);
-    case 'new-source':
-    case 'unusual-hour':
-      return lines("e.type = 'success' AND e.ip = ? AND e.user = ? AND e.time = ?", f.ip, f.user, f.time);
-    case 'account-change':
-      return lines("((e.type = 'account' AND e.user = ?) OR (e.type = 'sudo' AND e.command LIKE ? ESCAPE '!')) AND e.time BETWEEN ? AND ?",
-        f.user, `%${f.user.replace(/[!%_]/g, (c) => `!${c}`)}%`, f.time - 60_000, f.time + 60_000);
-    case 'log-tampering':
-      return /** @type {{ line: number, time: number | null, text: string }[]} */ (db.prepare(
-        'SELECT line, time, text FROM lines WHERE run = ? AND line BETWEEN ? AND ? ORDER BY line LIMIT ?').all(run, f.line - 1, f.line, limit));
-  }
+  const { from, where, params } = evidenceSource(f);
+  return /** @type {{ line: number, time: number | null, text: string }[]} */ (db.prepare(
+    `SELECT l.line, l.time, l.text FROM ${from} WHERE ${where} ORDER BY l.line LIMIT ?`).all(run, ...params, limit));
+}
+
+/**
+ * How many raw lines are behind a finding, counting at most `cap`.
+ * @param {DatabaseSync} db
+ * @param {number} run
+ * @param {Finding} f
+ * @param {number} cap
+ */
+export function evidenceCount(db, run, f, cap) {
+  const { from, where, params } = evidenceSource(f);
+  return Number(/** @type {{ n: number }} */ (db.prepare(
+    `SELECT COUNT(*) AS n FROM (SELECT 1 FROM ${from} WHERE ${where} LIMIT ?)`).get(run, ...params, cap)).n);
 }
